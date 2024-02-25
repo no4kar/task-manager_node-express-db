@@ -11,7 +11,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-db
 raw_reports
 reports
 cypress/screenshots
