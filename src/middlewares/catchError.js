@@ -1,6 +1,9 @@
+'use strict';
+// @ts-check
+
 /**
- *  @param {import("../types/todo.type").TyFuncController} action
- * @returns {import("../types/todo.type").TyFuncController} */
+ *  @param {import("../types/func.type").Controller} action
+ * @returns {import("../types/func.type").Controller} */
 export function catchError(action) {
   return async(req, res, next) => {
     try {

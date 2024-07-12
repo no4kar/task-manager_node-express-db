@@ -1,15 +1,7 @@
-import { } from 'express';
+export { };
 
 /**
- * @typedef {Object} Todo
- * @property {string} id
- * @property {string} userId
- * @property {string} title
- * @property {boolean} completed
-*/
-
-/**
- * @callback TyFuncController
+ * @callback Controller
  * @param {import('express').Request} req
  * @param {import('express').Response} res
  * @param {import('express').NextFunction} next
@@ -17,8 +9,8 @@ import { } from 'express';
  */
 
 /**
- * @callback TyFuncErrorMiddleware
- * @param {import('../exceptions/todo.error').ApiError} error
+ * @callback ErrorMiddleware
+ * @param {import('../exceptions/api.error').ApiError} error
  * @param {import('express').Request} req
  * @param {import('express').Response} res
  * @param {import('express').NextFunction} next
@@ -26,7 +18,7 @@ import { } from 'express';
  */
 
 /**
- * @callback TyFuncSendAuth
+ * @callback SendAuth
  * @param {import('express').Response} res
  * @param {import('sequelize').Model} user
  * @return {Promise<void>}

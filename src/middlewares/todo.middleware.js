@@ -1,6 +1,9 @@
+'use strict';
+// @ts-check
+
 /**
  * @param { ('delete' | 'update') } action
- * @returns {import("../types/todo.type").TyFuncController} */
+ * @returns {import("../types/func.type").Controller} */
 export const isAction = (action) => {
   return (req, res, next) => {
     if (req.query.action === action) {

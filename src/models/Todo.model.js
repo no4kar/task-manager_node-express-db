@@ -1,8 +1,10 @@
 'use strict';
+// @ts-check
 
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../store/sqlite.db.js';
 
+/** @type {import('../types/todo.type.js').ModelStatic} */
 export const Todo = sequelize.define('todo', {
   id: {
     type: DataTypes.UUID,

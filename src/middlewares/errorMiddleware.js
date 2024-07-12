@@ -1,8 +1,9 @@
-import { ApiError } from '../exceptions/todo.error.js';
+// @ts-check
+'use strict';
 
-/* eslint no-console: "warn" */
+import { ApiError } from '../exceptions/api.error.js';
 
-/** @type {import('../types/todo.type.js').TyFuncErrorMiddleware} */
+/** @type {import('../types/func.type.js').ErrorMiddleware} */
 export function errorMiddleware(error, req, res, next) {
   console.error(error);
 

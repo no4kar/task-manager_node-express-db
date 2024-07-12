@@ -1,14 +1,11 @@
-import 'dotenv/config';
-
-import todosServer from './todosServer.js';
-
-const PORT = process.env.TODOS_PORT || 3015;
+// @ts-check
+import * as todosServer from './todosServer.js';
 
 const serverRunInfo = (serverName, port, clientUrl) => (`
 ${serverName} is running on PORT=${port}
 origin: ${clientUrl}
 `);
 
-todosServer.listen(PORT, () => {
-  console.info(serverRunInfo('todosServer', PORT));
+todosServer.app.listen(todosServer.PORT, () => {
+  console.info(serverRunInfo('todosServer', todosServer.PORT));
 });
