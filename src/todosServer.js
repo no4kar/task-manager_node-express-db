@@ -15,7 +15,7 @@ import { errorMiddleware } from './middlewares/errorMiddleware.js';
 const PORT = process.env.TODOS_PORT || 3015; // eslint-disable-line
 
 // Swagger definition
-/**@type {swaggerJSDoc.Options['swaggerDefinition']} */
+/**@type {swaggerJSDoc.OAS3Definition} */
 const swaggerDefinition = {
   openapi: '3.0.0',
   info: {
@@ -67,6 +67,22 @@ const swaggerDefinition = {
         },
         required: ['id', 'userId', 'title', 'completed'],
       },
+      Pageble: {
+        type: 'object',
+        properties: {
+          count: {
+            type: 'number',
+            description: 'The count of the matched items',
+          },
+          content: {
+            type: 'array',
+            description: 'The todos found',
+            items: {
+              $ref: '#/components/schemas/Todo',
+            },
+          },
+        },
+      },
       Error: {
         type: 'object',
         properties: {
@@ -79,13 +95,16 @@ const swaggerDefinition = {
       },
     },
   },
+  paths: {
+    '/someOther': {},
+  },
 };
 
 // Options for the swagger docs
-/**@type {swaggerJSDoc.Options} */
+/**@type {swaggerJSDoc.OAS3Options} */
 const options = {
-  swaggerDefinition,
   apis: ['./src/routers/*.router.js'], // Path to the API docs
+  swaggerDefinition,
 };
 
 // Initialize swagger-jsdoc

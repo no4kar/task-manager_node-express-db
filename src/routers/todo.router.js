@@ -10,7 +10,7 @@ import { catchError } from '../middlewares/catchError.js';
 
 /**
  * @swagger
- * /todos:
+ * /todos/:
  *   get:
  *     summary: Retrieve a list of todos
  *     description: |
@@ -18,23 +18,47 @@ import { catchError } from '../middlewares/catchError.js';
  *       *       
  *       ### Example Request
  *       ```http
- *       GET /todos?userId=11967
+ *       GET todos/?page=1&size=2&userId=11967&title=asd&completed=true
  *       ```
  *       
  *       ### Responses
- *       - **200 OK**: Returns a single todo item.
- *       - **404 Not Found**: If no todo matches the specified ID.
+ *       - **200 OK**: Returns all matched todos.
+ *       - **422 Unprocessable entity**: If invalid query.
  *       - **500 Internal Server Error**: For server issues.
  * 
  *     tags:
  *       - Todos
  *     parameters:
  *       - in: query
+ *         name: page
+ *         schema:
+ *           type: number
+ *         required: true
+ *         description: The page
+ *       - in: query
+ *         name: size
+ *         schema:
+ *           type: number
+ *         required: true
+ *         description: The page's size
+ *       - in: query
  *         name: userId
  *         schema:
- *           type: integer
+ *           type: string
  *         required: false
  *         description: The ID of the user to retrieve todos for
+ *       - in: query
+ *         name: title
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: The title or part of the title
+ *       - in: query
+ *         name: completed
+ *         schema:
+ *           type: boolean
+ *         required: false
+ *         description: The completed status
  *     responses:
  *       200:
  *         description: A list of todos
@@ -43,9 +67,15 @@ import { catchError } from '../middlewares/catchError.js';
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/Todo'
+ *                 $ref: '#/components/schemas/Pageble'
  *       404:
  *         description: No todos found for the specified userId
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       422:
+ *         description: Invalid query
  *         content:
  *           application/json:
  *             schema:
@@ -58,6 +88,7 @@ import { catchError } from '../middlewares/catchError.js';
  *               $ref: '#/components/schemas/Error'
  */
 router.get('/', catchError(todoController.get));
+
 /**
  * @swagger
  * /todos/{id}:
@@ -116,10 +147,20 @@ router.get('/:id', catchError(todoController.getById));
 
 /**
  * @swagger
- * /todos:
+ * /todos/:
  *   post:
- *     summary: SUMMARY
- *     description: `DESCRIPTION`.
+ *     summary: Create a todo
+ *     description: |
+ *       ### Example Request
+ *       ```http
+ *       POST todos/
+ *       ```
+ *       
+ *       ### Responses
+ *       - **201 OK**: Returns a created todo item.
+ *       - **422 Unprocessable entity**: If invalid query.
+ *       - **500 Internal Server Error**: For server issues.
+ * 
  *     tags:
  *       - Todos
  *     parameters:
@@ -128,16 +169,28 @@ router.get('/:id', catchError(todoController.getById));
  *         schema:
  *           type: number
  *         required: true
- *         description: `userId` description
+ *         description: The userId
+ *       - in: body
+ *         name: title
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The todo's title
+ *       - in: body
+ *         name: completed
+ *         schema:
+ *           type: boolean
+ *         required: false
+ *         description: The todo's status
  *     responses:
- *       200:
- *         description: A single todo item
+ *       201:
+ *         description: A created todo item
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Todo'
- *       404:
- *         description: No todo found with the specified ID
+ *       422:
+ *         description: Invalid data
  *         content:
  *           application/json:
  *             schema:

@@ -3,6 +3,7 @@ import type * as Sequelize from 'sequelize';
 export declare namespace TyTodo {
   export {
     Item,
+    ItemPartial,
     ModelAttributes,
     CreationAttributes,
     Model,
@@ -16,6 +17,8 @@ type Item = {
   title: string;
   completed: boolean;
 };
+
+type ItemPartial = Partial<Item>;
 
 // ModelAttributes = Todo
 type ModelAttributes = TyTodo.Item;

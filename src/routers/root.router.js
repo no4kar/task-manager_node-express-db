@@ -1,5 +1,5 @@
-// @ts-check
 'use strict';
+// @ts-check
 
 import express from 'express';
 import path from 'node:path';

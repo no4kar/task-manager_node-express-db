@@ -6,6 +6,7 @@ import { sequelize } from '../store/sqlite.db.js';
 import { Todo as Todos } from '../models/Todo.model.js';
 
 /**@typedef {import('../types/todo.type.js').TyTodo.Item} TyTodoItem */
+/**@typedef {import('../types/todo.type.js').TyTodo.ItemPartial} TyTodoItemPartial */
 /**@typedef {import('../types/todo.type.js').TyTodo.Model} TyTodoModel */
 
 export {
@@ -29,8 +30,47 @@ function getAll() {
 }
 
 /**
- * @param {string} userId
- * @returns { Promise<TyTodoModel[]> } */
+ * @param {TyTodoItemPartial} itemPartial
+ * @param {number} [limit]
+ * @param {number} [offset]
+ */
+function getAllByOptions(
+  {
+    userId,
+    title,
+    completed,
+  },
+  limit,
+  offset,
+) {
+  /**@type {import('sequelize').WhereOptions<TyTodoItem>} */
+  const whereConditions = {};
+
+  if (userId !== undefined) {
+    whereConditions.userId = userId;
+  }
+
+  if (title !== undefined) {
+    whereConditions.title = {
+      [Op.like]: `%${title}%`,
+    };
+  }
+
+  if (completed !== undefined) {
+    whereConditions.completed = completed;
+  }
+
+  console.info(whereConditions);
+
+  return Todos.findAndCountAll({
+    where: whereConditions,
+    limit,
+    offset,
+  });
+}
+
+/**
+ * @param {string} userId */
 function getAllByUser(userId) {
   return Todos.findAll({
     where: {
@@ -40,19 +80,7 @@ function getAllByUser(userId) {
 }
 
 /**
- * @param {import('sequelize').WhereOptions<TyTodoItem>} WhereOptions
- * @returns { Promise<TyTodoModel[]> } */
-function getAllByOptions(WhereOptions) {
-  return Todos.findAll({
-    where: {
-      ...WhereOptions,
-    }
-  });
-}
-
-/**
- * @param {string} id
- * @returns { Promise<TyTodoModel | null> } */
+ * @param {string} id */
 function getById(id) {
   return Todos.findOne({
     where: {
@@ -62,18 +90,18 @@ function getById(id) {
 }
 
 /**
- * @param {import('../types/todo.type.js').CreationAttributes} properties
- * @returns {Promise<TyTodoModel | null>}*/
+ * @param {import('../types/todo.type.js').CreationAttributes} properties */
 function create(properties) {
-  return Todos.create(
-    { ...properties },
-    { fields: ['userId', 'title', 'completed'] });
+  return Todos.create({ ...properties });
+  // return Todos.create(
+  //   { ...properties },
+  //   { fields: ['userId', 'title', 'completed'] });
 }
 
 /**
  * @param {TyTodoItem} newTodo
  * @param {import('sequelize').Transaction | null | undefined} [transaction]
- * @returns {Promise<[affectedCount: number, affectedRows: TyTodoModel[]]>} */
+*/
 function updateById(newTodo, transaction) {
   const { id, ...restProps } = newTodo;
   return Todos.update({
