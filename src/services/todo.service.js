@@ -10,6 +10,7 @@ import { Todo as Todos } from '../models/Todo.model.js';
 /**@typedef {import('../types/todo.type.js').TyTodo.Model} TyTodoModel */
 
 export {
+  normalize,
   getAll,
   getAllByUser,
   getAllByOptions,
@@ -22,6 +23,11 @@ export {
   findMatchProps,
   findManyMatchProps,
 };
+
+/**@param {Object} item */
+function normalize(item) {
+  return item;
+}
 
 function getAll() {
   return Todos.findAll({

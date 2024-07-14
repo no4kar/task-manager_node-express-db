@@ -4,11 +4,10 @@ import { ApiError } from '../exceptions/api.error.js';
 
 /**@typedef {import('../types/todo.type.js').TyTodo.Item} TyTodoItem */
 
-
 /** @type {import('../types/func.type.js').Controller} */
 export async function get(req, res) {
-  console.info(`\napp.get('/todos')`);
-
+  // console.info(`\napp.get('/todos')`);
+  // query variables have 'undefined', 'string', 'string[]'
   const {
     page,
     size,
@@ -18,7 +17,16 @@ export async function get(req, res) {
   } = req.query;
 
   if (['undefined', 'string'].every(option => option !== typeof title)) {
-    throw ApiError.InvalidData(`typeof title !== 'string'`);
+    throw ApiError.InvalidData(
+      `Type error`, {
+      expected: {
+        title: 'undefined | string',
+      },
+      got: {
+        title: `${typeof title}: ${title}`,
+      }
+    }
+    );
   }
 
   if (typeof page === 'undefined' || typeof size === 'undefined') {
@@ -28,13 +36,13 @@ export async function get(req, res) {
   const limit = parseInt(String(size), 10) || Number.MAX_SAFE_INTEGER;
   const offset = ((parseInt(String(page), 10) || 1) - 1) * limit;
 
-  console.info({
-    userId,
-    title,
-    completed,
-    limit,
-    offset,
-  });
+  // console.info({
+  //   userId,
+  //   title,
+  //   completed,
+  //   limit,
+  //   offset,
+  // });
 
   const {
     rows,
@@ -58,13 +66,13 @@ export async function get(req, res) {
 
   res.send({
     count,
-    content: rows.map(row => row.dataValues),
+    content: rows.map(row => todoService.normalize(row.dataValues)),
   });
 }
 
 /** @type {import('../types/func.type.js').Controller} */
 export async function getById(req, res) {
-  console.info(`\napp.get('/todos/:id=${req.params.id}')`);
+  // console.info(`\napp.get('/todos/:id=${req.params.id}')`);
   const { id } = req.params;
   const todo = await todoService.getById(id);
 
@@ -72,11 +80,12 @@ export async function getById(req, res) {
     throw ApiError.NotFound(`Cant find todo by id=${id}`);
   }
 
-  res.send(todo);
+  res.send(todoService.normalize(todo.dataValues));
 }
 
 /** @type {import('../types/func.type.js').Controller} */
 export async function post(req, res) {
+  // express.json() can parse types correctly
   const {
     userId,
     title,
@@ -88,58 +97,98 @@ export async function post(req, res) {
     || typeof title !== 'string'
   ) {
     throw ApiError.InvalidData(
-      `Expected
+      `Type error`,
       {
-        userId: string,
-        title: string,
-      }
-
-      But got
-      {
-        ${title}:${typeof title},
-        ${userId}:${typeof userId},
-      }`, {
-      userId: 'string',
-      title: 'string',
-    });
+        expected: {
+          userId: 'string',
+          title: 'string',
+          completed: 'undefined | boolean',
+        },
+        got: {
+          userId: `${typeof userId}: ${userId}`,
+          title: `${typeof title}: ${title}`,
+          completed: `${typeof completed}: ${completed}`,
+        },
+      },
+    );
   }
+
+  // console.info(`{
+  //       ${userId}:${typeof userId},
+  //       ${title}:${typeof title},
+  //       ${completed}:${typeof completed},
+  //     }`);
 
   const todo = await todoService.create({
     userId,
     title,
     completed:
-      typeof completed !== 'undefined'
-        ? completed === 'true'
+      typeof completed === 'boolean'
+        ? completed
         : false,
   });
 
   res.status(201)
-    .send(todo.dataValues);
+    .send(todoService.normalize(todo.dataValues));
 }
 
 /** @type {import('../types/func.type.js').Controller} */
-export async function put(req, res) {// overwrites all fields except id
+export async function put(req, res) {
   console.info(`app.put('/todos/:id=${req.params.id}')`);
   const { id } = req.params;
-  const { title, userId, completed } = req.body;
+  const {
+    userId,
+    title,
+    completed,
+  } = req.body;
+
+  if (!userId || !title
+    || typeof userId !== 'string'
+    || typeof title !== 'string'
+    || typeof completed !== 'boolean'
+  ) {
+    throw ApiError.InvalidData(
+      `Type error`,
+      {
+        expected: {
+          userId: 'string',
+          title: 'string',
+          completed: 'boolean',
+        },
+        got: {
+          userId: `${typeof userId}: ${userId}`,
+          title: `${typeof title}: ${title}`,
+          completed: `${typeof completed}: ${completed}`,
+        }
+      },
+    );
+  }
+
   const foundTodo = await todoService.getById(id);
 
   if (!foundTodo) {
-    throw ApiError.NotFound(`Cant find todo by id=${id}`);
-  }
-
-  if (!title || !userId
-    || typeof completed !== 'boolean') {
-    throw ApiError.InvalidData('Expected', {
-      title: 'string',
-      userId: 'string',
-      completed: 'boolean',
+    const todo = await todoService.create({
+      userId,
+      title,
+      completed,
     });
+
+    res.status(201)
+      .send(todoService.normalize(todo.dataValues));
+
+    return;
   }
 
-  await todoService.updateById({ id, userId, title, completed });
+  Object.assign(foundTodo, {
+    ...foundTodo.dataValues,
+    userId,
+    title,
+    completed,
+  });
 
-  res.send(await todoService.getById(id));
+  res.send(todoService.normalize(
+    (await foundTodo.save()).dataValues,
+  ));
 }
 
 /** @type {import('../types/func.type.js').Controller} */

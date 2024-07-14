@@ -8,7 +8,10 @@ import path from 'node:path';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUI from 'swagger-ui-express';
 
-import { router as todoRouter } from './routers/todo.router.js';
+import {
+  router as todoRouter,
+  OAS3DefinitionPaths as todoOAS3DefinitionPaths,
+} from './routers/todo.router.js';
 import { router as rootRouter } from './routers/root.router.js';
 import { errorMiddleware } from './middlewares/errorMiddleware.js';
 
@@ -21,20 +24,16 @@ const swaggerDefinition = {
   info: {
     title: 'TODOs API',
     version: '1.0.0',
-    description: `
-    get('/')
-    get('/:id')
-    
-    post('/')
-    
-    put('/:id')
-    
-    patch('/:id')
-    patch('/', isAction('delete'))
-    patch('/', isAction('update'))
-
-    delete('/:id')
-    `,
+    description:
+      "### get('/')\n"
+      + "### get('/:id')\n\n"
+      + "### post('/')\n\n"
+      + "### put('/:id')\n\n"
+      // + "### patch('/:id')\n"
+      // + "### patch('/', isAction('delete'))\n"
+      // + "### patch('/', isAction('update'))\n\n"
+      // + "### delete('/:id')"
+    ,
   },
   servers: [
     {
@@ -52,7 +51,7 @@ const swaggerDefinition = {
             description: 'The todo ID',
           },
           userId: {
-            type: 'integer',
+            type: 'string',
             description: 'The ID of the user who owns the todo',
           },
           title: {
@@ -96,8 +95,8 @@ const swaggerDefinition = {
     },
   },
   paths: {
-    '/someOther': {},
-  },
+    ...todoOAS3DefinitionPaths,
+  }
 };
 
 // Options for the swagger docs
