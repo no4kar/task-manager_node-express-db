@@ -4,7 +4,6 @@ import { ApiError } from '../exceptions/api.error.js';
 
 /**@typedef {import('../types/todo.type.js').TyTodo.Item} TyTodoItem */
 
-
 /** @type {import('../types/func.type.js').Controller} */
 export async function get(req, res) {
   console.info(`\napp.get('/todos')`);
@@ -121,7 +120,12 @@ export async function post(req, res) {
 export async function put(req, res) {// overwrites all fields except id
   console.info(`app.put('/todos/:id=${req.params.id}')`);
   const { id } = req.params;
-  const { title, userId, completed } = req.body;
+  const {
+    userId,
+    title,
+    completed,
+  } = req.body;
+
   const foundTodo = await todoService.getById(id);
 
   if (!foundTodo) {
@@ -130,9 +134,22 @@ export async function put(req, res) {// overwrites all fields except id
 
   if (!title || !userId
     || typeof completed !== 'boolean') {
-    throw ApiError.InvalidData('Expected', {
-      title: 'string',
+    throw ApiError.InvalidData(
+      `Expected
+      {
+        userId: string,
+        title: string,
+        completed: boolean
+      }
+
+      But got
+      {
+        ${userId}:${typeof userId},
+        ${title}:${typeof title},
+        ${completed}:${typeof completed},
+      }`, {
       userId: 'string',
+      title: 'string',
       completed: 'boolean',
     });
   }
