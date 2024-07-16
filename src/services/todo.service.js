@@ -135,7 +135,7 @@ async function updateManyById(items) {
   });
 }
 
-/** @param {string} id */
+/** @param {TyTodoItem['id']} id */
 function removeById(id) {
   return Todos.destroy({
     where: { id },

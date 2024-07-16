@@ -66,7 +66,7 @@ const swaggerDefinition = {
         },
         required: ['id', 'userId', 'title', 'completed'],
       },
-      Pageble: {
+      Pageable: {
         type: 'object',
         properties: {
           count: {

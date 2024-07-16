@@ -180,6 +180,69 @@ export const OAS3DefinitionPaths =
         }
       }
     },
+    delete: {
+      summary: 'Delete a todo',
+      description:
+        'Delete todo item by providing ID in the param.\n\n' +
+        '### Example Request\n' +
+        '```http\n' +
+        'DELETE /todos/49894080-d3e4-11ee-8a1a-f51ed463b818\n' +
+        '```\n\n' +
+        '### Responses\n' +
+        '- **200 OK**: Successfully deleted. Returns a number of deleted todo item.\n' +
+        '- **404 Not Found**: The resource does not exist.\n' +
+        '- **500 Internal Server Error**: For server issues.\n',
+      tags: [
+        'Todos'
+      ],
+      parameters: [
+        {
+          in: 'path',
+          name: 'id',
+          schema: {
+            type: 'string'
+          },
+          required: true,
+          description: 'The todo\'s ID',
+        },
+      ],
+      responses: {
+        200: {
+          description: 'Successfully deleted',
+          content: {
+            'application/json': {
+              name: 'count',
+              schema: {
+                type: 'number',
+                // items: {
+                //   $ref: '#/components/schemas/Pageable'
+                // }
+              },
+            },
+          },
+        },
+        404: {
+          description: 'Invalid data',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/Error'
+              }
+            }
+          }
+        },
+        500: {
+          description: 'Internal server error',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/Error'
+              }
+            }
+          }
+        }
+      }
+    },
   },
 
   '/todos/': {
@@ -253,7 +316,7 @@ export const OAS3DefinitionPaths =
               schema: {
                 type: 'array',
                 items: {
-                  $ref: '#/components/schemas/Pageble'
+                  $ref: '#/components/schemas/Pageable'
                 }
               }
             }
