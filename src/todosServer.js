@@ -16,6 +16,7 @@ import { router as rootRouter } from './routers/root.router.js';
 import { errorMiddleware } from './middlewares/errorMiddleware.js';
 
 const PORT = process.env.TODOS_PORT || 3015; // eslint-disable-line
+const HOST = process.env.TODOS_HOST || `http://localhost:${PORT}`; // eslint-disable-line
 
 // Swagger definition
 /**@type {swaggerJSDoc.OAS3Definition} */
@@ -37,7 +38,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: `http://localhost:${PORT}`,
+      url: HOST,
       description: 'Development server',
     },
   ],
