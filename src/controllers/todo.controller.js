@@ -238,7 +238,7 @@ export async function updateMany(req, res) {
     return;
   }
 
-  await todoService.updateManyById(items);
+  (await todoService.updateManyById(items));
 
   res.sendStatus(204);
   return;

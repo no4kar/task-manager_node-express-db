@@ -4,7 +4,7 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../store/sqlite.db.js';
 
-/** @type {import('../types/todo.type.js').ModelStatic} */
+/** @type {import('../types/todo.type.js').TyTodo.ModelStatic} */
 export const Todo = sequelize.define('todo', {
   id: {
     type: DataTypes.UUID,

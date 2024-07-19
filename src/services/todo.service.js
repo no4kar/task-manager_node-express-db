@@ -96,7 +96,7 @@ function getById(id) {
 }
 
 /**
- * @param {import('../types/todo.type.js').CreationAttributes} properties */
+ * @param {import('../types/todo.type.js').TyTodo.CreationAttributes} properties */
 function create(properties) {
   return Todos.create({ ...properties });
   // return Todos.create(

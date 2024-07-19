@@ -32,7 +32,7 @@ const swaggerDefinition = {
       // + "### patch('/:id')\n"
       // + "### patch('/', isAction('delete'))\n"
       // + "### patch('/', isAction('update'))\n\n"
-      // + "### delete('/:id')"
+      + "### delete('/:id')"
     ,
   },
   servers: [
