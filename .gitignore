@@ -19,4 +19,3 @@ cypress/videos
 package-lock.json
 some.txt
 src/attempt.js
-src/db/*
