@@ -1,0 +1,21 @@
+Common Commit Types
+feat: A new feature for the user.
+Example: feat(auth): add user login functionality
+
+fix: A bug fix for the user.
+Example: fix(api): handle null values in user endpoint
+
+docs: Documentation updates or changes.
+Example: docs: update README with installation instructions
+
+style: Code style changes (formatting, missing semicolons, etc.), not affecting the functionality.
+Example: style: format code according to ESLint rules
+
+refactor: Code changes that neither fix a bug nor add a feature but improve the codebase (e.g., code cleanup).
+Example: refactor: simplify user authentication logic
+
+test: Adding or updating tests.
+Example: test(auth): add unit tests for login component
+
+chore: Changes to the build process or auxiliary tools and libraries.
+Example: chore(deps): update dependencies

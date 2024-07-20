@@ -90,8 +90,12 @@ const swaggerDefinition = {
             type: 'string',
             description: 'Error message',
           },
+          error: {
+            type: 'string',
+            description: 'Error stack',
+          },
         },
-        required: ['message'],
+        required: ['message', 'error'],
       },
     },
   },

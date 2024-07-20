@@ -18,8 +18,11 @@ export function errorMiddleware(error, req, res, next) {
     return;
   }
 
+  const unexpectedError = new Error(error);
+
   res.status(500)
     .send({
-      message: 'Unexpected error',
+      message: unexpectedError.message,
+      error: unexpectedError.stack,
     });
 }
