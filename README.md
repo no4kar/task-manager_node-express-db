@@ -1,6 +1,6 @@
-# Node Todos with SQLite Database
+# Node Task Manager with SQLite Database
 
-This project is a simple todos server built with Node.js and SQLite3. It includes [API documentation using Swagger](https://node-todos-with-db.onrender.com/api-docs/) and is configured to support TypeScript for development.
+This project is a simple [task manager server](https://node-todos-with-db.onrender.com/) built with Node.js with [Express.js](https://expressjs.com/) and SQLite3 DB controlled by [Sequelize ORM](https://sequelize.org/). It includes [API documentation using Swagger](https://node-todos-with-db.onrender.com/api-docs/) and is configured to support TypeScript for development.
 
 ## Warning
 
