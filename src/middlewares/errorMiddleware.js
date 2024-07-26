@@ -12,7 +12,8 @@ export function errorMiddleware(error, req, res, next) {
 
     res.status(status)
       .send({
-        message, errors,
+        message,
+        error: errors,
       });
 
     return;

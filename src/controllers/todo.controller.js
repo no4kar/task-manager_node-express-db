@@ -36,13 +36,13 @@ export async function get(req, res) {
   const limit = parseInt(String(size), 10) || Number.MAX_SAFE_INTEGER;
   const offset = ((parseInt(String(page), 10) || 1) - 1) * limit;
 
-  console.info({
-    userId,
-    title,
-    completed,
-    limit,
-    offset,
-  });
+  // console.info({
+  //   userId,
+  //   title,
+  //   completed,
+  //   limit,
+  //   offset,
+  // });
 
   const {
     rows,
