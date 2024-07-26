@@ -1,6 +1,6 @@
 # Node Todos with SQLite Database
 
-This project is a simple todos server built with Node.js and SQLite3. It includes API documentation using Swagger and is configured to support TypeScript for development.
+This project is a simple todos server built with Node.js and SQLite3. It includes [API documentation using Swagger](https://node-todos-with-db.onrender.com/api-docs/) and is configured to support TypeScript for development.
 
 ## Warning
 
