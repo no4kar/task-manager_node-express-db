@@ -2,6 +2,7 @@
 // @ts-check
 
 import * as todosServer from './todosServer.js';
+import { todos as todosConfig } from './config.js';
 
 /**
  * @param {string} serverName
@@ -15,6 +16,6 @@ origin: ${clientUrl}
 `);
 };
 
-todosServer.app.listen(todosServer.PORT, () => {
-  console.info(serverRunInfo('todosServer', Number(todosServer.PORT), 'localhost'));
+todosServer.app.listen(todosConfig.server.port, () => {
+  console.info(serverRunInfo('todosServer', Number(todosConfig.server.port), 'localhost'));
 });
