@@ -2,6 +2,10 @@
 
 This project is a simple todos server built with Node.js and SQLite3. It includes API documentation using Swagger and is configured to support TypeScript for development.
 
+## Warning
+
+**Note:** The hosting service where the server is deployed may run slowly. The first request, also known as a "cold start" may take up to 50 seconds.
+
 ## Table of Contents
 
 - [Features](#features)
@@ -65,10 +69,6 @@ To start the server, run:
 
 - You can find all the server's endpoints [here](https://node-todos-with-db.onrender.com/api-docs/).
 - Each endpoint can be tested by pressing the "Try it out" button and filling out the required form to ensure the server functions correctly.
-
-## Warning
-
-**Note:** The hosting service where the server is deployed may run slowly. The first request, also known as a "cold start," may take up to 50 seconds.
 
 ## Project Structure
 
