@@ -33,7 +33,7 @@ This project is a simple todos server built with Node.js and SQLite3. It include
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/node_todos-with-db.git
+    git clone https://github.com/no4kar/node_todos-with-db.git
     cd node_todos-with-db
     ```
 
