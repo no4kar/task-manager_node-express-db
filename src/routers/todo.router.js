@@ -6,7 +6,7 @@ export const router = express.Router();
 
 import * as todoController from '../controllers/todo.controller.js';
 import { isAction } from '../middlewares/todo.middleware.js';
-import { catchError } from '../middlewares/catchError.js';
+import { catchError } from '../middlewares/error.middleware.js';
 
 router.get('/', catchError(todoController.get));
 router.get('/:id', catchError(todoController.getById));

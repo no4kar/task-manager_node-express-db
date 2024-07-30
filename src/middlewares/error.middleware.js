@@ -27,3 +27,16 @@ export function errorMiddleware(error, req, res, next) {
       error: unexpectedError.stack,
     });
 }
+
+/**
+ *  @param {import("../types/func.type").Middleware} action
+ * @returns {import("../types/func.type").Middleware} */
+export function catchError(action) {
+  return async (req, res, next) => {
+    try {
+      await action(req, res, next);
+    } catch (error) {
+      next(error);
+    }
+  };
+}

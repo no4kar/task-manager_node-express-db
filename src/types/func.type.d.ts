@@ -4,14 +4,14 @@ import Sequelize from 'sequelize';
 
 export declare namespace TyFunc {
   export {
-    Controller,
+    Middleware,
     ErrorMiddleware,
     SendAuth,
   }
 }
 
 // Type definition for a controller function
-type Controller = (
+type Middleware = (
   req: Request,
   res: Response,
   next: NextFunction,

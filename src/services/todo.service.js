@@ -105,11 +105,11 @@ function create(properties) {
 }
 
 /**
- * @param {TyTodoItem} newTodo
+ * @param {TyTodoItemPartial} updatedTodo
  * @param {import('sequelize').Transaction | null | undefined} [transaction]
 */
-function updateById(newTodo, transaction) {
-  const { id, ...restProps } = newTodo;
+function updateById(updatedTodo, transaction) {
+  const { id, ...restProps } = updatedTodo;
   return Todos.update({
     ...restProps,
   }, {

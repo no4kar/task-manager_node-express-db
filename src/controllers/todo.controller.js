@@ -4,7 +4,7 @@ import { ApiError } from '../exceptions/api.error.js';
 
 /**@typedef {import('../types/todo.type.js').TyTodo.Item} TyTodoItem */
 
-/** @type {import('../types/func.type.js').Controller} */
+/** @type {import('../types/func.type.js').Middleware} */
 export async function get(req, res) {
   // console.info(`\napp.get('/todos')`);
   // query variables have 'undefined', 'string', 'string[]'
@@ -70,7 +70,7 @@ export async function get(req, res) {
   });
 }
 
-/** @type {import('../types/func.type.js').Controller} */
+/** @type {import('../types/func.type.js').Middleware} */
 export async function getById(req, res) {
   // console.info(`\napp.get('/todos/:id=${req.params.id}')`);
   const { id } = req.params;
@@ -83,7 +83,7 @@ export async function getById(req, res) {
   res.send(todoService.normalize(todo.dataValues));
 }
 
-/** @type {import('../types/func.type.js').Controller} */
+/** @type {import('../types/func.type.js').Middleware} */
 export async function post(req, res) {
   // express.json() can parse types correctly
   const {
@@ -132,7 +132,7 @@ export async function post(req, res) {
     .send(todoService.normalize(todo.dataValues));
 }
 
-/** @type {import('../types/func.type.js').Controller} */
+/** @type {import('../types/func.type.js').Middleware} */
 export async function put(req, res) {
   console.info(`app.put('/todos/:id=${req.params.id}')`);
   const { id } = req.params;
@@ -191,7 +191,7 @@ export async function put(req, res) {
   ));
 }
 
-/** @type {import('../types/func.type.js').Controller} */
+/** @type {import('../types/func.type.js').Middleware} */
 export async function patchById(req, res) {// overwrites some fields except id
   console.info(`\napp.patch('/todos/:id=${req.params.id}')\n`);
 
@@ -210,23 +210,34 @@ export async function patchById(req, res) {// overwrites some fields except id
     completed = foundTodo.dataValues.completed,
   } = req.body;
 
-  await todoService.updateById({
+  const [affectedCount, affectedRows] = await todoService.updateById({
     id,
     userId,
     title,
     completed,
   });
 
-  res.send(await todoService.getById(id));// error will be capture by errorMiddleware
+  // error will be capture by errorMiddleware
+  if (affectedCount !== 1) {
+    throw ApiError.BadRequest(
+      'Something went wrong',
+      {
+        affectedCount,
+      });
+  }
+
+  res.send(
+    todoService.normalize(affectedRows[0].dataValues)
+  );
 }
 
-/** @type {import('../types/func.type.js').Controller} */
+/** @type {import('../types/func.type.js').Middleware} */
 export function patchBulkUnknown(req, res) {// overwrites some fields except id
   console.info(`\napp.patch('/todos?action=${req.query.action}')`);
   throw ApiError.NotFound(`action=${req.query.action} unknown`);
 }
 
-/** @type {import('../types/func.type.js').Controller} */
+/** @type {import('../types/func.type.js').Middleware} */
 export async function updateMany(req, res) {
   console.info(`\napp.patch('/todos?action=${req.query.action}')\n`);
 
@@ -244,7 +255,7 @@ export async function updateMany(req, res) {
   return;
 }
 
-/** @type {import('../types/func.type.js').Controller} */
+/** @type {import('../types/func.type.js').Middleware} */
 export async function remove(req, res) {
   console.info(`\napp.delete('/todos/:id=${req.params.id}')\n`);
   const { id } = req.params;
@@ -259,7 +270,7 @@ export async function remove(req, res) {
   res.status(200).send(`${count}`);
 }
 
-/** @type {import('../types/func.type.js').Controller} */
+/** @type {import('../types/func.type.js').Middleware} */
 export async function removeMany(req, res) {
   console.info(`\napp.patch('/todos?action=${req.query.action}')`);
   /**@type {{ids: string[]}} */

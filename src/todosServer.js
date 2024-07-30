@@ -8,7 +8,7 @@ import swaggerUI from 'swagger-ui-express';
 
 import { router as rootRouter } from './routers/root.router.js';
 import { router as todoRouter } from './routers/todo.router.js';
-import { errorMiddleware } from './middlewares/errorMiddleware.js';
+import { errorMiddleware } from './middlewares/error.middleware.js';
 import { swaggerSpec } from './api-docs/swagger.js';
 
 export const app = express();
