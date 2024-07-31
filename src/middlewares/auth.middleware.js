@@ -3,7 +3,7 @@
 
 import { ApiError } from '../exceptions/api.error.js';
 
-import { jwtService } from '../services/jwt.service.js';
+import * as jwtService from '../services/jwt.service.js';
 
 /** @type {import('../types/func.type.js').Middleware} */
 export function authMiddleware(req, res, next) {

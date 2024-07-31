@@ -106,8 +106,7 @@ function create(properties) {
 
 /**
  * @param {TyTodoItemPartial} updatedTodo
- * @param {import('sequelize').Transaction | null | undefined} [transaction]
-*/
+ * @param {import('sequelize').Transaction | null | undefined} [transaction] */
 function updateById(updatedTodo, transaction) {
   const { id, ...restProps } = updatedTodo;
   return Todos.update({

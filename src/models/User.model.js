@@ -14,8 +14,8 @@ export const User = sequelize.define('user', {
   },
   email: {
     type: DataTypes.STRING,
-    unique: true,
     allowNull: false,
+    unique: true,
   },
   password: {
     type: DataTypes.STRING,
@@ -23,5 +23,6 @@ export const User = sequelize.define('user', {
   },
   activationToken: {
     type: DataTypes.STRING,
+    allowNull: true,
   },
 });

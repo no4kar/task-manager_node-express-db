@@ -9,10 +9,10 @@ import { catchError } from '../middlewares/error.middleware.js';
 
 router.get('/:id', catchError(userController.getById));
 
-router.post('/', catchError(userController.post));
+// router.post('/', catchError(userController.post));
 
-router.put('/:id', catchError(userController.put));
+// router.put('/:id', catchError(userController.put));
 
-router.patch('/:id', catchError(userController.patchById));
+// router.patch('/:id', catchError(userController.patchById));
 
-router.delete('/:id', catchError(userController.remove));
+// router.delete('/:id', catchError(userController.remove));

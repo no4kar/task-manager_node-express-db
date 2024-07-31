@@ -1,21 +1,27 @@
+// @ts-check
+'use strict';
+
 import jwt from 'jsonwebtoken';
 import { jwt as jwtConfig } from '../config.js';
 
-export const jwtService = {
+export {
   generateAccessToken,
   generateRefreshToken,
   validateAccessToken,
   validateRefreshToken,
 };
 
+/**@param {string} user */
 function generateAccessToken(user) {
   return jwt.sign(user, jwtConfig.secret.access, { expiresIn: '5s' });
 }
 
+/**@param {string} user */
 function generateRefreshToken(user) {
   return jwt.sign(user, jwtConfig.secret.refresh, { expiresIn: '30s' });
 }
 
+/**@param {string} token */
 function validateAccessToken(token) {
   try {
     return jwt.verify(token, jwtConfig.secret.access);
@@ -24,6 +30,7 @@ function validateAccessToken(token) {
   }
 }
 
+/**@param {string} token */
 function validateRefreshToken(token) {
   try {
     return jwt.verify(token, jwtConfig.secret.refresh);
