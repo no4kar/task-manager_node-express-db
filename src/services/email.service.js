@@ -2,9 +2,9 @@
 'use strict';
 
 import nodemailer from 'nodemailer';
-import { smtp as smtpConfig } from '../config.js';
+import { smtp as smtpConfig } from '@src/config.js';
 
-export {
+export const emailService = {
   send,
   sendActivationLink,
 };
@@ -20,10 +20,7 @@ const transporter = nodemailer.createTransport({
 });
 
 /**
-* @param {Object} param0 
-* @param {string} param0.email 
-* @param {string} param0.subject 
-* @param {string} param0.html  */
+* @param {{email: string, subject: string, html: string}} params */
 function send({ email, subject, html }) {
   return transporter.sendMail({
     from: 'Task Manager API', // sender address

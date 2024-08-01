@@ -1,10 +1,10 @@
-// @ts-check
 'use strict';
+// @ts-check
 
 import jwt from 'jsonwebtoken';
-import { jwt as jwtConfig } from '../config.js';
+import { jwt as jwtConfig } from '@src/config.js';
 
-export {
+export const jwtService = {
   generateAccessToken,
   generateRefreshToken,
   validateAccessToken,

@@ -4,14 +4,15 @@
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 
-import * as emailService from './email.service.js';
-import { ApiError } from '../exceptions/api.error.js';
-import { User } from '../models/User.model.js';
+import { emailService } from '@src/services/email.service.js';
+import { ApiError } from '@src/exceptions/api.error.js';
+import { User } from '@src/models/User.model.js';
 
-/** @typedef {import('../types/user.type.js').TyUser.Item} TyUserItem */
-/** @typedef {import('../types/user.type.js').TyUser.ItemNormalized} TyUserItemNormalized */
 
-export {
+export const userService = {
+  /** @typedef {import('@src/types/user.type.js').TyUser.Item} TyUserItem */
+  /** @typedef {import('@src/types/user.type.js').TyUser.ItemNormalized} TyUserItemNormalized */
+
   getAllActive,
   normalize,
   getByEmail,

@@ -1,18 +1,14 @@
-// @ts-check
 'use strict';
+// @ts-check
 
 import express from 'express';
 export const router = express.Router();
 
-import * as userController from '../controllers/todo.controller.js';
-import { catchError } from '../middlewares/error.middleware.js';
+import { userController } from '@src/controllers/auth.controller.js';
+import { catchError } from '@src/middlewares/error.middleware.js';
+import { authMiddleware } from '@src/middlewares/auth.middleware';
 
-router.get('/:id', catchError(userController.getById));
-
-// router.post('/', catchError(userController.post));
-
-// router.put('/:id', catchError(userController.put));
-
-// router.patch('/:id', catchError(userController.patchById));
-
-// router.delete('/:id', catchError(userController.remove));
+router.get('/',
+  catchError(authMiddleware),
+  catchError(userController.getAll),
+);

@@ -1,11 +1,25 @@
 // @ts-check
-import * as todoService from '../services/todo.service.js';
-import { ApiError } from '../exceptions/api.error.js';
+'use strict';
 
-/**@typedef {import('../types/todo.type.js').TyTodo.Item} TyTodoItem */
+import { todoService } from '@src/services/todo.service.js';
+import { ApiError } from '@src/exceptions/api.error.js';
 
-/** @type {import('../types/func.type.js').Middleware} */
-export async function get(req, res) {
+/**@typedef {import('@src/types/todo.type.js').TyTodo.Item} TyTodoItem */
+
+export const todoController = {
+  get,
+  getById,
+  post,
+  put,
+  patchById,
+  removeMany,
+  updateMany,
+  patchBulkUnknown,
+  remove,
+};
+
+/** @type {import('@src/types/func.type.js').Middleware} */
+async function get(req, res) {
   // console.info(`\napp.get('/todos')`);
   // query variables have 'undefined', 'string', 'string[]'
   const {
@@ -70,8 +84,8 @@ export async function get(req, res) {
   });
 }
 
-/** @type {import('../types/func.type.js').Middleware} */
-export async function getById(req, res) {
+/** @type {import('@src/types/func.type.js').Middleware} */
+async function getById(req, res) {
   // console.info(`\napp.get('/todos/:id=${req.params.id}')`);
   const { id } = req.params;
   const todo = await todoService.getById(id);
@@ -83,8 +97,8 @@ export async function getById(req, res) {
   res.send(todoService.normalize(todo.dataValues));
 }
 
-/** @type {import('../types/func.type.js').Middleware} */
-export async function post(req, res) {
+/** @type {import('@src/types/func.type.js').Middleware} */
+async function post(req, res) {
   // express.json() can parse types correctly
   const {
     userId,
@@ -132,8 +146,8 @@ export async function post(req, res) {
     .send(todoService.normalize(todo.dataValues));
 }
 
-/** @type {import('../types/func.type.js').Middleware} */
-export async function put(req, res) {
+/** @type {import('@src/types/func.type.js').Middleware} */
+async function put(req, res) {
   console.info(`app.put('/todos/:id=${req.params.id}')`);
   const { id } = req.params;
   const {
@@ -191,8 +205,8 @@ export async function put(req, res) {
   ));
 }
 
-/** @type {import('../types/func.type.js').Middleware} */
-export async function patchById(req, res) {// overwrites some fields except id
+/** @type {import('@src/types/func.type.js').Middleware} */
+async function patchById(req, res) {// overwrites some fields except id
   console.info(`\napp.patch('/todos/:id=${req.params.id}')\n`);
 
   const { id } = req.params;
@@ -231,17 +245,17 @@ export async function patchById(req, res) {// overwrites some fields except id
   );
 }
 
-/** @type {import('../types/func.type.js').Middleware} */
-export function patchBulkUnknown(req, res) {// overwrites some fields except id
+/** @type {import('@src/types/func.type.js').Middleware} */
+function patchBulkUnknown(req, res) {// overwrites some fields except id
   console.info(`\napp.patch('/todos?action=${req.query.action}')`);
   throw ApiError.NotFound(`action=${req.query.action} unknown`);
 }
 
-/** @type {import('../types/func.type.js').Middleware} */
-export async function updateMany(req, res) {
+/** @type {import('@src/types/func.type.js').Middleware} */
+async function updateMany(req, res) {
   console.info(`\napp.patch('/todos?action=${req.query.action}')\n`);
 
-  /**@type {{items: todoService.TyTodoItem[]}} */
+  /**@type {{items: TyTodoItem[]}} */
   const { items } = req.body;
 
   if (!Array.isArray(items)) {
@@ -255,8 +269,8 @@ export async function updateMany(req, res) {
   return;
 }
 
-/** @type {import('../types/func.type.js').Middleware} */
-export async function remove(req, res) {
+/** @type {import('@src/types/func.type.js').Middleware} */
+async function remove(req, res) {
   console.info(`\napp.delete('/todos/:id=${req.params.id}')\n`);
   const { id } = req.params;
   const foundTodo = await todoService.getById(id);
@@ -270,8 +284,8 @@ export async function remove(req, res) {
   res.status(200).send(`${count}`);
 }
 
-/** @type {import('../types/func.type.js').Middleware} */
-export async function removeMany(req, res) {
+/** @type {import('@src/types/func.type.js').Middleware} */
+async function removeMany(req, res) {
   console.info(`\napp.patch('/todos?action=${req.query.action}')`);
   /**@type {{ids: string[]}} */
   const { ids } = req.body;

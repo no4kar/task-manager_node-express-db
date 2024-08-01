@@ -2,9 +2,9 @@
 // @ts-check
 
 import { DataTypes } from 'sequelize';
-import { sequelize } from '../store/sqlite.db.js';
+import { sequelize } from '@src/store/sqlite.db.js';
 
-/** @type {import('../types/user.type.js').TyUser.ModelStatic} */
+/** @type {import('@src/types/user.type.js').TyUser.ModelStatic} */
 export const User = sequelize.define('user', {
   id: {
     type: DataTypes.UUID,

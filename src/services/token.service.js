@@ -1,12 +1,12 @@
 'use strict';
 // @ts-check
 
-import { Token } from '../models/Token.model.js';
+import { Token } from '@src/models/Token.model.js';
 
-/** @typedef {import('../types/token.type.js').TyToken.Item} TyTokenItem*/
-/** @typedef {import('../types/token.type.js').TyToken.CreationAttributes} TyTokenCreationAttributes*/
+/** @typedef {import('@src/types/token.type.js').TyToken.Item} TyTokenItem*/
+/** @typedef {import('@src/types/token.type.js').TyToken.CreationAttributes} TyTokenCreationAttributes*/
 
-export {
+export const tokenService = {
   getByRefreshToken,
   save,
   remove,
