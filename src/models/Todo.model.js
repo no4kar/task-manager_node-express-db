@@ -3,6 +3,7 @@
 
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../store/sqlite.db.js';
+import { User } from './User.model.js';
 
 /** @type {import('../types/todo.type.js').TyTodo.ModelStatic} */
 export const Todo = sequelize.define('todo', {
@@ -13,8 +14,12 @@ export const Todo = sequelize.define('todo', {
     primaryKey: true,
   },
   userId: {
-    type: DataTypes.STRING,
+    type: DataTypes.UUID,
     allowNull: false,
+    references: {
+      model: User,
+      key: 'id',
+    },
   },
   title: {
     type: DataTypes.STRING,
