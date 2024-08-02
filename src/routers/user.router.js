@@ -2,13 +2,13 @@
 // @ts-check
 
 import express from 'express';
-export const router = express.Router();
+export const userRouter = express.Router();
 
-import { userController } from '@src/controllers/auth.controller.js';
-import { catchError } from '@src/middlewares/error.middleware.js';
-import { authMiddleware } from '@src/middlewares/auth.middleware';
+import { userController } from '../controllers/user.controller.js';
+import { catchError } from '../middlewares/error.middleware.js';
+import { authMiddleware } from '../middlewares/auth.middleware';
 
-router.get('/',
+userRouter.get('/',
   catchError(authMiddleware),
   catchError(userController.getAll),
 );

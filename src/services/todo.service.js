@@ -2,12 +2,12 @@
 // @ts-check
 
 import { Op } from 'sequelize';
-import { sequelize } from '@src/store/sqlite.db.js';
-import { Todo as Todos } from '@src/models/Todo.model.js';
+import { sequelize } from '../store/sqlite.db.js';
+import { Todo as Todos } from '../models/Todo.model.js';
 
-/**@typedef {import('@src/types/todo.type.js').TyTodo.Item} TyTodoItem */
-/**@typedef {import('@src/types/todo.type.js').TyTodo.ItemPartial} TyTodoItemPartial */
-/**@typedef {import('@src/types/todo.type.js').TyTodo.Model} TyTodoModel */
+/**@typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodoItem */
+/**@typedef {import('src/types/todo.type.js').TyTodo.ItemPartial} TyTodoItemPartial */
+/**@typedef {import('src/types/todo.type.js').TyTodo.Model} TyTodoModel */
 
 export const todoService = {
   normalize,
@@ -95,7 +95,7 @@ function getById(id) {
 }
 
 /**
- * @param {import('@src/types/todo.type.js').TyTodo.CreationAttributes} properties */
+ * @param {import('src/types/todo.type.js').TyTodo.CreationAttributes} properties */
 function create(properties) {
   return Todos.create({ ...properties });
   // return Todos.create(

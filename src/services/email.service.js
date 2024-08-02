@@ -2,7 +2,7 @@
 'use strict';
 
 import nodemailer from 'nodemailer';
-import { smtp as smtpConfig } from '@src/config.js';
+import { smtp as smtpConfig } from '../config.js';
 
 export const emailService = {
   send,

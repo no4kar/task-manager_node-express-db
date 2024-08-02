@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { ApiError } from '@src/exceptions/api.error';
+import { ApiError } from '../exceptions/api.error';
 import Sequelize from 'sequelize';
 
 export declare namespace TyFunc {

@@ -10,8 +10,8 @@
   },
   "scripts": {
     "clean": "npm cache clean --force",
-    "start": "node ./src/index.js",
     "setup": "node ./src/setup.js",
+    "start": "node ./src/index.js",
     "dev": "nodemon ./src/index.js"
   },
   "author": "no4kar",

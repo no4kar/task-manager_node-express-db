@@ -7,8 +7,7 @@ import { todos as todosConfig } from './config.js';
 /**
  * @param {string} serverName
  * @param {number} port
- * @param {string} clientUrl
- */
+ * @param {string} clientUrl */
 function serverRunInfo(serverName, port, clientUrl) {
   return (`
 ${serverName} is running on PORT=${port}

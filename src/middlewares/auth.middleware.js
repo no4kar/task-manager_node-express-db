@@ -1,11 +1,11 @@
 // @ts-check
 'use strict';
 
-import { ApiError } from '@src/exceptions/api.error.js';
+import { ApiError } from '../exceptions/api.error.js';
 
-import { jwtService } from '@src/services/jwt.service.js';
+import { jwtService } from '../services/jwt.service.js';
 
-/** @type {import('@src/types/func.type.js').Middleware} */
+/** @type {import('src/types/func.type.js').Middleware} */
 export function authMiddleware(req, res, next) {
   const authHeader = req.headers['authorization'];
 

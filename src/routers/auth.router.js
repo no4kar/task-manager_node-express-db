@@ -4,15 +4,15 @@
 import express from 'express';
 export const authRouter = express.Router();
 
-import { authController } from '@src/controllers/auth.controller.js';
-import { catchError } from '@src/middlewares/error.middleware.js';
+import { authController } from '../controllers/auth.controller.js';
+import { catchError } from '../middlewares/error.middleware.js';
 
-
-authRouter.post('/registration', catchError(authController.register));
 authRouter.get(
-  '/activation/:activationToken',
+  '/activate/:activationToken',
   catchError(authController.activate),
 );
+authRouter.get('/refresh', catchError(authController.refresh));
+
+authRouter.post('/registration', catchError(authController.register));
 authRouter.post('/login', catchError(authController.login));
 authRouter.post('/logout', catchError(authController.logout));
-authRouter.get('/refresh', catchError(authController.refresh));

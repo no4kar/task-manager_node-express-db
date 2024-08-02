@@ -2,7 +2,7 @@
 // @ts-check
 
 import jwt from 'jsonwebtoken';
-import { jwt as jwtConfig } from '@src/config.js';
+import { jwt as jwtConfig } from '../config.js';
 
 export const jwtService = {
   generateAccessToken,
