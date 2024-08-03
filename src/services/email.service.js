@@ -2,7 +2,10 @@
 'use strict';
 
 import nodemailer from 'nodemailer';
-import { smtp as smtpConfig } from '../config.js';
+import { 
+  smtp as smtpConfig,
+  todos as todosConfig,
+ } from '../config.js';
 
 export const emailService = {
   send,
@@ -35,7 +38,7 @@ function send({ email, subject, html }) {
  * @param {string} email
  * @param {string} token */
 function sendActivationLink(email, token) {
-  const link = `${process.env.CLIENT_URL}/activate/${token}`;
+  const link = `${todosConfig.server.host}/activate/${token}`;
 
   return send({
     email,

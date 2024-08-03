@@ -156,11 +156,13 @@ async function put(req, res) {
     completed,
   } = req.body;
 
-  if (!userId || !title
-    || typeof userId !== 'string'
-    || typeof title !== 'string'
-    || typeof completed !== 'boolean'
-  ) {
+  const errors = {
+    userId: !userId || typeof userId !== 'string',
+    title: !title || typeof title !== 'string',
+    completed: typeof completed !== 'boolean',
+  };
+
+  if (errors.userId || errors.title || errors.completed) {
     throw ApiError.InvalidData(
       `Type error`,
       {
@@ -200,8 +202,10 @@ async function put(req, res) {
     completed,
   });
 
+  await foundTodo.save();
+
   res.send(todoService.normalize(
-    (await foundTodo.save()).dataValues,
+    foundTodo.dataValues,
   ));
 }
 

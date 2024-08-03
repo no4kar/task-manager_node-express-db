@@ -39,36 +39,40 @@ async function register(req, res) {
 async function activate(req, res) {
   const { activationToken } = req.params;
 
-  const user = await User.findOne({
+  const foundUser = await User.findOne({
     where: { activationToken },
   });
 
-  if (!user) {
-    throw ApiError.NotFound(`Can't find user`);
+  if (!foundUser) {
+    throw ApiError.NotFound(`Can't find user by activationToken`);
   }
 
-  user.activationToken = null;
-  await user.save();
+  Object.assign(foundUser, {
+    ...foundUser.dataValues,
+    activationToken: null,
+  });
 
-  await sendAuthentication(res, user);
+  await foundUser.save();
+
+  await sendAuthentication(res, foundUser.dataValues);
 }
 
 /** @type {import('src/types/func.type').Middleware} */
 async function login(req, res) {
   const { email, password } = req.body;
-  const user = await userService.getByEmail(email);
+  const foundUser = await userService.getByEmail(email);
 
-  if (!user) {
+  if (!foundUser) {
     throw ApiError.BadRequest('User with this email does not exist');
   }
 
-  const isPasswordValid = await bcrypt.compare(password, user.password);
+  const isPasswordValid = await bcrypt.compare(password, foundUser.dataValues.password);
 
   if (!isPasswordValid) {
     throw ApiError.BadRequest('Password is wrong');
   }
 
-  await sendAuthentication(res, user);
+  await sendAuthentication(res, foundUser.dataValues);
 }
 
 /** @type {import('src/types/func.type').Middleware} */
@@ -80,7 +84,7 @@ async function refresh(req, res) {
     throw ApiError.Unauthorized();
   }
 
-  const token = await tokenService.getByToken(refreshToken);
+  const token = await tokenService.getByRefreshToken(refreshToken);
 
   if (!token) {
     throw ApiError.Unauthorized();
@@ -109,9 +113,8 @@ async function logout(req, res) {
  * @param {import('express').Response} res
  * @param {import('src/types/user.type').TyUser.Item} user */
 async function sendAuthentication(res, user) {
-  const userData = userService.normalize(user);
-  const accessToken = jwtService.generateAccessToken(userData.id);
-  const refreshToken = jwtService.generateRefreshToken(userData.id);
+  const accessToken = jwtService.generateAccessToken(user);
+  const refreshToken = jwtService.generateRefreshToken(user);
 
   await tokenService.save({ userId: user.id, refreshToken });
 
@@ -123,7 +126,7 @@ async function sendAuthentication(res, user) {
   });
 
   res.send({
-    user: userData,
+    user: userService.normalize(user),
     accessToken,
   });
 }

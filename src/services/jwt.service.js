@@ -11,12 +11,12 @@ export const jwtService = {
   validateRefreshToken,
 };
 
-/**@param {string} user */
+/**@param {import('src/types/user.type.js').TyUser.Item} user */
 function generateAccessToken(user) {
   return jwt.sign(user, jwtConfig.secret.access, { expiresIn: '5s' });
 }
 
-/**@param {string} user */
+/**@param {import('src/types/user.type.js').TyUser.Item} user */
 function generateRefreshToken(user) {
   return jwt.sign(user, jwtConfig.secret.refresh, { expiresIn: '30s' });
 }
