@@ -63,13 +63,18 @@ async function login(req, res) {
   const foundUser = await userService.getByEmail(email);
 
   if (!foundUser) {
-    throw ApiError.BadRequest('User with this email does not exist');
+    throw ApiError.BadRequest('The user with this email does not exist');
   }
 
-  const isPasswordValid = await bcrypt.compare(password, foundUser.dataValues.password);
+  if (foundUser.dataValues.activationToken) {
+    throw ApiError.BadRequest('The user is not yet activated');
+  }
+
+  const isPasswordValid
+    = await bcrypt.compare(password, foundUser.dataValues.password);
 
   if (!isPasswordValid) {
-    throw ApiError.BadRequest('Password is wrong');
+    throw ApiError.BadRequest('Login details are wrong');
   }
 
   await sendAuthentication(res, foundUser.dataValues);

@@ -38,7 +38,7 @@ function send({ email, subject, html }) {
  * @param {string} email
  * @param {string} token */
 function sendActivationLink(email, token) {
-  const link = `${todosConfig.server.host}/activate/${token}`;
+  const link = `${todosConfig.client.host}/activate/${token}`;
 
   return send({
     email,

@@ -10,8 +10,9 @@ import { rootRouter } from './routers/root.router.js';
 import { todoRouter } from './routers/todo.router.js';
 import { authRouter } from './routers/auth.router.js';
 
-import { errorMiddleware } from './middlewares/error.middleware.js';
+import { catchError, errorMiddleware } from './middlewares/error.middleware.js';
 import { swaggerSpec } from './api-docs/swagger.js';
+import { authMiddleware } from './middlewares/auth.middleware.js';
 
 export const app = express();
 
@@ -26,7 +27,7 @@ app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 
 // Routers
 app.use('/', rootRouter);
-app.use('/todos', todoRouter);
+app.use('/todos', catchError(authMiddleware), todoRouter);
 app.use('/auth', authRouter);
 
 // Intercept of the errors

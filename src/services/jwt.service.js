@@ -13,12 +13,12 @@ export const jwtService = {
 
 /**@param {import('src/types/user.type.js').TyUser.Item} user */
 function generateAccessToken(user) {
-  return jwt.sign(user, jwtConfig.secret.access, { expiresIn: '5s' });
+  return jwt.sign(user, jwtConfig.secret.access, { expiresIn: '1d' });
 }
 
 /**@param {import('src/types/user.type.js').TyUser.Item} user */
 function generateRefreshToken(user) {
-  return jwt.sign(user, jwtConfig.secret.refresh, { expiresIn: '30s' });
+  return jwt.sign(user, jwtConfig.secret.refresh, { expiresIn: '1d' });
 }
 
 /**@param {string} token */

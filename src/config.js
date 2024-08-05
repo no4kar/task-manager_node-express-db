@@ -1,7 +1,10 @@
 import 'dotenv/config';
 
-const todosPort = Number(process.env.TODOS_PORT || 3015);
-const todosHost = process.env.TODOS_HOST || `http://localhost:${todosPort}`;
+const serverPort = Number(process.env.SERVER_PORT || 3001);
+const serverHost = process.env.SERVER_HOST || `http://localhost:${serverPort}`;
+
+const clientPort = Number(process.env.CLIENT_PORT || 8080);
+const clientHost = process.env.CLIENT_HOST || `http://localhost:${clientPort}`;
 
 const JWTAccessSecret = process.env.JWT_ACCESS_SECRET || 'secretOrPrivateKey';
 const JWTRefreshSecret = process.env.JWT_REFRESH_SECRET || 'secretOrPrivateKey';
@@ -15,8 +18,12 @@ const smtpPassword = process.env.SMTP_PASSWORD || 'example-password';
 
 export const todos = {
   server: {
-    port: todosPort,
-    host: todosHost,
+    port: serverPort,
+    host: serverHost,
+  },
+  client: {
+    port: clientPort,
+    host: clientHost,
   },
 };
 

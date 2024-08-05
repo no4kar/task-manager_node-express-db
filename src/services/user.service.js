@@ -53,11 +53,12 @@ async function register({ email, password }) {
   // get activation token
   const activationToken = uuidv1();
   // hash the password
-  const hash = await bcrypt.hash(password, bcryptConfig.hash.saltOrRounds);
+  const hashedPassword
+    = await bcrypt.hash(password, bcryptConfig.hash.saltOrRounds);
 
   const createdUser = await User.create({
     email,
-    password: hash,
+    password: hashedPassword,
     activationToken,
   });
 
