@@ -16,7 +16,7 @@ const smtpHost = process.env.SMTP_HOST || 'smtp.example.com';
 const smtpUser = process.env.SMTP_USER || 'example@email.com';
 const smtpPassword = process.env.SMTP_PASSWORD || 'example-password';
 
-export const todos = {
+export const todo = {
   server: {
     port: serverPort,
     host: serverHost,

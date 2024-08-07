@@ -83,6 +83,7 @@ async function login(req, res) {
 /** @type {import('src/types/func.type').Middleware} */
 async function refresh(req, res) {
   const { refreshToken } = req.cookies;
+
   const userData = jwtService.validateRefreshToken(refreshToken);
 
   if (!userData) {
@@ -95,9 +96,13 @@ async function refresh(req, res) {
     throw ApiError.Unauthorized();
   }
 
-  const user = await userService.getByEmail(userData.email);
+  const user = await userService.getByEmail(userData?.email);
 
-  await sendAuthentication(res, user);
+  if (!user) {
+    throw ApiError.Unauthorized();
+  }
+
+  await sendAuthentication(res, user.dataValues);
 }
 
 /** @type {import('src/types/func.type').Middleware} */
@@ -123,11 +128,18 @@ async function sendAuthentication(res, user) {
 
   await tokenService.save({ userId: user.id, refreshToken });
 
+  // res.cookie('refreshToken', refreshToken, {
+  //   maxAge: 30 * 24 * 60 * 60 * 1000,
+  //   httpOnly: true,
+  //   sameSite: 'none',
+  //   secure: true,
+  // });
+
   res.cookie('refreshToken', refreshToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
     httpOnly: true,
-    sameSite: 'none',
-    secure: true,
+    sameSite: 'lax', // or 'strict'
+    secure: false,   // Change to true in production with HTTPS
   });
 
   res.send({

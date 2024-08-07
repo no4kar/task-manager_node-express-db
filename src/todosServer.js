@@ -1,9 +1,10 @@
-'use strict';
 // @ts-check
+'use strict';
 
 import express from 'express';
 import cors from 'cors';
 import path from 'node:path';
+import cookieParser from 'cookie-parser';
 import swaggerUI from 'swagger-ui-express';
 
 import { rootRouter } from './routers/root.router.js';
@@ -16,7 +17,14 @@ import { authMiddleware } from './middlewares/auth.middleware.js';
 
 export const app = express();
 
-app.use(cors());
+app.use(cookieParser());
+app.use(catchError(
+  cors(
+    {
+      origin: 'http://localhost:5173', // Adjust the port as needed
+      credentials: true,
+    }
+  )));
 app.use(express.json());
 
 // Get all files from address

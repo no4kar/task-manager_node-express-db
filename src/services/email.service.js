@@ -4,7 +4,7 @@
 import nodemailer from 'nodemailer';
 import { 
   smtp as smtpConfig,
-  todos as todosConfig,
+  todo as todoConfig,
  } from '../config.js';
 
 export const emailService = {
@@ -38,7 +38,7 @@ function send({ email, subject, html }) {
  * @param {string} email
  * @param {string} token */
 function sendActivationLink(email, token) {
-  const link = `${todosConfig.client.host}/activate/${token}`;
+  const link = `${todoConfig.client.host}/activate/${token}`;
 
   return send({
     email,

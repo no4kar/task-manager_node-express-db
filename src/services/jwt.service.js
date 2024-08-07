@@ -16,11 +16,6 @@ function generateAccessToken(user) {
   return jwt.sign(user, jwtConfig.secret.access, { expiresIn: '1d' });
 }
 
-/**@param {import('src/types/user.type.js').TyUser.Item} user */
-function generateRefreshToken(user) {
-  return jwt.sign(user, jwtConfig.secret.refresh, { expiresIn: '1d' });
-}
-
 /**@param {string} token */
 function validateAccessToken(token) {
   try {
@@ -28,6 +23,11 @@ function validateAccessToken(token) {
   } catch (error) {
     return null;
   }
+}
+
+/**@param {import('src/types/user.type.js').TyUser.Item} user */
+function generateRefreshToken(user) {
+  return jwt.sign(user, jwtConfig.secret.refresh, { expiresIn: '1d' });
 }
 
 /**@param {string} token */
