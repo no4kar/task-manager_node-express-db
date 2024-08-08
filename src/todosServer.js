@@ -14,6 +14,7 @@ import { authRouter } from './routers/auth.router.js';
 import { catchError, errorMiddleware } from './middlewares/error.middleware.js';
 import { swaggerSpec } from './api-docs/swagger.js';
 import { authMiddleware } from './middlewares/auth.middleware.js';
+import { todo as todoConfig } from './config.js';
 
 export const app = express();
 
@@ -21,7 +22,7 @@ app.use(cookieParser());
 app.use(catchError(
   cors(
     {
-      origin: 'http://localhost:5173', // Adjust the port as needed
+      origin: todoConfig.client.host, // Adjust the port as needed
       credentials: true,
     }
   )));
