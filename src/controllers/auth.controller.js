@@ -128,18 +128,11 @@ async function sendAuthentication(res, user) {
 
   await tokenService.save({ userId: user.id, refreshToken });
 
-  // res.cookie('refreshToken', refreshToken, {
-  //   maxAge: 30 * 24 * 60 * 60 * 1000,
-  //   httpOnly: true,
-  //   sameSite: 'none',
-  //   secure: true,
-  // });
-
   res.cookie('refreshToken', refreshToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
     httpOnly: true,
     sameSite: 'lax', // or 'strict'
-    secure: false,   // Change to true in production with HTTPS
+    secure: !false, // Change to true in production with HTTPS
   });
 
   res.send({
