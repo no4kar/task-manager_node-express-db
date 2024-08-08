@@ -1,9 +1,9 @@
-// @ts-check
 'use strict';
+// @ts-check
 
 import { ApiError } from '../exceptions/api.error.js';
 
-/** @type {import('../types/func.type.js').ErrorMiddleware} */
+/** @type {import('src/types/func.type.js').ErrorMiddleware} */
 export function errorMiddleware(error, req, res, next) {
   console.error(error);
 
@@ -29,8 +29,8 @@ export function errorMiddleware(error, req, res, next) {
 }
 
 /**
- *  @param {import("../types/func.type").Middleware} action
- * @returns {import("../types/func.type").Middleware} */
+ *  @param {import("src/types/func.type").Middleware} action
+ * @returns {import("src/types/func.type").Middleware} */
 export function catchError(action) {
   return async (req, res, next) => {
     try {

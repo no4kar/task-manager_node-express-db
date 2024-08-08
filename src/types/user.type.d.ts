@@ -5,12 +5,13 @@ export namespace TyUser {
     id: string;
     email: string;
     password: string;
-    activationToken: string;
+    activationToken: string | null;
     createdAt: string;
     updatedAt: string;
   };
 
   export type ItemPartial = Partial<Item>;
+  export type ItemNormalized = Pick<Item, 'id' | 'email'>;
 
   export type ModelAttributes = Item;
   export type CreationAttributes = Omit<Item, 'id' | 'createdAt' | 'updatedAt'>;

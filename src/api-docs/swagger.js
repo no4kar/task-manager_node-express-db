@@ -1,8 +1,7 @@
 import {
   OAS3DefinitionPaths as todoOAS3DefinitionPaths,
-} from './todo.paths.js';
-// import { HOST } from '../todosServer.js';
-import { todos as todosConfig } from '../config.js';
+} from '../api-docs/todo.paths.js';
+import { todo as todoConfig } from '../config.js';
 import swaggerJSDoc from 'swagger-jsdoc';
 
 
@@ -26,7 +25,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: todosConfig.server.host,
+      url: todoConfig.server.host,
       description: 'Development server',
     },
   ],

@@ -5,11 +5,11 @@ import { Op } from 'sequelize';
 import { sequelize } from '../store/sqlite.db.js';
 import { Todo as Todos } from '../models/Todo.model.js';
 
-/**@typedef {import('../types/todo.type.js').TyTodo.Item} TyTodoItem */
-/**@typedef {import('../types/todo.type.js').TyTodo.ItemPartial} TyTodoItemPartial */
-/**@typedef {import('../types/todo.type.js').TyTodo.Model} TyTodoModel */
+/**@typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodoItem */
+/**@typedef {import('src/types/todo.type.js').TyTodo.ItemPartial} TyTodoItemPartial */
+/**@typedef {import('src/types/todo.type.js').TyTodo.Model} TyTodoModel */
 
-export {
+export const todoService = {
   normalize,
   getAll,
   getAllByUser,
@@ -38,8 +38,7 @@ function getAll() {
 /**
  * @param {TyTodoItemPartial} itemPartial
  * @param {number} [limit]
- * @param {number} [offset]
- */
+ * @param {number} [offset] */
 function getAllByOptions(
   {
     userId,
@@ -96,7 +95,7 @@ function getById(id) {
 }
 
 /**
- * @param {import('../types/todo.type.js').TyTodo.CreationAttributes} properties */
+ * @param {import('src/types/todo.type.js').TyTodo.CreationAttributes} properties */
 function create(properties) {
   return Todos.create({ ...properties });
   // return Todos.create(
@@ -106,8 +105,7 @@ function create(properties) {
 
 /**
  * @param {TyTodoItemPartial} updatedTodo
- * @param {import('sequelize').Transaction | null | undefined} [transaction]
-*/
+ * @param {import('sequelize').Transaction | null | undefined} [transaction] */
 function updateById(updatedTodo, transaction) {
   const { id, ...restProps } = updatedTodo;
   return Todos.update({

@@ -2,8 +2,7 @@ export class ApiError extends Error {
   /**
    * @param {number} status
    * @param {string} message
-   * @param {Error | Object} [errors={}]
-   */
+   * @param {Error | Object} [errors={}] */
   constructor(status, message, errors = {}) {
     super(message);
 
@@ -13,8 +12,7 @@ export class ApiError extends Error {
 
   /**
    * @param {string} message
-   * @param {Error | Object} [errors={}]
-   */
+   * @param {Error | Object} [errors={}] */
   static BadRequest(message, errors) {
     return new ApiError(400, message, errors);
   }
@@ -29,8 +27,7 @@ export class ApiError extends Error {
 
     /**
    * @param {string} message
-   * @param {Error | Object} [errors={}]
-   */
+   * @param {Error | Object} [errors={}] */
   static InvalidData(message = 'Unprocessable entity', errors) {
     return new ApiError(422, message, errors);
   }

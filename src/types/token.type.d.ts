@@ -2,6 +2,7 @@ import type * as Sequelize from 'sequelize';
 
 export namespace TyToken {
   export type Item = {
+    userId: string;
     refreshToken: string;
     createdAt: string;
     updatedAt: string;

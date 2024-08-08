@@ -4,7 +4,7 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../store/sqlite.db.js';
 
-/** @type {import('../types/user.type.js').TyUser.ModelStatic} */
+/** @type {import('src/types/user.type.js').TyUser.ModelStatic} */
 export const User = sequelize.define('user', {
   id: {
     type: DataTypes.UUID,
@@ -14,14 +14,15 @@ export const User = sequelize.define('user', {
   },
   email: {
     type: DataTypes.STRING,
-    unique: true,
     allowNull: false,
+    unique: true,
   },
   password: {
     type: DataTypes.STRING,
     allowNull: false,
   },
   activationToken: {
-    type: DataTypes.STRING,
+    type: DataTypes.UUIDV1,
+    allowNull: true,
   },
 });
