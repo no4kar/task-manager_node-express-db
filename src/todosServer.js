@@ -19,13 +19,23 @@ import { todo as todoConfig } from './config.js';
 export const app = express();
 
 app.use(cookieParser());
-app.use(catchError(
-  cors(
-    {
-      origin: todoConfig.client.host, // Adjust the port as needed
-      credentials: true,
+app.use(cors(
+    // {
+    //   origin: todoConfig.client.host, // Adjust the port as needed
+    //   credentials: true,
+    //   methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    //   allowedHeaders: ['Content-Type', 'Authorization'],
+    // },
+      (req, cb) => {
+        const corsOptions = {
+            origin: todoConfig.client.host || req.header('Origin'), // Dynamically set the origin
+            methods: ['GET', 'POST', 'PUT', 'DELETE'],
+            allowedHeaders: ['Content-Type', 'Authorization'],
+            credentials: true,
+        };
+        cb(null, corsOptions);
     }
-  )));
+  ));
 app.use(express.json());
 
 // Get all files from address

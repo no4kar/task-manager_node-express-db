@@ -4,7 +4,7 @@ const serverPort = Number(process.env.SERVER_PORT || 3001);
 const serverHost = process.env.SERVER_HOST || `http://localhost:${serverPort}`;
 
 const clientPort = Number(process.env.CLIENT_PORT || 8080);
-const clientHost = process.env.CLIENT_HOST || `http://localhost:${clientPort}`;
+const clientHost = process.env.CLIENT_HOST || '';
 
 const JWTAccessSecret = process.env.JWT_ACCESS_SECRET || 'secretOrPrivateKey';
 const JWTRefreshSecret = process.env.JWT_REFRESH_SECRET || 'secretOrPrivateKey';
@@ -16,7 +16,7 @@ const smtpHost = process.env.SMTP_HOST || 'smtp.example.com';
 const smtpUser = process.env.SMTP_USER || 'example@email.com';
 const smtpPassword = process.env.SMTP_PASSWORD || 'example-password';
 
-export const todo = {
+export const todo = Object.freeze({
   server: {
     port: serverPort,
     host: serverHost,
@@ -25,24 +25,24 @@ export const todo = {
     port: clientPort,
     host: clientHost,
   },
-};
+});
 
-export const jwt = {
+export const jwt = Object.freeze({
   secret: {
     access: JWTAccessSecret,
     refresh: JWTRefreshSecret,
   },
-}
+});
 
-export const bcrypt = {
+export const bcrypt = Object.freeze({
   hash: {
     saltOrRounds: bcryptSaltOrRounds,
   },
-}
+});
 
-export const smtp = {
+export const smtp = Object.freeze({
   host: smtpHost,
   port: smtpPort,
   user: smtpUser,
   password: smtpPassword,
-}
+});
