@@ -10,7 +10,7 @@ import swaggerJSDoc from 'swagger-jsdoc';
 const swaggerDefinition = {
   openapi: '3.0.0',
   info: {
-    title: 'TODOs API',
+    title: 'TASK MANAGER API',
     version: '1.0.0',
     description:
       "### get('/')\n"

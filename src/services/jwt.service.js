@@ -1,5 +1,5 @@
-'use strict';
 // @ts-check
+'use strict';
 
 import jwt from 'jsonwebtoken';
 import { jwt as jwtConfig } from '../config.js';
@@ -13,7 +13,7 @@ export const jwtService = {
 
 /**@param {import('src/types/user.type.js').TyUser.Item} user */
 function generateAccessToken(user) {
-  return jwt.sign(user, jwtConfig.secret.access, { expiresIn: '1d' });
+  return jwt.sign(user, jwtConfig.secret.access, { expiresIn: '30s' });
 }
 
 /**@param {string} token */
