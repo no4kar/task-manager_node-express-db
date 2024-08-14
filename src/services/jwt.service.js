@@ -2,7 +2,7 @@
 'use strict';
 
 import jwt from 'jsonwebtoken';
-import { jwt as jwtConfig } from '../config.js';
+import { jwt as jwtConfig } from '../configs/env.config.js';
 
 export const jwtService = {
   generateAccessToken,
@@ -11,12 +11,12 @@ export const jwtService = {
   validateRefreshToken,
 };
 
-/**@param {import('src/types/user.type.js').TyUser.Item} user */
+/** @param {import('src/types/user.type.js').TyUser.Item} user */
 function generateAccessToken(user) {
   return jwt.sign(user, jwtConfig.secret.access, { expiresIn: '30s' });
 }
 
-/**@param {string} token */
+/** @param {string} token */
 function validateAccessToken(token) {
   try {
     return jwt.verify(token, jwtConfig.secret.access);
@@ -25,12 +25,12 @@ function validateAccessToken(token) {
   }
 }
 
-/**@param {import('src/types/user.type.js').TyUser.Item} user */
+/** @param {import('src/types/user.type.js').TyUser.Item} user */
 function generateRefreshToken(user) {
   return jwt.sign(user, jwtConfig.secret.refresh, { expiresIn: '1d' });
 }
 
-/**@param {string} token */
+/** @param {string} token */
 function validateRefreshToken(token) {
   try {
     return jwt.verify(token, jwtConfig.secret.refresh);

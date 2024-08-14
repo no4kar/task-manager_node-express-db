@@ -31,7 +31,7 @@ async function get(req, res) {
   } = req.query;
 
   if (['undefined', 'string'].every(option => option !== typeof title)) {
-    throw ApiError.InvalidData(
+    throw ApiError.UnprocessableEntity(
       `Type error`, {
       expected: {
         title: 'undefined | string',
@@ -44,24 +44,16 @@ async function get(req, res) {
   }
 
   if (typeof page === 'undefined' || typeof size === 'undefined') {
-    throw ApiError.InvalidData(`'page' and 'size' are required`);
+    throw ApiError.UnprocessableEntity(`'page' and 'size' are required`);
   }
 
   const limit = parseInt(String(size), 10) || Number.MAX_SAFE_INTEGER;
   const offset = ((parseInt(String(page), 10) || 1) - 1) * limit;
 
-  // console.info({
-  //   userId,
-  //   title,
-  //   completed,
-  //   limit,
-  //   offset,
-  // });
-
   const {
     rows,
     count,
-  } = await todoService.getAllByOptions(
+  } = await todoService.getAndCountAllByOptions(
     {
       userId: typeof userId !== 'undefined'
         ? String(userId)
@@ -110,7 +102,7 @@ async function post(req, res) {
     || typeof userId !== 'string'
     || typeof title !== 'string'
   ) {
-    throw ApiError.InvalidData(
+    throw ApiError.UnprocessableEntity(
       `Type error`,
       {
         expected: {
@@ -163,7 +155,7 @@ async function put(req, res) {
   };
 
   if (errors.userId || errors.title || errors.completed) {
-    throw ApiError.InvalidData(
+    throw ApiError.UnprocessableEntity(
       `Type error`,
       {
         expected: {
@@ -195,12 +187,9 @@ async function put(req, res) {
     return;
   }
 
-  Object.assign(foundTodo, {
-    ...foundTodo.dataValues,
-    userId,
-    title,
-    completed,
-  });
+  foundTodo.setDataValue('userId', userId);
+  foundTodo.setDataValue('title', title);
+  foundTodo.setDataValue('completed', completed);
 
   await foundTodo.save();
 
@@ -218,7 +207,7 @@ async function patchById(req, res) {// overwrites some fields except id
   const foundTodo = await todoService.getById(id);
 
   if (!foundTodo) {
-    throw ApiError.NotFound(`Cant find todo by id=${id}`);
+    throw ApiError.NotFound(`Can't find todo by id=${id}`);
   }
 
   // get updated values from req.body or use previous
@@ -228,7 +217,10 @@ async function patchById(req, res) {// overwrites some fields except id
     completed = foundTodo.dataValues.completed,
   } = req.body;
 
-  const [affectedCount, affectedRows] = await todoService.updateById({
+  const [
+    affectedCount,
+    affectedRows,
+  ] = await todoService.updateById({
     id,
     userId,
     title,
@@ -295,7 +287,7 @@ async function removeMany(req, res) {
   const { ids } = req.body;
 
   if (!Array.isArray(ids)) {
-    throw ApiError.InvalidData('Expected', {
+    throw ApiError.UnprocessableEntity('Expected', {
       ids: 'string[]',
     });
   }

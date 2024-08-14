@@ -4,7 +4,6 @@
 import bcrypt from 'bcrypt';
 
 import { ApiError } from '../exceptions/api.error.js';
-import { User } from '../models/User.model.js';
 import { jwtService } from '../services/jwt.service.js';
 import { tokenService } from '../services/token.service.js';
 import { userService } from '../services/user.service.js';
@@ -15,6 +14,7 @@ export const authController = {
   login,
   logout,
   refresh,
+  googleAuthCallback,
 };
 
 /** @type {import('src/types/func.type').Middleware} */
@@ -39,19 +39,14 @@ async function register(req, res) {
 async function activate(req, res) {
   const { activationToken } = req.params;
 
-  const foundUser = await User.findOne({
-    where: { activationToken },
-  });
+  const foundUser
+    = await userService.getByOptions({ activationToken });
 
   if (!foundUser) {
     throw ApiError.NotFound(`Can't find user by activationToken`);
   }
 
-  Object.assign(foundUser, {
-    ...foundUser.dataValues,
-    activationToken: null,
-  });
-
+  foundUser.setDataValue('activationToken', null);
   await foundUser.save();
 
   await sendAuthentication(res, foundUser.dataValues);
@@ -60,14 +55,14 @@ async function activate(req, res) {
 /** @type {import('src/types/func.type').Middleware} */
 async function login(req, res) {
   const { email, password } = req.body;
-  const foundUser = await userService.getByEmail(email);
+  const foundUser = await userService.getByOptions({ email });
 
   if (!foundUser) {
-    throw ApiError.BadRequest('The user with this email does not exist');
+    throw ApiError.NotFound('The user with this email does not exist');
   }
 
   if (foundUser.dataValues.activationToken) {
-    throw ApiError.BadRequest('The user is not yet activated');
+    throw ApiError.Forbidden('The user is not yet activated');
   }
 
   const isPasswordValid
@@ -96,7 +91,7 @@ async function refresh(req, res) {
     throw ApiError.Unauthorized();
   }
 
-  const user = await userService.getByEmail(userData?.email);
+  const user = await userService.getByOptions({ email: userData?.email });
 
   if (!user) {
     throw ApiError.Unauthorized();
@@ -117,6 +112,18 @@ async function logout(req, res) {
   }
 
   res.sendStatus(204);
+}
+
+/** @type {import('src/types/func.type').Middleware} */
+async function googleAuthCallback(req, res) {
+  /** @type {import('src/types/user.type').TyUser.Item | undefined} */
+  const user = req.user; // This is the user returned by Passport
+
+  if (!user) {
+    throw ApiError.Unauthorized('Google authentication failed');
+  }
+
+  sendAuthentication(res, user);
 }
 
 /** 

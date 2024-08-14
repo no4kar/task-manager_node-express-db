@@ -3,8 +3,6 @@
 
 import { userService } from '../services/user.service.js';
 
-/**@typedef {import('src/types/user.type.js').TyUser.Item} TyUserItem */
-
 export const userController = {
   getAll,
 };

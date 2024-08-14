@@ -16,6 +16,9 @@ const smtpHost = process.env.SMTP_HOST || 'smtp.example.com';
 const smtpUser = process.env.SMTP_USER || 'example@email.com';
 const smtpPassword = process.env.SMTP_PASSWORD || 'example-password';
 
+const googleClientId = process.env.GOOGLE_CLIENT_ID || '';
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || '';
+
 export const todo = Object.freeze({
   server: {
     port: serverPort,
@@ -45,4 +48,11 @@ export const smtp = Object.freeze({
   port: smtpPort,
   user: smtpUser,
   password: smtpPassword,
+});
+
+export const google = Object.freeze({
+  client: {
+    id: googleClientId,
+    secret: googleClientSecret,
+  },
 });

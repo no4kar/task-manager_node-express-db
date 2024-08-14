@@ -2,10 +2,10 @@
 'use strict';
 
 import nodemailer from 'nodemailer';
-import { 
+import {
   smtp as smtpConfig,
   todo as todoConfig,
- } from '../config.js';
+} from '../configs/env.config.js';
 
 export const emailService = {
   send,

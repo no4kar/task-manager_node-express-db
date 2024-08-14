@@ -14,22 +14,12 @@ import { authRouter } from './routers/auth.router.js';
 import { catchError, errorMiddleware } from './middlewares/error.middleware.js';
 import { swaggerSpec } from './api-docs/swagger.js';
 import { authMiddleware } from './middlewares/auth.middleware.js';
-import { todo as todoConfig } from './config.js';
+import { corsConfig } from './configs/cors.config.js';
 
 export const app = express();
 
 app.use(cookieParser());
-app.use(cors(
-      (req, cb) => {
-        const corsOptions = {
-            origin: todoConfig.client.host || req.header('Origin'), // Dynamically set the origin
-            methods: ['GET', 'POST', 'PUT', 'DELETE'],
-            allowedHeaders: ['Content-Type', 'Authorization'],
-            credentials: true,
-        };
-        cb(null, corsOptions);
-    }
-  ));
+app.use(cors(corsConfig));
 app.use(express.json());
 
 // Get all files from address

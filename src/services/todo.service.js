@@ -5,15 +5,15 @@ import { Op } from 'sequelize';
 import { sequelize } from '../store/sqlite.db.js';
 import { Todo as Todos } from '../models/Todo.model.js';
 
-/**@typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodoItem */
-/**@typedef {import('src/types/todo.type.js').TyTodo.ItemPartial} TyTodoItemPartial */
+/**@typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodo */
+/**@typedef {import('src/types/todo.type.js').TyTodo.ItemPartial} TyTodoPartial */
 /**@typedef {import('src/types/todo.type.js').TyTodo.Model} TyTodoModel */
 
 export const todoService = {
   normalize,
   getAll,
   getAllByUser,
-  getAllByOptions,
+  getAndCountAllByOptions,
   getById,
   create,
   updateById,
@@ -36,10 +36,10 @@ function getAll() {
 }
 
 /**
- * @param {TyTodoItemPartial} itemPartial
+ * @param {TyTodoPartial} itemPartial
  * @param {number} [limit]
  * @param {number} [offset] */
-function getAllByOptions(
+function getAndCountAllByOptions(
   {
     userId,
     title,
@@ -48,7 +48,7 @@ function getAllByOptions(
   limit,
   offset,
 ) {
-  /**@type {import('sequelize').WhereOptions<TyTodoItem>} */
+  /**@type {import('sequelize').WhereOptions<TyTodo>} */
   const whereConditions = {};
 
   if (userId !== undefined) {
@@ -104,7 +104,7 @@ function create(properties) {
 }
 
 /**
- * @param {TyTodoItemPartial} updatedTodo
+ * @param {TyTodoPartial} updatedTodo
  * @param {import('sequelize').Transaction | null | undefined} [transaction] */
 function updateById(updatedTodo, transaction) {
   const { id, ...restProps } = updatedTodo;
@@ -118,10 +118,10 @@ function updateById(updatedTodo, transaction) {
 }
 
 /**
- * @param {TyTodoItem[]} items*/
+ * @param {TyTodo[]} items*/
 async function updateManyById(items) {
   return sequelize.transaction(async (t) => { // eslint-disable-line
-    /**@type {(TyTodoItem | null)[]} */
+    /**@type {(TyTodo | null)[]} */
     const results = [];
 
     for (const item of items) {
@@ -133,7 +133,7 @@ async function updateManyById(items) {
   });
 }
 
-/** @param {TyTodoItem['id']} id */
+/** @param {TyTodo['id']} id */
 function removeById(id) {
   return Todos.destroy({
     where: { id },

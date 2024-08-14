@@ -1,7 +1,7 @@
 import {
   OAS3DefinitionPaths as todoOAS3DefinitionPaths,
 } from '../api-docs/todo.paths.js';
-import { todo as todoConfig } from '../config.js';
+import { todo as todoConfig } from '../configs/env.config.js';
 import swaggerJSDoc from 'swagger-jsdoc';
 
 

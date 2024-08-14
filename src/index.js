@@ -2,7 +2,7 @@
 'use strict';
 
 import * as todosServer from './todosServer.js';
-import { todo as todoConfig } from './config.js';
+import { todo as todoConfig } from './configs/env.config.js';
 
 /**
  * @param {string} serverName
