@@ -6,6 +6,8 @@ import cors from 'cors';
 import path from 'node:path';
 import cookieParser from 'cookie-parser';
 import swaggerUI from 'swagger-ui-express';
+import passport from 'passport';
+import './configs/passport.config.js';
 
 import { rootRouter } from './routers/root.router.js';
 import { todoRouter } from './routers/todo.router.js';
@@ -21,6 +23,7 @@ export const app = express();
 app.use(cookieParser());
 app.use(cors(corsConfig));
 app.use(express.json());
+app.use(passport.initialize());
 
 // Get all files from address
 app.use(express.static(path.resolve('./public')));

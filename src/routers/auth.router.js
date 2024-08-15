@@ -17,13 +17,13 @@ authRouter
   .get('/google',
     passport.authenticate('google', {
       scope: ['profile', 'email'],
-      successRedirect: '/auth/google/callback',
-      failureRedirect: '/auth/logout',
+      // successRedirect: '/auth/activateByGoogle',
+      // failureRedirect: '/auth/logout',
     })
   )
-  .get('/google/callback',
+  .get('/activateByGoogle',
     passport.authenticate('google', { session: false }),
-    catchError(authController.googleAuthCallback)
+    catchError(authController.activateByGoogle)
   );
 
 authRouter

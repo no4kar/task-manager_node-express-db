@@ -1,31 +1,32 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { userService } from '../services/user.service.js';
-import { tokenService } from '../services/token.service.js';
-import { jwtService } from 'src/services/jwt.service.js';
 import {
   google as googleConfig,
   todo as todoConfig,
 } from './env.config.js';
-
-/**
- * @callback VerifyFunction
- * @param {string} accessToken - The access token.
- * @param {string} refreshToken - The refresh token.
- * @param {import('passport-google-oauth20').Profile} profile - The user's profile information.
- * @param {import('passport-google-oauth20').VerifyCallback} done - The callback function to indicate verification completion.
- * @returns {Promise<void>} */
+import { bcryptService } from '../services/bcrypt.service.js';
 
 passport.use(
   new GoogleStrategy(
     {
       clientID: googleConfig.client.id,
       clientSecret: googleConfig.client.secret,
-      callbackURL: `${todoConfig.server.host}/auth/google/callback`,
-      passReqToCallback: true,
+      callbackURL: `${todoConfig.server.host}/auth/activateByGoogle`,
+      // passReqToCallback: true,
     },
-    /**@type {VerifyFunction} */
-    async (accessToken, refreshToken, profile, done) => {
+    async function (
+      accessToken,
+      refreshToken,
+      profile,
+      done,
+    ) {
+      console.dir({
+        accessToken,
+        refreshToken,
+        profile,
+      });
+
       try {
         // Check if the user already exists in the database
         const foundUser = await userService.getByOptions({
@@ -33,33 +34,24 @@ passport.use(
         });
 
         if (foundUser) {
-          return done(null, foundUser);
+          foundUser.setDataValue('activationToken', profile.id);
+          await foundUser.save();
+          return done(null, foundUser.dataValues);
         }
 
         // If user does not exist, create a new user with Google profile info
         const createdUser = await userService.create({
           email: profile.emails[0].value,
-          password: Math.random().toString(16).slice(2),
-          // password: null, // No password required for Google OAuth2
-          googleId: profile.id,
-          // Add other profile fields as needed
+          password: await bcryptService.hash(profile.id),
+          // password: Math.random().toString(16).slice(2),
+          activationToken: profile.id,
         });
 
-        // Generate JWT tokens for the authenticated user
-        const accessToken = jwtService.generateAccessToken(user);
-        const refreshToken = jwtService.generateRefreshToken(user);
-
-        // Save the refresh token in the database
-        await tokenService.save({ userId: user.id, refreshToken });
-
-        // Attach the tokens to the user object so they can be used in the controller
-        user.tokens = { accessToken, refreshToken };
-        // Return the user for session handling
-        return done(null, createdUser);
+        return done(null, createdUser.dataValues);
       } catch (error) {
         return done(error);
       }
-    }
+    },
   )
 );
 
@@ -69,8 +61,8 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const user = await userService.getByOptions({ id });
-    done(null, user);
+    const foundUser = await userService.getByOptions({ id });
+    done(null, foundUser?.dataValues);
   } catch (error) {
     done(error);
   }

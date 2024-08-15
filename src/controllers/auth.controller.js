@@ -1,20 +1,20 @@
 // @ts-check
 'use strict';
 
-import bcrypt from 'bcrypt';
-
 import { ApiError } from '../exceptions/api.error.js';
 import { jwtService } from '../services/jwt.service.js';
 import { tokenService } from '../services/token.service.js';
 import { userService } from '../services/user.service.js';
+import { bcryptService } from '../services/bcrypt.service.js';
+import { todo as todoConfig } from '../configs/env.config.js';
 
 export const authController = {
   register,
   activate,
+  activateByGoogle,
   login,
   logout,
   refresh,
-  googleAuthCallback,
 };
 
 /** @type {import('src/types/func.type').Middleware} */
@@ -53,6 +53,18 @@ async function activate(req, res) {
 }
 
 /** @type {import('src/types/func.type').Middleware} */
+async function activateByGoogle(req, res) {
+  /** @type {import('src/types/user.type').TyUser.Item | undefined} */
+  const user = req.user; // This is the user returned by Passport
+
+  if (!user) {
+    throw ApiError.Unauthorized('Google authentication failed');
+  }
+
+  res.redirect(`${todoConfig.client.host}/task-manager_react-vite/activate/${user.activationToken}`);
+}
+
+/** @type {import('src/types/func.type').Middleware} */
 async function login(req, res) {
   const { email, password } = req.body;
   const foundUser = await userService.getByOptions({ email });
@@ -66,7 +78,7 @@ async function login(req, res) {
   }
 
   const isPasswordValid
-    = await bcrypt.compare(password, foundUser.dataValues.password);
+    = await bcryptService.compare(password, foundUser.dataValues.password);
 
   if (!isPasswordValid) {
     throw ApiError.BadRequest('Login details are wrong');
@@ -112,18 +124,6 @@ async function logout(req, res) {
   }
 
   res.sendStatus(204);
-}
-
-/** @type {import('src/types/func.type').Middleware} */
-async function googleAuthCallback(req, res) {
-  /** @type {import('src/types/user.type').TyUser.Item | undefined} */
-  const user = req.user; // This is the user returned by Passport
-
-  if (!user) {
-    throw ApiError.Unauthorized('Google authentication failed');
-  }
-
-  sendAuthentication(res, user);
 }
 
 /** 

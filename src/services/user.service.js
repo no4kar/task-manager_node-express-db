@@ -1,28 +1,33 @@
-'use strict';
 // @ts-check
+'use strict';
 
-import bcrypt from 'bcrypt';
 import { v1 as uuidv1 } from 'uuid';
 
-import { emailService } from '../services/email.service.js';
-import { bcrypt as bcryptConfig } from '../configs/env.config.js';
 import { ApiError } from '../exceptions/api.error.js';
-import { User } from '../models/User.model.js';
+import { User as Users } from '../models/User.model.js';
+import { emailService } from '../services/email.service.js';
+import { bcryptService } from './bcrypt.service.js';
 
 /** @typedef {import('src/types/user.type.js').TyUser.Item} TyUser */
 /** @typedef {import('src/types/user.type.js').TyUser.ItemNormalized} TyUserNormalized */
 /** @typedef {import('src/types/user.type.js').TyUser.ItemPartial} TyUserPartial */
 
 export const userService = {
-  getAllActive,
   normalize,
+  getAllActive,
   getByOptions,
   getAndCountAllByOptions,
+  create,
   register,
 };
 
+/** @param {TyUserNormalized} itemNormalized */
+function normalize({ id, email }) {
+  return { id, email };
+}
+
 function getAllActive() {
-  return User.findAll({
+  return Users.findAll({
     where: {
       activationToken: null,
     },
@@ -54,7 +59,7 @@ function getByOptions({
 
   console.info(whereConditions);
 
-  return User.findOne({
+  return Users.findOne({
     where: whereConditions,
   });
 }
@@ -88,17 +93,18 @@ function getAndCountAllByOptions({
 
   console.info(whereConditions);
 
-  return User.findAndCountAll({
+  return Users.findAndCountAll({
     where: whereConditions,
     limit,
     offset,
   });
 }
 
-/** @param {TyUserNormalized} itemNormalized */
-function normalize({ id, email }) {
-  return { id, email };
-}
+/**
+ * @param {import('src/types/user.type.js').TyUser.CreationAttributes} properties */
+ function create(properties) {
+  return Users.create({ ...properties });
+ }
 
 /** @param {{email: string, password: string}} params */
 async function register({ email, password }) {
@@ -114,9 +120,9 @@ async function register({ email, password }) {
   const activationToken = uuidv1();
   // hash the password
   const hashedPassword
-    = await bcrypt.hash(password, bcryptConfig.hash.saltOrRounds);
+    = await bcryptService.hash(password);
 
-  const createdUser = await User.create({
+  const createdUser = await Users.create({
     email,
     password: hashedPassword,
     activationToken,

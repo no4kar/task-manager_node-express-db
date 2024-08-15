@@ -31,7 +31,7 @@ function normalize(item) {
 
 function getAll() {
   return Todos.findAll({
-    order: ['id'],
+    order: [['id', 'ASC']],
   });
 }
 
