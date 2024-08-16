@@ -4,7 +4,7 @@ const serverPort = Number(process.env.SERVER_PORT || 3001);
 const serverHost = process.env.SERVER_HOST || `http://localhost:${serverPort}`;
 
 const clientPort = Number(process.env.CLIENT_PORT || 8080);
-const clientHost = process.env.CLIENT_HOST || '';
+const clientHost = process.env.CLIENT_HOST || `http://localhost:${clientPort}`;
 
 const JWTAccessSecret = process.env.JWT_ACCESS_SECRET || 'secretOrPrivateKey';
 const JWTRefreshSecret = process.env.JWT_REFRESH_SECRET || 'secretOrPrivateKey';

@@ -6,15 +6,15 @@ import { todo as todoConfig } from './configs/env.config.js';
 
 /**
  * @param {string} serverName
- * @param {number} port
- * @param {string} clientUrl */
-function serverRunInfo(serverName, port, clientUrl) {
+ * @param {Object} configs */
+function serverRunInfo(serverName, configs) {
   return (`
-${serverName} is running on PORT=${port}
-origin: ${clientUrl}
+${serverName} is running 
+server: ${configs.server.host}
+client: ${configs.client.host}
 `);
 };
 
 todosServer.app.listen(todoConfig.server.port, () => {
-  console.info(serverRunInfo('todosServer', Number(todoConfig.server.port), 'localhost'));
+  console.info(serverRunInfo('todosServer', todoConfig));
 });
