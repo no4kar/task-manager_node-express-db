@@ -8,8 +8,6 @@ export const corsConfig = (req, cb) => {
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   };
-
-  console.dir(corsConfig);
   
   cb(null, corsOptions);
 }

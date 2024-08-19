@@ -13,7 +13,7 @@ export const jwtService = {
 
 /** @param {import('src/types/user.type.js').TyUser.Item} user */
 function generateAccessToken(user) {
-  return jwt.sign(user, jwtConfig.secret.access, { expiresIn: '30s' });
+  return jwt.sign(user, jwtConfig.secret.access, { expiresIn: '1h' });
 }
 
 /** @param {string} token */
@@ -27,7 +27,7 @@ function validateAccessToken(token) {
 
 /** @param {import('src/types/user.type.js').TyUser.Item} user */
 function generateRefreshToken(user) {
-  return jwt.sign(user, jwtConfig.secret.refresh, { expiresIn: '1d' });
+  return jwt.sign(user, jwtConfig.secret.refresh, { expiresIn: '10d' });
 }
 
 /** @param {string} token */

@@ -7,7 +7,12 @@ import { jwtService } from '../services/jwt.service.js';
 
 /** @type {import('src/types/func.type.js').Middleware} */
 export function authMiddleware(req, res, next) {
-  const authHeader = req.headers['authorization'];
+  // Simplified check for Google authorization 
+  if (req.user) {
+    next();
+  }
+
+  const authHeader = req.headers.authorization;
 
   if (!authHeader) {
     throw ApiError.Unauthorized();
