@@ -15,14 +15,14 @@ authRouter
   .get('/google',
     passport.authenticate('google', {
       scope: ['profile', 'email']
-    })
+    }),
   )
   .get('/google/callback',
     passport.authenticate('google', { session: false }),
     catchError(authController.activateByGoogle), // here 'passport' attaches 'user' to 'req'
   )
   .get('/activate/:activationToken',
-    catchError(authController.activate)
+    catchError(authController.activate),
   )
   ;
 

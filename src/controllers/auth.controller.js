@@ -167,7 +167,7 @@ function validatePassword(value) {
     return 'Password is required';
   }
 
-  if (value.length < 6) {
-    return 'At least 6 characters';
+  if (value.length < 8) {
+    return 'At least 8 characters';
   }
 }

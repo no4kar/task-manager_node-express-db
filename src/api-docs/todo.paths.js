@@ -1,3 +1,5 @@
+import { responseError } from './responseError.js';
+
 /**@type {import('swagger-jsdoc').OAS3Definition['paths']} */
 export const OAS3DefinitionPaths =
 {
@@ -22,6 +24,11 @@ export const OAS3DefinitionPaths =
       tags: [
         'Todos'
       ],
+      security: [
+        {
+          BearerAuth: [],
+        }
+      ],
       parameters: [
         {
           in: 'path',
@@ -44,26 +51,9 @@ export const OAS3DefinitionPaths =
             }
           }
         },
-        404: {
-          description: 'No todo found with the specified ID',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/Error'
-              }
-            }
-          }
-        },
-        500: {
-          description: 'Internal server error',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/Error'
-              }
-            }
-          }
-        }
+        401: responseError[401],
+        404: responseError[404],
+        500: responseError[500],
       }
     },
     put: {
@@ -148,26 +138,9 @@ export const OAS3DefinitionPaths =
             }
           }
         },
-        422: {
-          description: 'Invalid data',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/Error'
-              }
-            }
-          }
-        },
-        500: {
-          description: 'Internal server error',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/Error'
-              }
-            }
-          }
-        }
+        401: responseError[401],
+        422: responseError[422],
+        500: responseError[500],
       }
     },
     delete: {
@@ -312,36 +285,10 @@ export const OAS3DefinitionPaths =
             }
           }
         },
-        404: {
-          description: 'No todos found for the specified userId',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/Error'
-              }
-            }
-          }
-        },
-        422: {
-          description: 'Invalid query',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/Error'
-              }
-            }
-          }
-        },
-        500: {
-          description: 'Internal server error',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/Error'
-              }
-            }
-          }
-        }
+        401: responseError[401],
+        404: responseError[404],
+        422: responseError[422],
+        500: responseError[500],
       }
     },
     post: {
@@ -401,26 +348,9 @@ export const OAS3DefinitionPaths =
             },
           },
         },
-        422: {
-          description: 'Invalid data',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/Error',
-              },
-            },
-          },
-        },
-        500: {
-          description: 'Internal server error',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/Error',
-              },
-            },
-          },
-        },
+        401: responseError[401],
+        422: responseError[422],
+        500: responseError[500],
       },
     },
   },

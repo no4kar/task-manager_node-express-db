@@ -1,6 +1,9 @@
 import {
   OAS3DefinitionPaths as todoOAS3DefinitionPaths,
-} from '../api-docs/todo.paths.js';
+} from './todo.paths.js';
+import {
+  OAS3DefinitionPaths as authOAS3DefinitionPaths,
+} from './auth.paths.js';
 import { todo as todoConfig } from '../configs/env.config.js';
 import swaggerJSDoc from 'swagger-jsdoc';
 
@@ -13,14 +16,18 @@ const swaggerDefinition = {
     title: 'TASK MANAGER API',
     version: '1.0.0',
     description:
-      "### get('/')\n"
-      + "### get('/:id')\n\n"
-      + "### post('/')\n\n"
-      + "### put('/:id')\n\n"
+      "### todoRouter\n"
+      + '### get(\'/\')\n'
+      + "\t### get('/:id')\n"
+      + "\t### post('/')\n"
+      + "\t### put('/:id')\n"
       // + "### patch('/:id')\n"
       // + "### patch('/', isAction('delete'))\n"
       // + "### patch('/', isAction('update'))\n\n"
-      + "### delete('/:id')"
+      + "\n\t### delete('/:id')\n"
+
+      + "### authRouter\n"
+      + "\t### post('/login')\n"
     ,
   },
   servers: [
@@ -46,13 +53,40 @@ const swaggerDefinition = {
             type: 'string',
             description: 'The title of the todo',
           },
-          // todo, inProgress, done
           completed: {
             type: 'boolean',
             description: 'Whether the todo is completed',
           },
         },
         required: ['id', 'userId', 'title', 'completed'],
+      },
+      User: {
+        type: 'object',
+        description: 'The authenticated user object',
+        properties: {
+          id: {
+            type: 'string',
+            description: 'The user ID',
+          },
+          email: {
+            type: 'string',
+            description: 'The user\'s email who owns the todos',
+          },
+        },
+        // required: ['email'],
+      },
+      Auth: {
+        type: 'object',
+        properties: {
+          user: {
+            $ref: '#/components/schemas/User',
+          },
+          accessToken: {
+            type: 'string',
+            description: 'The access token for the authenticated session',
+          },
+        },
+        required: ['user', 'accessToken'],
       },
       Pageable: {
         type: 'object',
@@ -85,9 +119,20 @@ const swaggerDefinition = {
         required: ['message', 'error'],
       },
     },
+    securitySchemes: {
+      BearerAuth: {
+        type: 'http',
+        description:
+          'Enter JWT Bearer token in the format: Bearer {token}\n\n',
+        in: 'header',
+        scheme: 'bearer',
+        bearerFormat: 'JWT', // Optional, just a hint for the format
+      }
+    },
   },
   paths: {
     ...todoOAS3DefinitionPaths,
+    ...authOAS3DefinitionPaths,
   }
 };
 

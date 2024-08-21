@@ -2,7 +2,6 @@
 'use strict';
 
 import { ApiError } from '../exceptions/api.error.js';
-
 import { jwtService } from '../services/jwt.service.js';
 
 /** @type {import('src/types/func.type.js').Middleware} */
