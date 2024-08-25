@@ -20,7 +20,7 @@ export const OAS3DefinitionPaths =
         + '### Responses\n'
         + '- **200 OK**: Successful login, returns user data and an access token, and sets a refresh token cookie.\n'
         + '- **401 Unauthorized**: Invalid email or password.\n'
-        + '- **422 Unprocessable Entity**: If the request body contains invalid data.\n'
+        // + '- **422 Unprocessable Entity**: If the request body contains invalid data.\n'
         + '- **500 Internal Server Error**: For server issues.\n',
       tags: ['Auth'],
       requestBody: {
@@ -50,6 +50,13 @@ export const OAS3DefinitionPaths =
       responses: {
         200: {
           description: 'Successful login. Returns the authenticated user data and access token, and sets a refresh token in the cookies.',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/Auth',
+              },
+            },
+          },
           headers: {
             'Set-Cookie': {
               description: 'Sets the refresh token with HttpOnly, Secure, and SameSite attributes.',
@@ -62,13 +69,6 @@ export const OAS3DefinitionPaths =
                 SameSite=None;
                 Path=/;
                 Max-Age=2592000`,
-              },
-            },
-          },
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/Auth',
               },
             },
           },

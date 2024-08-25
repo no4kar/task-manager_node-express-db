@@ -79,6 +79,11 @@ export const OAS3DefinitionPaths =
       tags: [
         'Todos'
       ],
+      security: [
+        {
+          BearerAuth: [],
+        }
+      ],
       requestBody: {
         description: 'The details of the todo item to be created.',
         required: true,
@@ -158,6 +163,11 @@ export const OAS3DefinitionPaths =
       tags: [
         'Todos'
       ],
+      security: [
+        {
+          BearerAuth: [],
+        }
+      ],
       parameters: [
         {
           in: 'path',
@@ -221,8 +231,11 @@ export const OAS3DefinitionPaths =
         '- **200 OK**: Returns all matched todos.\n' +
         '- **422 Unprocessable entity**: If invalid query.\n' +
         '- **500 Internal Server Error**: For server issues.\n',
-      tags: [
-        'Todos'
+      tags: ['Todos'],
+      security: [
+        {
+          BearerAuth: [],
+        }
       ],
       parameters: [
         {
@@ -310,6 +323,11 @@ export const OAS3DefinitionPaths =
         '- **422 Unprocessable Entity**: If invalid data is provided.\n' +
         '- **500 Internal Server Error**: For server issues.\n',
       tags: ['Todos'],
+      security: [
+        {
+          BearerAuth: [],
+        }
+      ],
       requestBody: {
         description: 'The details of the todo item to be created.',
         required: true,

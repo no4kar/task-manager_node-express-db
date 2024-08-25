@@ -123,7 +123,7 @@ const swaggerDefinition = {
       BearerAuth: {
         type: 'http',
         description:
-          'Enter JWT Bearer token in the format: Bearer {token}\n\n',
+          'Enter JWT Bearer token',
         in: 'header',
         scheme: 'bearer',
         bearerFormat: 'JWT', // Optional, just a hint for the format

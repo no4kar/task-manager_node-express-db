@@ -1,5 +1,5 @@
-'use strict';
 // @ts-check
+'use strict';
 
 import { ApiError } from '../exceptions/api.error.js';
 
