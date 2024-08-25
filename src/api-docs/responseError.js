@@ -40,5 +40,3 @@ export const responseError = {
     }
   },
 };
-
-const a = { 2: 'asd', };

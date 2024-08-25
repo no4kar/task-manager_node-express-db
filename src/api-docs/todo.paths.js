@@ -187,33 +187,12 @@ export const OAS3DefinitionPaths =
               name: 'count',
               schema: {
                 type: 'number',
-                // items: {
-                //   $ref: '#/components/schemas/Pageable'
-                // }
               },
             },
           },
         },
-        404: {
-          description: 'Invalid data',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/Error'
-              }
-            }
-          }
-        },
-        500: {
-          description: 'Internal server error',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/Error'
-              }
-            }
-          }
-        }
+        404: responseError[404],
+        500: responseError[500],
       }
     },
   },
