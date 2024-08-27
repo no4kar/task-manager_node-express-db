@@ -19,40 +19,46 @@ const smtpPassword = process.env.SMTP_PASSWORD || 'example-password';
 const googleClientId = process.env.GOOGLE_CLIENT_ID || '';
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || '';
 
-export const todo = Object.freeze({
-  server: {
-    port: serverPort,
-    host: serverHost,
+const mangodbUser = process.env.MANGO_USER || '';
+const mangodbPassword = process.env.MANGO_PASSWORD || '';
+
+export const env = Object.freeze({
+  todo: {
+    server: {
+      port: serverPort,
+      host: serverHost,
+    },
+    client: {
+      port: clientPort,
+      host: clientHost,
+    },
   },
-  client: {
-    port: clientPort,
-    host: clientHost,
+  jwt: {
+    secret: {
+      access: JWTAccessSecret,
+      refresh: JWTRefreshSecret,
+    },
+  },
+  bcrypt: {
+    hash: {
+      saltOrRounds: bcryptSaltOrRounds,
+    },
+  },
+  smtp: {
+    host: smtpHost,
+    port: smtpPort,
+    user: smtpUser,
+    password: smtpPassword,
+  },
+  google: {
+    client: {
+      id: googleClientId,
+      secret: googleClientSecret,
+    },
+  },
+  mangodb: {
+    user: mangodbUser,
+    password: mangodbPassword,
   },
 });
 
-export const jwt = Object.freeze({
-  secret: {
-    access: JWTAccessSecret,
-    refresh: JWTRefreshSecret,
-  },
-});
-
-export const bcrypt = Object.freeze({
-  hash: {
-    saltOrRounds: bcryptSaltOrRounds,
-  },
-});
-
-export const smtp = Object.freeze({
-  host: smtpHost,
-  port: smtpPort,
-  user: smtpUser,
-  password: smtpPassword,
-});
-
-export const google = Object.freeze({
-  client: {
-    id: googleClientId,
-    secret: googleClientSecret,
-  },
-});
