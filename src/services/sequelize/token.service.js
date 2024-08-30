@@ -1,7 +1,7 @@
 'use strict';
 // @ts-check
 
-import { Token } from '../models/Token.model.js';
+import { Token } from '../../models/sequelize/Token.model.js';
 
 /** @typedef {import('src/types/token.type.js').TyToken.Item} TyTokenItem*/
 /** @typedef {import('src/types/token.type.js').TyToken.CreationAttributes} TyTokenCreationAttributes*/

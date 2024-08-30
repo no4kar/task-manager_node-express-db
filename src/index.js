@@ -2,7 +2,7 @@
 'use strict';
 
 import * as todosServer from './todosServer.js';
-import { todo as todoConfig } from './configs/env.config.js';
+import { env } from './configs/env.config.js';
 
 /**
  * @param {string} serverName
@@ -15,6 +15,6 @@ client: ${configs.client.host}
 `);
 };
 
-todosServer.app.listen(todoConfig.server.port, () => {
-  console.info(serverRunInfo('todosServer', todoConfig));
+todosServer.app.listen(env.todo.server.port, () => {
+  console.info(serverRunInfo('todosServer', env.todo));
 });

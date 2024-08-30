@@ -4,7 +4,7 @@ import {
 import {
   OAS3DefinitionPaths as authOAS3DefinitionPaths,
 } from './auth.paths.js';
-import { todo as todoConfig } from '../configs/env.config.js';
+import { env } from '../configs/env.config.js';
 import swaggerJSDoc from 'swagger-jsdoc';
 
 
@@ -32,7 +32,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: todoConfig.server.host,
+      url: env.todo.server.host,
       description: 'Development server',
     },
   ],

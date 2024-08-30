@@ -1,10 +1,7 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { userService } from '../services/user.service.js';
-import {
-  google as googleConfig,
-  todo as todoConfig,
-} from './env.config.js';
+import { userService } from '../services/sequelize/user.service.js';
+import { env } from './env.config.js';
 import { bcryptService } from '../services/bcrypt.service.js';
 import { ApiError } from '../exceptions/api.error.js';
 
@@ -12,9 +9,9 @@ passport.use(
   new GoogleStrategy(
     // options: StrategyOptions
     {
-      clientID: googleConfig.client.id,
-      clientSecret: googleConfig.client.secret,
-      callbackURL: `${todoConfig.server.host}/auth/google/callback`,
+      clientID: env.google.client.id,
+      clientSecret: env.google.client.secret,
+      callbackURL: `${env.todo.server.host}/auth/google/callback`,
     },
     // verify: (accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) => void
     async function (

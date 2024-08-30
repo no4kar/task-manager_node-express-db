@@ -3,10 +3,10 @@
 
 import { ApiError } from '../exceptions/api.error.js';
 import { jwtService } from '../services/jwt.service.js';
-import { tokenService } from '../services/token.service.js';
-import { userService } from '../services/user.service.js';
+import { tokenService } from '../services/sequelize/token.service.js';
+import { userService } from '../services/sequelize/user.service.js';
 import { bcryptService } from '../services/bcrypt.service.js';
-import { todo as todoConfig } from '../configs/env.config.js';
+import { env } from '../configs/env.config.js';
 
 export const authController = {
   register,
@@ -61,7 +61,7 @@ async function activateByGoogle(req, res) {
     throw ApiError.Unauthorized('Google authentication failed');
   }
 
-  res.redirect(`${todoConfig.client.host}/task-manager_react-vite/activate/${user.activationToken}`);
+  res.redirect(`${env.todo.client.host}/task-manager_react-vite/activate/${user.activationToken}`);
 }
 
 /** @type {import('src/types/func.type').Middleware} */

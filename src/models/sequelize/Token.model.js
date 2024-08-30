@@ -2,7 +2,7 @@
 // @ts-check
 
 import { DataTypes } from 'sequelize';
-import { sequelize } from '../store/sqlite.db.js';
+import { sequelize } from '../../store/sqlite.db.js';
 import { User } from './User.model.js';
 
 /** @type {import('src/types/token.type.js').TyToken.ModelStatic} */
