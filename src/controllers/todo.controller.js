@@ -1,7 +1,7 @@
 // @ts-check
 'use strict';
 
-import { todoService } from '../services/todo.service.js';
+import { todoService } from '../services/sequelize/todo.service.js';
 import { ApiError } from '../exceptions/api.error.js';
 
 /**@typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodoItem */

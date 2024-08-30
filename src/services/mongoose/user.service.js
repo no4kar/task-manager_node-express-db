@@ -3,14 +3,18 @@
 
 import { v1 as uuidv1 } from 'uuid';
 
-import { ApiError } from '../exceptions/api.error.js';
-import { User as Users } from '../models/User.model.js';
-import { emailService } from '../services/email.service.js';
-import { bcryptService } from './bcrypt.service.js';
+import { ApiError } from '../../exceptions/api.error.js';
+import { User as Users } from '../../models/mongoose/User.model.js';
+import { emailService } from '../email.service.js';
+import { bcryptService } from '../bcrypt.service.js';
 
 /** @typedef {import('src/types/user.type.js').TyUser.Item} TyUser */
 /** @typedef {import('src/types/user.type.js').TyUser.ItemNormalized} TyUserNormalized */
 /** @typedef {import('src/types/user.type.js').TyUser.ItemPartial} TyUserPartial */
+/**
+ * @template T1, T2
+ * @typedef {import('mongoose').QueryWithHelpers<T1,T2>} QueryWithHelpers<T1,T2> */
+/** @typedef {import('mongoose').FilterQuery<TyUser>} TyUserFilterQuery */
 
 export const userService = {
   normalize,
@@ -26,13 +30,9 @@ function normalize({ id, email }) {
   return { id, email };
 }
 
+// Retrieves all active users (i.e., users with no activation token)
 function getAllActive() {
-  return Users.findAll({
-    where: {
-      activationToken: null,
-    },
-    order: [['id', 'ASC']],
-  });
+  return Users.find({ activationToken: null }).sort({ id: 'asc' });
 }
 
 /**
@@ -42,7 +42,7 @@ function getByOptions({
   email,
   activationToken,
 }) {
-  /**@type {import('sequelize').WhereOptions<TyUser>} */
+  /** @type {TyUserFilterQuery} */
   const whereConditions = {};
 
   if (id !== undefined) {
@@ -57,18 +57,17 @@ function getByOptions({
     whereConditions.activationToken = activationToken;
   }
 
-  console.info(whereConditions);
+  /**@type {QueryWithHelpers<TyUser | null,TyUser>} */
+  const query = Users.findOne(whereConditions);
 
-  return Users.findOne({
-    where: whereConditions,
-  });
+    return query.exec();
 }
 
 /**
  * @param {TyUserPartial} itemPartial
  * @param {number} [limit]
  * @param {number} [offset] */
-function getAndCountAllByOptions({
+async function getAndCountAllByOptions({
   id,
   email,
   activationToken,
@@ -76,7 +75,7 @@ function getAndCountAllByOptions({
   limit,
   offset,
 ) {
-  /**@type {import('sequelize').WhereOptions<TyUser>} */
+  /**@type {TyUserFilterQuery} */
   const whereConditions = {};
 
   if (id !== undefined) {
@@ -91,20 +90,29 @@ function getAndCountAllByOptions({
     whereConditions.activationToken = activationToken;
   }
 
-  console.info(whereConditions);
+  /** @type {QueryWithHelpers<TyUser[],TyUser>} */
+  const query
+    = Users.find(
+      whereConditions,
+      null,
+      {
+        limit,
+        skip: offset,
+      });
 
-  return Users.findAndCountAll({
-    where: whereConditions,
-    limit,
-    offset,
-  });
+  const rows = await query.exec();
+
+  return {
+    rows,
+    count: rows.length,
+  };
 }
 
 /**
  * @param {import('src/types/user.type.js').TyUser.CreationAttributes} properties */
- function create(properties) {
+function create(properties) {
   return Users.create({ ...properties });
- }
+}
 
 /** @param {{email: string, password: string}} params */
 async function register({ email, password }) {
@@ -128,13 +136,13 @@ async function register({ email, password }) {
     activationToken,
   });
 
-  if (!createdUser.dataValues.activationToken) {
+  if (!createdUser.activationToken) {
     throw new Error('something went wrong');
   }
 
   await emailService.sendActivationLink(
-    createdUser.dataValues.email,
-    createdUser.dataValues.activationToken,
+    createdUser.email,
+    createdUser.activationToken,
   );
 }
 

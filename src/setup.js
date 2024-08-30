@@ -1,9 +1,9 @@
 // import 'dotenv/config';
 import { sequelize } from './store/sqlite.db.js';
 
-import { Token } from './models/Token.model.js';
-import { User } from './models/User.model.js';
-import { Todo } from './models/Todo.model.js';
+import { Token } from './models/sequelize/Token.model.js';
+import { User } from './models/sequelize/User.model.js';
+import { Todo } from './models/sequelize/Todo.model.js';
 
 // User has one Token (one-to-one relationship)
 const UserHasOneToken = User.hasOne(Token, {

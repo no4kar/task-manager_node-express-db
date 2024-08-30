@@ -2,8 +2,8 @@
 // @ts-check
 
 import { Op } from 'sequelize';
-import { sequelize } from '../store/sqlite.db.js';
-import { Todo as Todos } from '../models/Todo.model.js';
+import { sequelize } from '../../store/sqlite.db.js';
+import { Todo as Todos } from '../../models/sequelize/Todo.model.js';
 
 /**@typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodo */
 /**@typedef {import('src/types/todo.type.js').TyTodo.ItemPartial} TyTodoPartial */

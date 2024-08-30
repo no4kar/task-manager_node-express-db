@@ -2,7 +2,7 @@
 // @ts-check
 
 import bcrypt from 'bcrypt';
-import { bcrypt as bcryptConfig } from '../configs/env.config.js';
+import { env } from '../configs/env.config.js';
 
 export const bcryptService = {
   hash,
@@ -11,7 +11,7 @@ export const bcryptService = {
 
 /** @param {string | Buffer} data */
 function hash(data) {
-  return bcrypt.hash(data, bcryptConfig.hash.saltOrRounds);
+  return bcrypt.hash(data, env.bcrypt.hash.saltOrRounds);
 }
 
 /** 

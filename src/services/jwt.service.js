@@ -2,7 +2,7 @@
 'use strict';
 
 import jwt from 'jsonwebtoken';
-import { jwt as jwtConfig } from '../configs/env.config.js';
+import { env } from '../configs/env.config.js';
 
 export const jwtService = {
   generateAccessToken,
@@ -13,13 +13,13 @@ export const jwtService = {
 
 /** @param {import('src/types/user.type.js').TyUser.Item} user */
 function generateAccessToken(user) {
-  return jwt.sign(user, jwtConfig.secret.access, { expiresIn: '1h' });
+  return jwt.sign(user, env.jwt.secret.access, { expiresIn: '1h' });
 }
 
 /** @param {string} token */
 function validateAccessToken(token) {
   try {
-    return jwt.verify(token, jwtConfig.secret.access);
+    return jwt.verify(token, env.jwt.secret.access);
   } catch (error) {
     return null;
   }
@@ -27,13 +27,13 @@ function validateAccessToken(token) {
 
 /** @param {import('src/types/user.type.js').TyUser.Item} user */
 function generateRefreshToken(user) {
-  return jwt.sign(user, jwtConfig.secret.refresh, { expiresIn: '10d' });
+  return jwt.sign(user, env.jwt.secret.refresh, { expiresIn: '10d' });
 }
 
 /** @param {string} token */
 function validateRefreshToken(token) {
   try {
-    return jwt.verify(token, jwtConfig.secret.refresh);
+    return jwt.verify(token, env.jwt.secret.refresh);
   } catch (error) {
     return null;
   }

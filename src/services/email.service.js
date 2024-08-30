@@ -2,10 +2,7 @@
 'use strict';
 
 import nodemailer from 'nodemailer';
-import {
-  smtp as smtpConfig,
-  todo as todoConfig,
-} from '../configs/env.config.js';
+import { env } from '../configs/env.config.js';
 
 export const emailService = {
   send,
@@ -13,12 +10,12 @@ export const emailService = {
 };
 
 const transporter = nodemailer.createTransport({
-  host: smtpConfig.host,
-  port: smtpConfig.port,
+  host: env.smtp.host,
+  port: env.smtp.port,
   secure: false, // true for 465, false for other ports
   auth: {
-    user: smtpConfig.user,
-    pass: smtpConfig.password,
+    user: env.smtp.user,
+    pass: env.smtp.password,
   },
 });
 
@@ -38,7 +35,7 @@ function send({ email, subject, html }) {
  * @param {string} email
  * @param {string} token */
 function sendActivationLink(email, token) {
-  const link = `${todoConfig.client.host}/activate/${token}`;
+  const link = `${env.todo.client.host}/activate/${token}`;
 
   return send({
     email,
