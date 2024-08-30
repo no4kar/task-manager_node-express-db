@@ -40,4 +40,5 @@ const userSchema = new Schema(
 
 // Create and export the User model using the defined schema
 /** @type {import('mongoose').Model<TyUserItem>} */
-export const User = model('usergit s', userSchema);
+
+export const User = model('users', userSchema);
