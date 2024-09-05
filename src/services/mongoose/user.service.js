@@ -11,19 +11,9 @@ import { bcryptService } from '../bcrypt.service.js';
 /** @typedef {import('src/types/user.type.js').TyUser.Item} TyUser */
 /** @typedef {import('src/types/user.type.js').TyUser.ItemNormalized} TyUserNormalized */
 /** @typedef {import('src/types/user.type.js').TyUser.ItemPartial} TyUserPartial */
-
-/**
- * @template ResultType, DocType
- * @typedef {import('mongoose').QueryWithHelpers<ResultType,DocType>} QueryWithHelpers<ResultType,DocType> */
-/**
- * @template DocType
- * @typedef {import('mongoose').QueryWithHelpers<import('mongoose').HydratedDocument<DocType>[],DocType>} QueryArr<DocType> */
-/**
- * @template DocType
- * @typedef {import('mongoose').QueryWithHelpers<import('mongoose').HydratedDocument<DocType>,DocType>} QueryItem<DocType> */
-
+/** @typedef {import('src/types/db.type.js').TyMongoose.Query.Arr<TyUser>} TyUserQueryArr */
+/** @typedef {import('src/types/db.type.js').TyMongoose.Query.Item<TyUser>} TyUserQueryItem */
 /** @typedef {import('mongoose').FilterQuery<TyUser>} TyUserFilterQuery */
-/** @typedef {import('mongoose').Query<import('mongodb').DeleteResult,QueryItem<TyUser>>} QueryDeleteOne */
 
 export const userService = {
   normalize,
@@ -42,7 +32,7 @@ function normalize({ id, email }) {
 
 /** Retrieves all active users (i.e., users with no activation token) */
 function getAllActive() {
-  /** @type {QueryArr<TyUser>} */
+  /** @type {TyUserQueryArr} */
   const query = Users.find({ activationToken: null });
 
   return query.sort({ createdAt: 'asc' }).exec();
@@ -70,7 +60,7 @@ function getByOptions({
     whereConditions.activationToken = activationToken;
   }
 
-  /** @type {QueryItem<TyUser>} */
+  /** @type {TyUserQueryItem} */
   const query = Users.findOne(whereConditions);
 
   return query.exec();
@@ -103,7 +93,7 @@ async function getAndCountAllByOptions({
     whereConditions.activationToken = activationToken;
   }
 
-  /** @type {QueryArr<TyUser>} */
+  /** @type {TyUserQueryArr} */
   const query
     = Users.find(whereConditions);
 
@@ -125,7 +115,7 @@ function create(properties) {
 /**
  * @param {import('src/types/user.type.js').TyUser.Item['id']} id */
 async function removeById(id) {
-  /** @type {QueryItem<TyUser>} */
+  /** @type {TyUserQueryItem} */
   const query = Users.findOne({ id });
 
   const foundUser = await query.exec();;
