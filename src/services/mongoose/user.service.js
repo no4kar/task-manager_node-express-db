@@ -11,10 +11,19 @@ import { bcryptService } from '../bcrypt.service.js';
 /** @typedef {import('src/types/user.type.js').TyUser.Item} TyUser */
 /** @typedef {import('src/types/user.type.js').TyUser.ItemNormalized} TyUserNormalized */
 /** @typedef {import('src/types/user.type.js').TyUser.ItemPartial} TyUserPartial */
+
 /**
- * @template T1, T2
- * @typedef {import('mongoose').QueryWithHelpers<T1,T2>} QueryWithHelpers<T1,T2> */
+ * @template ResultType, DocType
+ * @typedef {import('mongoose').QueryWithHelpers<ResultType,DocType>} QueryWithHelpers<ResultType,DocType> */
+/**
+ * @template DocType
+ * @typedef {import('mongoose').QueryWithHelpers<import('mongoose').HydratedDocument<DocType>[],DocType>} QueryArr<DocType> */
+/**
+ * @template DocType
+ * @typedef {import('mongoose').QueryWithHelpers<import('mongoose').HydratedDocument<DocType>,DocType>} QueryItem<DocType> */
+
 /** @typedef {import('mongoose').FilterQuery<TyUser>} TyUserFilterQuery */
+/** @typedef {import('mongoose').Query<import('mongodb').DeleteResult,QueryItem<TyUser>>} QueryDeleteOne */
 
 export const userService = {
   normalize,
@@ -22,6 +31,7 @@ export const userService = {
   getByOptions,
   getAndCountAllByOptions,
   create,
+  removeById,
   register,
 };
 
@@ -30,9 +40,12 @@ function normalize({ id, email }) {
   return { id, email };
 }
 
-// Retrieves all active users (i.e., users with no activation token)
+/** Retrieves all active users (i.e., users with no activation token) */
 function getAllActive() {
-  return Users.find({ activationToken: null }).sort({ id: 'asc' });
+  /** @type {QueryArr<TyUser>} */
+  const query = Users.find({ activationToken: null });
+
+  return query.sort({ createdAt: 'asc' }).exec();
 }
 
 /**
@@ -57,10 +70,10 @@ function getByOptions({
     whereConditions.activationToken = activationToken;
   }
 
-  /**@type {QueryWithHelpers<TyUser | null,TyUser>} */
+  /** @type {QueryItem<TyUser>} */
   const query = Users.findOne(whereConditions);
 
-    return query.exec();
+  return query.exec();
 }
 
 /**
@@ -72,10 +85,10 @@ async function getAndCountAllByOptions({
   email,
   activationToken,
 },
-  limit,
-  offset,
+  limit = Number.MAX_SAFE_INTEGER,
+  offset = 0,
 ) {
-  /**@type {TyUserFilterQuery} */
+  /** @type {TyUserFilterQuery} */
   const whereConditions = {};
 
   if (id !== undefined) {
@@ -90,21 +103,16 @@ async function getAndCountAllByOptions({
     whereConditions.activationToken = activationToken;
   }
 
-  /** @type {QueryWithHelpers<TyUser[],TyUser>} */
+  /** @type {QueryArr<TyUser>} */
   const query
-    = Users.find(
-      whereConditions,
-      null,
-      {
-        limit,
-        skip: offset,
-      });
+    = Users.find(whereConditions);
 
-  const rows = await query.exec();
+  const rows = await query.limit(limit).skip(offset).exec();
+  const count = await query.countDocuments().exec();
 
   return {
     rows,
-    count: rows.length,
+    count,
   };
 }
 
@@ -112,6 +120,17 @@ async function getAndCountAllByOptions({
  * @param {import('src/types/user.type.js').TyUser.CreationAttributes} properties */
 function create(properties) {
   return Users.create({ ...properties });
+}
+
+/**
+ * @param {import('src/types/user.type.js').TyUser.Item['id']} id */
+async function removeById(id) {
+  /** @type {QueryItem<TyUser>} */
+  const query = Users.findOne({ id });
+
+  const foundUser = await query.exec();;
+
+  return foundUser.deleteOne();
 }
 
 /** @param {{email: string, password: string}} params */
