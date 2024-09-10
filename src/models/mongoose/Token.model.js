@@ -2,7 +2,7 @@
 'use strict';
 
 import { Schema, model } from 'mongoose';
-import { userNameModel } from './User.model.js';
+// import { userNameModel } from './User.model.js';
 
 /**
  * @typedef {import('src/types/token.type').TyToken.Item} TyTokenItem
@@ -17,7 +17,7 @@ const tokenSchema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: userNameModel,
+      ref: 'users',
       required: true,
     },
     refreshToken: {

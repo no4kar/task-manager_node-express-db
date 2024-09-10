@@ -113,14 +113,13 @@ function create(properties) {
 }
 
 /**
- * @param {import('src/types/user.type.js').TyUser.Item['id']} id */
+ * @param {import('src/types/user.type.js').TyUser.Item['id']} id
+ * @returns {Promise<{acknowledged: boolean, deletedCount: number}>} */
 async function removeById(id) {
   /** @type {TyUserQueryItem} */
   const query = Users.findOne({ id });
 
-  const foundUser = await query.exec();;
-
-  return foundUser.deleteOne();
+  return query.deleteOne().exec();
 }
 
 /** @param {{email: string, password: string}} params */

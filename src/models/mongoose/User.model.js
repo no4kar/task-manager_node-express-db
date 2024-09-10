@@ -2,7 +2,7 @@
 'use strict';
 
 import { Schema, model } from 'mongoose';
-import { Token } from './Token.model.js';
+import { Token as Tokens } from './Token.model.js';
 
 /**
  * @typedef {import('src/types/user.type.js').TyUser.Item} TyUserItem
@@ -56,7 +56,7 @@ userSchema.pre('save', function (next) {
 userSchema.post('deleteOne', { document: true, query: false }, async function (doc, next) {
   try {
     // Remove the associated token
-    await Token.deleteOne({ userId: doc._id });
+    await Tokens.deleteOne({ userId: doc._id });
     next();
   } catch (error) {
     next(error);
