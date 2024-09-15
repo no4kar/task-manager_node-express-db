@@ -108,6 +108,7 @@
   },
   "include": [
     "src/**/*.js", // Include all JavaScript files in the src directory.
-    "types/**/*.d.ts" // Include all TypeScript definition files.
+    "src/**/*.d.ts", "src/models/mongoose/Token.model.js", // Include all TypeScript definition files.
+    // "types/**/*.d.ts" // Include all TypeScript definition files.
   ]
 }

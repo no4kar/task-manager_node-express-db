@@ -1,5 +1,5 @@
-// @ts-check
 'use strict';
+// @ts-check
 
 import jwt from 'jsonwebtoken';
 import { env } from '../configs/env.config.js';

@@ -1,5 +1,5 @@
-// @ts-check
 'use strict';
+// @ts-check
 
 import express from 'express';
 export const todoRouter = express.Router();

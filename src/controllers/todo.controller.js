@@ -1,5 +1,5 @@
-// @ts-check
 'use strict';
+// @ts-check
 
 import { todoService } from '../services/sequelize/todo.service.js';
 import { ApiError } from '../exceptions/api.error.js';

@@ -1,9 +1,9 @@
-// @ts-check
 'use strict';
+// @ts-check
 
 import { ApiError } from '../exceptions/api.error.js';
 import { jwtService } from '../services/jwt.service.js';
-import { tokenService } from '../services/sequelize/token.service.js';
+import { tokenService } from '../services/mongoose/token.service.js';
 import { userService } from '../services/sequelize/user.service.js';
 import { bcryptService } from '../services/bcrypt.service.js';
 import { env } from '../configs/env.config.js';

@@ -1,19 +1,15 @@
-import type {
-  QueryWithHelpers,
-  HydratedDocument,
-  Query,
-} from 'mongoose';
-import type {
-  DeleteResult,
-} from 'mongodb';
+import type * as Mongoose from 'mongoose';
+import type * as MongoDB from 'mongodb';
+import { TyToken } from './token.type.js';
 
 export namespace TyMongoose {
+  export type Schema<DocType>
+    = Mongoose.Schema<DocType>;
+  export type Model<DocType>
+    = Mongoose.Model<DocType>;
+
   export namespace Query {
-    export type Arr<DocType>
-      = QueryWithHelpers<HydratedDocument<DocType[]>, DocType>;
-    export type Item<DocType>
-      = QueryWithHelpers<HydratedDocument<DocType>, DocType>;
-    export type DeleteOne<DocType>
-      = Query<DeleteResult, Item<DocType>>;
+    export type Filter<DocType>
+      = Mongoose.FilterQuery<DocType>;
   }
 }

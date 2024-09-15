@@ -1,18 +1,19 @@
-// @ts-check
 'use strict';
+// @ts-check
 
-import { Schema, model } from 'mongoose';
+import {
+  Schema,
+  model,
+} from 'mongoose';
 import { Token as Tokens } from './Token.model.js';
+import modelName from '../modelName.js';
 
 /**
- * @typedef {import('src/types/user.type.js').TyUser.Item} TyUserItem
- * @typedef {import('mongoose').Types.ObjectId} ObjectId
+ * @typedef {import('src/types/user.type.js').TyUser.Item} TyUser
+ * @typedef {import('src/types/db.type.js').TyMongoose.Schema<TyUser>} TyUserSchema
  */
 
-export const userNameModel = 'users';
-
-// Define the schema for the User model
-/** @type {import('mongoose').Schema<TyUserItem & {_id:ObjectId}>} */
+/** @type {TyUserSchema} */
 const userSchema = new Schema(
   {
     id: {
@@ -39,8 +40,8 @@ const userSchema = new Schema(
   },
   {
     timestamps: true, // Automatically manage createdAt and updatedAt fields
-    toJSON: { virtuals: true, versionKey: false }, // Removes the __v version key from JSON output
-    toObject: { virtuals: true, versionKey: false }, // Removes the __v version key from Object output
+    // toJSON: { virtuals: true, versionKey: false }, // Removes the __v version key from JSON output
+    // toObject: { virtuals: true, versionKey: false }, // Removes the __v version key from Object output
   }
 );
 
@@ -64,21 +65,20 @@ userSchema.post('deleteOne', { document: true, query: false }, async function (d
 });
 
 // Transform the output to remove `_id` field from the final JSON
-userSchema.set('toJSON', {
-  transform: (doc, ret) => {
-    delete ret._id; // Removes the _id field from the output
-    return ret;
-  }
-});
+// userSchema.set('toJSON', {
+//   transform: (doc, ret) => {
+//     delete ret._id; // Removes the _id field from the output
+//     return ret;
+//   }
+// });
 
 // Transform the output to remove `_id` field from the final Object
-userSchema.set('toObject', {
-  transform: (doc, ret) => {
-    delete ret._id; // Removes the _id field from the output
-    return ret;
-  }
-});
+// userSchema.set('toObject', {
+//   transform: (doc, ret) => {
+//     delete ret._id; // Removes the _id field from the output
+//     return ret;
+//   }
+// });
 
-// Create and export the User model using the defined schema
-/** @type {import('mongoose').Model<import('mongoose').HydratedDocument<TyUserItem>>} */
-export const User = model(userNameModel, userSchema);
+export const User
+  = model(modelName.user, userSchema);

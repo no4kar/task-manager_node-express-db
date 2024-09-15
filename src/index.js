@@ -1,5 +1,5 @@
-// @ts-check
 'use strict';
+// @ts-check
 
 import * as todosServer from './todosServer.js';
 import { env } from './configs/env.config.js';

@@ -1,5 +1,5 @@
-// @ts-check
 'use strict';
+// @ts-check
 
 import { v1 as uuidv1 } from 'uuid';
 

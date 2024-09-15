@@ -1,13 +1,12 @@
-// @ts-check
 'use strict';
+// @ts-check
 
-import { Token } from '../../models/mongoose/Token.model.js';
+import { Token as Tokens } from '../../models/mongoose/Token.model.js';
 
-/** @typedef {import('src/types/token.type.js').TyToken.Item} TyToken*/
-/** @typedef {import('src/types/token.type.js').TyToken.CreationAttributes} TyTokenCreationAttributes*/
-/** @typedef {import('mongoose').FilterQuery<TyToken>} TyTokenFilterQuery */
-/** @typedef {import('src/types/db.type.js').TyMongoose.Query.Item<TyToken>} TyTokenQueryItem */
-
+/**
+ * @typedef {import('src/types/token.type.js').TyToken.Item} TyToken
+ * @typedef {import('src/types/token.type.js').TyToken.CreationAttributes} TyTokenCreationAttributes
+*/
 
 export const tokenService = {
   getByRefreshToken,
@@ -15,11 +14,15 @@ export const tokenService = {
   remove,
 };
 
-/** @param {TyTokenCreationAttributes} tokenCreationAttributes*/
-async function save({ userId, refreshToken }) {
-  /** @type {TyTokenQueryItem} */
+/**
+ * @param {TyTokenCreationAttributes} param0
+ * @returns */
+async function save({
+  userId,
+  refreshToken,
+}) {
   const query
-    = Token.findOne({ userId });
+    = Tokens.findOne({ userId });
 
   const foundToken = await query.exec();
 
@@ -29,24 +32,25 @@ async function save({ userId, refreshToken }) {
     return foundToken.save();
   }
 
-  return Token.create({ userId, refreshToken });
+  return Tokens.create({ userId, refreshToken });
 }
 
-/** @param {TyToken['refreshToken']} refreshToken */
-async function getByRefreshToken(refreshToken) {
-  /** @type {TyTokenQueryItem} */
+/**
+ * @param {TyToken['refreshToken']} refreshToken
+ * @returns */
+function getByRefreshToken(refreshToken) {
   const query
-    = Token.findOne({ refreshToken });
+    = Tokens.findOne({ refreshToken });
 
   return query.exec();
 }
 
-/** 
- * @param {TyToken['userId']} userId 
- * @returns {Promise<{acknowledged: boolean, deletedCount: number}>} */
+/**
+ * @param {TyToken['userId']} userId
+ * @returns {Promise<{ acknowledged: boolean, deletedCount: number }>}*/
 function remove(userId) {
-  /** @type {TyTokenQueryItem} */
-  const query = Token.findOne({ userId });
+  const query
+    = Tokens.findOne({ userId });
 
   return query.deleteOne().exec();
 }

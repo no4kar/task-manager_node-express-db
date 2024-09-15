@@ -1,13 +1,16 @@
 'use strict';
 // @ts-check
 
-import { Op } from 'sequelize';
-import { sequelize } from '../../store/sqlite.db.js';
-import { Todo as Todos } from '../../models/sequelize/Todo.model.js';
+import { Todo as Todos } from '../../models/mongoose/Todo.model.js';
 
-/**@typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodo */
-/**@typedef {import('src/types/todo.type.js').TyTodo.ItemPartial} TyTodoPartial */
-/**@typedef {import('src/types/todo.type.js').TyTodo.Model} TyTodoModel */
+/** 
+ * @typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodo
+ * @typedef {import('src/types/todo.type.js').TyTodo.ItemPartial} TyTodoPartial
+ * @typedef {import('src/types/todo.type.js').TyTodo.ItemNormalized} TyTodoNormalized 
+ * @typedef {import('src/types/todo.type.js').TyTodo.ItemExtended} TyTodoExtended 
+ * @typedef {import('src/types/todo.type.js').TyTodo.CreationAttributes} TyTodoCreationAttributes 
+ * @typedef {import('src/types/db.type.js').TyMongoose.Query.Filter<TyTodo>} TyTodoFilterQuery
+ */
 
 export const todoService = {
   normalize,
@@ -17,38 +20,50 @@ export const todoService = {
   getById,
   create,
   updateById,
-  updateManyById,
   removeById,
-  removeManyById,
-  findMatchProps,
-  findManyMatchProps,
 };
 
-/**@param {Object} item */
-function normalize(item) {
-  return item;
+/** 
+ * @param {TyTodoExtended} param0
+ * @returns {TyTodoNormalized} */
+function normalize({
+  id,
+  userId,
+  title,
+  completed,
+  createdAt,
+  updatedAt,
+}) {
+  return {
+    id,
+    userId,
+    title,
+    completed,
+    createdAt,
+    updatedAt,
+  };
 }
 
 function getAll() {
-  return Todos.findAll({
-    order: [['id', 'ASC']],
-  });
+  const query = Todos.find();
+
+  return query.sort({ id: 'asc' }).exec();
 }
 
 /**
- * @param {TyTodoPartial} itemPartial
- * @param {number} [limit]
- * @param {number} [offset] */
-function getAndCountAllByOptions(
+ * @param {TyTodoPartial} param0
+ * @param {number} limit
+ * @param {number} offset */
+async function getAndCountAllByOptions(
   {
     userId,
     title,
     completed,
   },
-  limit,
-  offset,
+  limit = Number.MAX_SAFE_INTEGER,
+  offset = 0,
 ) {
-  /**@type {import('sequelize').WhereOptions<TyTodo>} */
+  /** @type {TyTodoFilterQuery} */
   const whereConditions = {};
 
   if (userId !== undefined) {
@@ -56,46 +71,46 @@ function getAndCountAllByOptions(
   }
 
   if (title !== undefined) {
-    whereConditions.title = {
-      [Op.like]: `%${title}%`,
-    };
+    whereConditions.title = new RegExp(title, 'i');;
   }
 
   if (completed !== undefined) {
     whereConditions.completed = completed;
   }
 
-  console.info(whereConditions);
+  const query
+    = Todos.find(whereConditions);
 
-  return Todos.findAndCountAll({
-    where: whereConditions,
-    limit,
-    offset,
-  });
+  const rows = await query.limit(limit).skip(offset).exec();
+  const count = await query.countDocuments().exec();
+
+  return {
+    rows,
+    count,
+  };
 }
 
 /**
- * @param {string} userId */
+ * @param {string} userId 
+ * @returns */
 function getAllByUser(userId) {
-  return Todos.findAll({
-    where: {
-      userId,
-    }
-  });
+  const query = Todos.find({ userId });
+
+  return query.sort({ createdAt: 'asc' }).exec();
 }
 
 /**
- * @param {string} id */
+ * @param {string} id
+ * @returns */
 function getById(id) {
-  return Todos.findOne({
-    where: {
-      id,
-    }
-  });
+  const query = Todos.findOne({ id });
+
+  return query.exec();
 }
 
 /**
- * @param {import('src/types/todo.type.js').TyTodo.CreationAttributes} properties */
+ * @param {TyTodoCreationAttributes} properties 
+ * @returns */
 function create(properties) {
   return Todos.create({ ...properties });
 }
@@ -114,59 +129,9 @@ function updateById(updatedTodo, transaction) {
   });
 }
 
-/**
- * @param {TyTodo[]} items*/
-async function updateManyById(items) {
-  return sequelize.transaction(async (t) => { // eslint-disable-line
-    /**@type {(TyTodo | null)[]} */
-    const results = [];
-
-    for (const item of items) {
-      const [, affectedRows] = (await updateById(item, t));
-      results.push(...(affectedRows.map(ar => ar.dataValues)));
-    }
-
-    return results;
-  });
-}
-
 /** @param {TyTodo['id']} id */
 function removeById(id) {
-  return Todos.destroy({
-    where: { id },
-  });
-}
+  const query = Todos.findOne({ id });
 
-/** @param {string[]} ids */
-function removeManyById(ids) {
-  return Todos.destroy({
-    where: {
-      id: { [Op.in]: ids },
-    },
-  });
-}
-
-/**
- * @param {object} targetObj
- * @param {object} sourceObj */
-function findMatchProps(targetObj, sourceObj) {
-  const result = {};
-
-  for (const [targetKey, targetValue] of Object.entries(targetObj)) {
-    if (!(targetKey in sourceObj)
-      || typeof targetValue !== typeof sourceObj[targetKey]) {
-      continue;
-    }
-
-    result[targetKey] = sourceObj[targetKey];
-  }
-
-  return Object.keys(result).length ? result : null;
-}
-
-/**
- * @param {object} targetObj
- * @param {object[]} sourceObjs */
-function findManyMatchProps(targetObj, sourceObjs) {
-  return sourceObjs.map(compareObj => findMatchProps(targetObj, compareObj));
+  return query.deleteOne().exec();
 }

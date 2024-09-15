@@ -1,5 +1,5 @@
-// @ts-check
 'use strict';
+// @ts-check
 
 import nodemailer from 'nodemailer';
 import { env } from '../configs/env.config.js';

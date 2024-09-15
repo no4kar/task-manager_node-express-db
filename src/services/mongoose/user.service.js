@@ -1,5 +1,5 @@
-// @ts-check
 'use strict';
+// @ts-check
 
 import { v1 as uuidv1 } from 'uuid';
 
@@ -8,12 +8,14 @@ import { User as Users } from '../../models/mongoose/User.model.js';
 import { emailService } from '../email.service.js';
 import { bcryptService } from '../bcrypt.service.js';
 
-/** @typedef {import('src/types/user.type.js').TyUser.Item} TyUser */
-/** @typedef {import('src/types/user.type.js').TyUser.ItemNormalized} TyUserNormalized */
-/** @typedef {import('src/types/user.type.js').TyUser.ItemPartial} TyUserPartial */
-/** @typedef {import('src/types/db.type.js').TyMongoose.Query.Arr<TyUser>} TyUserQueryArr */
-/** @typedef {import('src/types/db.type.js').TyMongoose.Query.Item<TyUser>} TyUserQueryItem */
-/** @typedef {import('mongoose').FilterQuery<TyUser>} TyUserFilterQuery */
+/**
+ * @typedef {import('src/types/user.type.js').TyUser.Item} TyUser
+ * @typedef {import('src/types/user.type.js').TyUser.ItemExtended} TyUserExtended
+ * @typedef {import('src/types/user.type.js').TyUser.ItemNormalized} TyUserNormalized
+ * @typedef {import('src/types/user.type.js').TyUser.ItemPartial} TyUserPartial
+ * @typedef {import('src/types/user.type.js').TyUser.CreationAttributes} TyUserCreationAttributes
+ * @typedef {import('src/types/db.type.js').TyMongoose.Query.Filter<TyUser>} TyUserFilterQuery
+ */
 
 export const userService = {
   normalize,
@@ -25,21 +27,23 @@ export const userService = {
   register,
 };
 
-/** @param {TyUserNormalized} itemNormalized */
+/** 
+ * @param {TyUserExtended} param0
+ * @returns {TyUserNormalized} */
 function normalize({ id, email }) {
   return { id, email };
 }
 
 /** Retrieves all active users (i.e., users with no activation token) */
 function getAllActive() {
-  /** @type {TyUserQueryArr} */
   const query = Users.find({ activationToken: null });
 
   return query.sort({ createdAt: 'asc' }).exec();
 }
 
 /**
- * @param {TyUserPartial} itemPartial */
+ * @param {TyUserPartial} param0
+ * @returns */
 function getByOptions({
   id,
   email,
@@ -60,16 +64,16 @@ function getByOptions({
     whereConditions.activationToken = activationToken;
   }
 
-  /** @type {TyUserQueryItem} */
   const query = Users.findOne(whereConditions);
 
   return query.exec();
 }
 
 /**
- * @param {TyUserPartial} itemPartial
- * @param {number} [limit]
- * @param {number} [offset] */
+ * @param {TyUserPartial} param0
+ * @param {number} limit
+ * @param {number} offset
+ * @returns */
 async function getAndCountAllByOptions({
   id,
   email,
@@ -93,9 +97,7 @@ async function getAndCountAllByOptions({
     whereConditions.activationToken = activationToken;
   }
 
-  /** @type {TyUserQueryArr} */
-  const query
-    = Users.find(whereConditions);
+  const query = Users.find(whereConditions);
 
   const rows = await query.limit(limit).skip(offset).exec();
   const count = await query.countDocuments().exec();
@@ -107,22 +109,24 @@ async function getAndCountAllByOptions({
 }
 
 /**
- * @param {import('src/types/user.type.js').TyUser.CreationAttributes} properties */
+ * @param {TyUserCreationAttributes} properties 
+ * @returns */
 function create(properties) {
   return Users.create({ ...properties });
 }
 
 /**
- * @param {import('src/types/user.type.js').TyUser.Item['id']} id
- * @returns {Promise<{acknowledged: boolean, deletedCount: number}>} */
-async function removeById(id) {
-  /** @type {TyUserQueryItem} */
+ * @param {TyUser['id']} id
+ * @returns {Promise<{ acknowledged: boolean, deletedCount: number }>} */
+function removeById(id) {
   const query = Users.findOne({ id });
 
   return query.deleteOne().exec();
 }
 
-/** @param {{email: string, password: string}} params */
+/**
+ * @param {{ email: string, password: string }} param0 
+ * @returns {Promise<void>}*/
 async function register({ email, password }) {
   const foundUser = await getByOptions({ email });
 

@@ -1,23 +1,23 @@
-// @ts-check
 'use strict';
+// @ts-check
 
-import { Schema, model } from 'mongoose';
-// import { userNameModel } from './User.model.js';
+import {
+  Schema,
+  model,
+} from 'mongoose';
+import modelName from '../modelName.js';
 
 /**
- * @typedef {import('src/types/token.type').TyToken.Item} TyTokenItem
- * @typedef {import('mongoose').Types.ObjectId} ObjectId
+ * @typedef {import('src/types/token.type').TyToken.Item} TyToken
+ * @typedef {import('src/types/db.type').TyMongoose.Schema<TyToken>} TyTokenSchema
  */
 
-export const tokenNameModel = 'tokens';
-
-// Define the schema for the User model
-/** @type {import('mongoose').Schema<TyTokenItem>} */
+/** @type {TyTokenSchema} */
 const tokenSchema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: 'users',
+      ref: modelName.user,
       required: true,
     },
     refreshToken: {
@@ -30,6 +30,7 @@ const tokenSchema = new Schema(
   },
 );
 
-// Create and export the User model using the defined schema
-/** @type {import('mongoose').Model<import('mongoose').HydratedDocument<TyTokenItem>>} */
-export const Token = model(tokenNameModel, tokenSchema);
+// Create and export the Token model using the defined schema
+export const Token
+  = model(modelName.token, tokenSchema);
+
