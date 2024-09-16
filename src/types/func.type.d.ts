@@ -1,12 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '../exceptions/api.error';
 import Sequelize from 'sequelize';
+import type Mongoose from 'mongoose';
 
 export declare namespace TyFunc {
   export {
     Middleware,
     ErrorMiddleware,
     SendAuth,
+    MongooseSessionTransaction,
   }
 }
 
@@ -30,3 +32,8 @@ type SendAuth = (
   res: Response,
   user: Sequelize.Model
 ) => Promise<void>;
+
+// Type definition for a wrap-function with session transaction for Mongoose actions
+type MongooseSessionTransaction = <T>(
+  cb: (session: Mongoose.ClientSession) => Promise<T>
+) => Promise<T>;

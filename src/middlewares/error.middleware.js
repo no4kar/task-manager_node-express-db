@@ -29,7 +29,7 @@ export function errorMiddleware(error, req, res, next) {
 }
 
 /**
- *  @param {import("src/types/func.type").Middleware} action
+ * @param {import("src/types/func.type").Middleware} action
  * @returns {import("src/types/func.type").Middleware} */
 export function catchError(action) {
   return async (req, res, next) => {
