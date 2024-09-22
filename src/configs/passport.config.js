@@ -1,6 +1,6 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { userService } from '../services/sequelize/user.service.js';
+import { userService } from '../services/mongoose/user.service.js';
 import { env } from './env.config.js';
 import { bcryptService } from '../services/bcrypt.service.js';
 import { ApiError } from '../exceptions/api.error.js';
@@ -27,10 +27,9 @@ passport.use(
         });
 
         if (foundUser) {
-          foundUser.setDataValue('activationToken', profile.id);
-          await foundUser.save();
+          await userService.setDataValues(foundUser, { activationToken: profile.id });
 
-          return done(null, foundUser.dataValues);
+          return done(null, foundUser.toObject());
         }
 
         // If user does not exist, create a new user with Google profile info

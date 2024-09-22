@@ -3,6 +3,7 @@
 
 import * as todosServer from './todosServer.js';
 import { env } from './configs/env.config.js';
+import { connectDB } from './store/mongoose.db.js';
 
 /**
  * @param {string} serverName
@@ -15,6 +16,17 @@ client: ${configs.client.host}
 `);
 };
 
-todosServer.app.listen(env.todo.server.port, () => {
-  console.info(serverRunInfo('todosServer', env.todo));
-});
+try {
+  const start = Date.now();
+
+  await connectDB();
+  console.info(`Connected to MongoDB in ${Date.now() - start} ms`);
+
+  todosServer.app.listen(env.todo.server.port, () => {
+    console.info(serverRunInfo('todosServer', env.todo));
+  });
+
+} catch (error) {
+  console.dir(error);
+  process.exit(1);
+}

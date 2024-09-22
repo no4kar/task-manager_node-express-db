@@ -4,7 +4,7 @@
 import { ApiError } from '../exceptions/api.error.js';
 import { jwtService } from '../services/jwt.service.js';
 import { tokenService } from '../services/mongoose/token.service.js';
-import { userService } from '../services/sequelize/user.service.js';
+import { userService } from '../services/mongoose/user.service.js';
 import { bcryptService } from '../services/bcrypt.service.js';
 import { env } from '../configs/env.config.js';
 
@@ -46,10 +46,13 @@ async function activate(req, res) {
     throw ApiError.NotFound(`Can't find user by activationToken`);
   }
 
-  foundUser.setDataValue('activationToken', null);
-  await foundUser.save();
+  await userService.setDataValues(foundUser, { activationToken: null });
 
-  await sendAuthentication(res, foundUser.dataValues);
+  await sendAuthentication(res, foundUser);
+  // foundUser.setDataValue('activationToken', null);
+  // await foundUser.save();
+
+  // await sendAuthentication(res, foundUser.dataValues);
 }
 
 /** @type {import('src/types/func.type').Middleware} */
@@ -73,18 +76,18 @@ async function login(req, res) {
     throw ApiError.NotFound('The user with this email does not exist');
   }
 
-  if (foundUser.dataValues.activationToken) {
+  if (foundUser.activationToken) {
     throw ApiError.Forbidden('The user is not yet activated');
   }
 
   const isPasswordValid
-    = await bcryptService.compare(password, foundUser.dataValues.password);
+    = await bcryptService.compare(password, foundUser.password);
 
   if (!isPasswordValid) {
     throw ApiError.BadRequest('Login details are wrong');
   }
 
-  await sendAuthentication(res, foundUser.dataValues);
+  await sendAuthentication(res, foundUser);
 }
 
 /** @type {import('src/types/func.type').Middleware} */
@@ -109,7 +112,7 @@ async function refresh(req, res) {
     throw ApiError.Unauthorized();
   }
 
-  await sendAuthentication(res, user.dataValues);
+  await sendAuthentication(res, user);
 }
 
 /** @type {import('src/types/func.type').Middleware} */

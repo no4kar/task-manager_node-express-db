@@ -1,7 +1,7 @@
 'use strict';
 // @ts-check
 
-import { todoService } from '../services/sequelize/todo.service.js';
+import { todoService } from '../services/mongoose/todo.service.js';
 import { ApiError } from '../exceptions/api.error.js';
 
 /**@typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodoItem */
@@ -72,7 +72,7 @@ async function get(req, res) {
 
   res.send({
     count,
-    content: rows.map(row => todoService.normalize(row.dataValues)),
+    content: rows.map(row => todoService.normalize(row.toObject())),
   });
 }
 
@@ -86,7 +86,7 @@ async function getById(req, res) {
     throw ApiError.NotFound(`Cant find todo by id=${id}`);
   }
 
-  res.send(todoService.normalize(todo.dataValues));
+  res.send(todoService.normalize(todo.toObject()));
 }
 
 /** @type {import('src/types/func.type.js').Middleware} */
@@ -135,7 +135,7 @@ async function post(req, res) {
   });
 
   res.status(201)
-    .send(todoService.normalize(todo.dataValues));
+    .send(todoService.normalize(todo.toObject()));
 }
 
 /** @type {import('src/types/func.type.js').Middleware} */
@@ -182,19 +182,18 @@ async function put(req, res) {
     });
 
     res.status(201)
-      .send(todoService.normalize(todo.dataValues));
+      .send(todoService.normalize(todo.toObject()));
 
     return;
   }
 
-  foundTodo.setDataValue('userId', userId);
-  foundTodo.setDataValue('title', title);
-  foundTodo.setDataValue('completed', completed);
-
-  await foundTodo.save();
+  await todoService.setDataValues(
+    foundTodo,
+    { userId, title, completed },
+  );
 
   res.send(todoService.normalize(
-    foundTodo.dataValues,
+    foundTodo.toObject(),
   ));
 }
 
@@ -212,10 +211,11 @@ async function patchById(req, res) {// overwrites some fields except id
 
   // get updated values from req.body or use previous
   const {
-    userId = foundTodo.dataValues.userId,
-    title = foundTodo.dataValues.title,
-    completed = foundTodo.dataValues.completed,
+    userId = foundTodo.userId,
+    title = foundTodo.title,
+    completed = foundTodo.completed,
   } = req.body;
+
 
   const [
     affectedCount,
@@ -237,7 +237,7 @@ async function patchById(req, res) {// overwrites some fields except id
   }
 
   res.send(
-    todoService.normalize(affectedRows[0].dataValues)
+    todoService.normalize(affectedRows[0].toObject())
   );
 }
 
@@ -259,7 +259,7 @@ async function updateMany(req, res) {
     return;
   }
 
-  (await todoService.updateManyById(items));
+  await todoService.updateManyById(items);
 
   res.sendStatus(204);
   return;
@@ -275,7 +275,7 @@ async function remove(req, res) {
     throw ApiError.NotFound(`Cant find todo by id=${id}`);
   }
 
-  const count = await todoService.removeById(foundTodo.dataValues.id);
+  const count = await todoService.removeById(foundTodo.id);
 
   res.status(200).send(`${count}`);
 }

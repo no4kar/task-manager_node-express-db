@@ -9,6 +9,7 @@ import { emailService } from '../email.service.js';
 import { bcryptService } from '../bcrypt.service.js';
 
 /** @typedef {import('src/types/user.type.js').TyUser.Item} TyUser */
+/** @typedef {import('src/types/user.type.js').TyUser.Model} TyUserModel */
 /** @typedef {import('src/types/user.type.js').TyUser.ItemNormalized} TyUserNormalized */
 /** @typedef {import('src/types/user.type.js').TyUser.ItemPartial} TyUserPartial */
 
@@ -17,6 +18,7 @@ export const userService = {
   getAllActive,
   getByOptions,
   getAndCountAllByOptions,
+  setDataValues,
   create,
   register,
 };
@@ -98,6 +100,15 @@ function getAndCountAllByOptions({
     limit,
     offset,
   });
+}
+
+
+/**
+ * @param {TyUserModel} model
+ * @param {TyUserPartial} properties
+ * @returns */
+function setDataValues(model, properties) {
+  return model.set(properties).save();
 }
 
 /**

@@ -15,6 +15,7 @@ export const todoService = {
   getAllByUser,
   getAndCountAllByOptions,
   getById,
+  setDataValues,
   create,
   updateById,
   updateManyById,
@@ -92,6 +93,14 @@ function getById(id) {
       id,
     }
   });
+}
+
+/**
+ * @param {TyTodoModel} model
+ * @param {TyTodoPartial} properties
+ * @returns */
+function setDataValues(model, properties) {
+  return model.set(properties).save();
 }
 
 /**

@@ -6,6 +6,7 @@ import {
   model,
 } from 'mongoose';
 import { Token as Tokens } from './Token.model.js';
+import { Todo as Todos } from './Todo.model.js';
 import modelName from '../modelName.js';
 
 /**
@@ -14,7 +15,7 @@ import modelName from '../modelName.js';
  */
 
 /** @type {TyUserSchema} */
-const userSchema = new Schema(
+export const userSchema = new Schema(
   {
     id: {
       type: String,
@@ -58,6 +59,7 @@ userSchema.post('deleteOne', { document: true, query: false }, async function (d
   try {
     // Remove the associated token
     await Tokens.deleteOne({ userId: doc._id });
+    await Todos.deleteMany({ userId: doc._id });
     next();
   } catch (error) {
     next(error);

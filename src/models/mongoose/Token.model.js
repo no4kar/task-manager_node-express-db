@@ -13,7 +13,7 @@ import modelName from '../modelName.js';
  */
 
 /** @type {TyTokenSchema} */
-const tokenSchema = new Schema(
+export const tokenSchema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,

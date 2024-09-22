@@ -15,13 +15,16 @@ import { bcryptService } from '../bcrypt.service.js';
  * @typedef {import('src/types/user.type.js').TyUser.ItemPartial} TyUserPartial
  * @typedef {import('src/types/user.type.js').TyUser.CreationAttributes} TyUserCreationAttributes
  * @typedef {import('src/types/db.type.js').TyMongoose.Query.Filter<TyUser>} TyUserFilterQuery
+ * @typedef {import('src/types/db.type.js').TyMongoose.FoundDocument<unknown,{},TyUser>} TyUserFoundDocument
  */
 
 export const userService = {
   normalize,
   getAllActive,
+  getDataValue,
   getByOptions,
   getAndCountAllByOptions,
+  setDataValues,
   create,
   removeById,
   register,
@@ -39,6 +42,13 @@ function getAllActive() {
   const query = Users.find({ activationToken: null });
 
   return query.sort({ createdAt: 'asc' }).exec();
+}
+
+/**
+ * @param {TyUserFoundDocument} document 
+ * @returns */
+function getDataValue(document) {
+  return document.toObject();
 }
 
 /**
@@ -106,6 +116,14 @@ async function getAndCountAllByOptions({
     rows,
     count,
   };
+}
+
+/**
+ * @param {TyUserFoundDocument} document
+ * @param {TyUserPartial} properties
+ * @returns */
+function setDataValues(document, properties) {
+  return document.set(properties).save();
 }
 
 /**

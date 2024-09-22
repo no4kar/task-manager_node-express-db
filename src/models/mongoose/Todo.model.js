@@ -11,7 +11,7 @@ import modelName from '../modelName.js';
 
 // Define the schema for the User model
 /** @type {TyTodoSchema} */
-const todoSchema = new Schema(
+export const todoSchema = new Schema(
   {
     id: {
       type: String,

@@ -11,6 +11,7 @@ import { Todo as Todos } from '../../models/mongoose/Todo.model.js';
  * @typedef {import('src/types/todo.type.js').TyTodo.ItemExtended} TyTodoExtended 
  * @typedef {import('src/types/todo.type.js').TyTodo.CreationAttributes} TyTodoCreationAttributes 
  * @typedef {import('src/types/db.type.js').TyMongoose.Query.Filter<TyTodo>} TyTodoFilterQuery
+ * @typedef {import('src/types/db.type.js').TyMongoose.FoundDocument<unknown,{},TyTodo>} TyTodoFoundDocument
  */
 
 export const todoService = {
@@ -19,6 +20,7 @@ export const todoService = {
   getAllByUser,
   getAndCountAllByOptions,
   getById,
+  setDataValues,
   create,
   updateById,
   removeById,
@@ -110,6 +112,14 @@ function getById(id) {
 }
 
 /**
+ * @param {TyTodoFoundDocument} document
+ * @param {TyTodoPartial} properties
+ * @returns */
+function setDataValues(document, properties) {
+  return document.set(properties).save();
+}
+
+/**
  * @param {TyTodoCreationAttributes} properties 
  * @returns */
 function create(properties) {
@@ -118,17 +128,27 @@ function create(properties) {
 
 /**
  * @param {TyTodoPartial} updatedProps
- * @param {import('mongoose').ClientSession} [session] */
+ * @param {import('mongoose').ClientSession} [session] 
+ * @returns {Promise<[affectedCount: number, affectedRows: TyTodoFoundDocument[]]>}*/
 async function updateById(updatedProps, session) {
   const { id, ...restProps } = updatedProps;
 
-  const query = Todos.updateOne(
-    { id },
-    restProps,
-    { session } // Pass the session to the update operation
+  const result = await Todos.updateOne(
+    { _id: id }, // Filter by the document ID
+    { $set: restProps }, // Set the new properties
+    { session } // Pass the session if any (for transactions)
   );
 
-  return query.exec();
+  const updatedTodo = await Todos.findOne({ _id: id }).session(session || null); // Optional session
+
+  if (!updatedTodo) {
+    throw new Error(`Can't get updated todo`);
+  }
+
+  return [
+    result.matchedCount,
+    [updatedTodo],
+  ];
 }
 
 /** @param {TyTodo['id']} id */
