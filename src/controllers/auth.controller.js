@@ -66,7 +66,7 @@ async function activateByGoogle(req, res) {
 /** @type {import('src/types/func.type').Middleware} */
 async function login(req, res) {
   const { email, password } = req.body;
-  const foundUser   = await userService.getByOptions({ email });
+  const foundUser = await userService.getByOptions({ email });
 
   if (!foundUser) {
     throw ApiError.NotFound('The user with this email does not exist');

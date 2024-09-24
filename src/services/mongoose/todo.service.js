@@ -81,15 +81,16 @@ async function getAndCountAllByOptions(
     whereConditions.completed = completed;
   }
 
-  const query
-    = Todos.find(whereConditions);
-
-  const count = await query.countDocuments().exec();
-  const rows = await query.limit(limit).skip(offset).exec();
-
   return {
-    rows,
-    count,
+    rows:
+      await Todos.find(whereConditions)
+        .limit(limit)
+        .skip(offset)
+        .exec(),
+    count:
+      await Todos.find(whereConditions)
+        .countDocuments()
+        .exec(),
   };
 }
 
