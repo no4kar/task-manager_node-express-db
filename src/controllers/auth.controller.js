@@ -48,11 +48,7 @@ async function activate(req, res) {
 
   await userService.setDataValues(foundUser, { activationToken: null });
 
-  await sendAuthentication(res, foundUser);
-  // foundUser.setDataValue('activationToken', null);
-  // await foundUser.save();
-
-  // await sendAuthentication(res, foundUser.dataValues);
+  await sendAuthentication(res, foundUser.toObject());
 }
 
 /** @type {import('src/types/func.type').Middleware} */
@@ -70,7 +66,7 @@ async function activateByGoogle(req, res) {
 /** @type {import('src/types/func.type').Middleware} */
 async function login(req, res) {
   const { email, password } = req.body;
-  const foundUser = await userService.getByOptions({ email });
+  const foundUser   = await userService.getByOptions({ email });
 
   if (!foundUser) {
     throw ApiError.NotFound('The user with this email does not exist');
@@ -87,38 +83,42 @@ async function login(req, res) {
     throw ApiError.BadRequest('Login details are wrong');
   }
 
-  await sendAuthentication(res, foundUser);
+  await sendAuthentication(res, foundUser.toObject());
 }
 
 /** @type {import('src/types/func.type').Middleware} */
 async function refresh(req, res) {
   const { refreshToken } = req.cookies;
 
-  const userData = jwtService.validateRefreshToken(refreshToken);
+  const userData
+    = jwtService.validateRefreshToken(refreshToken);
 
   if (!userData) {
     throw ApiError.Unauthorized();
   }
 
-  const token = await tokenService.getByRefreshToken(refreshToken);
+  const token
+    = await tokenService.getByRefreshToken(refreshToken);
 
   if (!token) {
     throw ApiError.Unauthorized();
   }
 
-  const user = await userService.getByOptions({ email: userData?.email });
+  const foundUser
+    = await userService.getByOptions({ email: userData.email });
 
-  if (!user) {
+  if (!foundUser) {
     throw ApiError.Unauthorized();
   }
 
-  await sendAuthentication(res, user);
+  await sendAuthentication(res, foundUser.toObject());
 }
 
 /** @type {import('src/types/func.type').Middleware} */
 async function logout(req, res) {
   const { refreshToken } = req.cookies;
-  const userData = jwtService.validateRefreshToken(refreshToken);
+  const userData
+    = jwtService.validateRefreshToken(refreshToken);
 
   res.clearCookie('refreshToken');
 

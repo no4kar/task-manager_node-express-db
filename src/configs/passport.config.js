@@ -39,7 +39,7 @@ passport.use(
           activationToken: profile.id,
         });
 
-        return done(null, createdUser.dataValues);
+        return done(null, createdUser.toObject());
       } catch (error) {
         return done(error, false);
       }
@@ -57,7 +57,7 @@ passport.deserializeUser(async (id, done) => {
 
     if (!foundUser) throw ApiError.NotFound(`Can't find user by id`);;
 
-    return done(null, foundUser.dataValues);
+    return done(null, foundUser.toObject());
   } catch (error) {
     return done(error, false);
   }
