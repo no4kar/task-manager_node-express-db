@@ -15,7 +15,7 @@ import { bcryptService } from '../bcrypt.service.js';
  * @typedef {import('src/types/user.type.js').TyUser.ItemPartial} TyUserPartial
  * @typedef {import('src/types/user.type.js').TyUser.CreationAttributes} TyUserCreationAttributes
  * @typedef {import('src/types/db.type.js').TyMongoose.Query.Filter<TyUser>} TyUserFilterQuery
- * @typedef {import('src/types/db.type.js').TyMongoose.FoundDocument<unknown,{},TyUser>} TyUserFoundDocument
+ * @typedef {import('src/types/db.type.js').TyMongoose.Document<unknown,{},TyUser>} TyUserDocument
  */
 
 export const userService = {
@@ -24,7 +24,7 @@ export const userService = {
   getDataValue,
   getByOptions,
   getAndCountAllByOptions,
-  setDataValues,
+  update,
   create,
   removeById,
   register,
@@ -45,7 +45,7 @@ function getAllActive() {
 }
 
 /**
- * @param {TyUserFoundDocument} document 
+ * @param {TyUserDocument} document 
  * @returns */
 function getDataValue(document) {
   return document.toObject();
@@ -107,22 +107,24 @@ async function getAndCountAllByOptions({
     whereConditions.activationToken = activationToken;
   }
 
-  const query = Users.find(whereConditions);
-
-  const rows = await query.limit(limit).skip(offset).exec();
-  const count = await query.countDocuments().exec();
-
   return {
-    rows,
-    count,
+    rows:
+      await Users.find(whereConditions)
+        .limit(limit)
+        .skip(offset)
+        .exec(),
+    count:
+      await Users.find(whereConditions)
+        .countDocuments()
+        .exec(),
   };
 }
 
 /**
- * @param {TyUserFoundDocument} document
+ * @param {TyUserDocument} document
  * @param {TyUserPartial} properties
  * @returns */
-function setDataValues(document, properties) {
+function update(document, properties) {
   return document.set(properties).save();
 }
 

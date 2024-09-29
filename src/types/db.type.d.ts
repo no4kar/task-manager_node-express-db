@@ -8,7 +8,7 @@ export namespace TyMongoose {
     = Mongoose.Schema<DocType>;
   export type Model<DocType>
     = Mongoose.Model<DocType>;
-  export type FoundDocument<T = unknown, TQueryHelpers = any, DocType>
+  export type Document<T = unknown, TQueryHelpers = any, DocType>
     = Mongoose.Document<T, TQueryHelpers, DocType> & DocType & {
       _id: Mongoose.Types.ObjectId;
   };

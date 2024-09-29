@@ -10,14 +10,14 @@ import { Token as Tokens } from '../../models/mongoose/Token.model.js';
 
 export const tokenService = {
   getByRefreshToken,
-  save,
+  update,
   remove,
 };
 
 /**
  * @param {TyTokenCreationAttributes} param0
  * @returns */
-async function save({
+async function update({
   userId,
   refreshToken,
 }) {

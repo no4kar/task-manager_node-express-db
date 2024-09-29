@@ -22,6 +22,9 @@ const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || '';
 const mangodbUser = process.env.MANGO_USER || '';
 const mangodbPassword = process.env.MANGO_PASSWORD || '';
 
+const maxUnhandledRequestsPerIP = Number(process.env.MAX_UNHANDLED_REQUESTS_PER_IP) || 3;
+const maxTotalUnhandledRequests = Number(process.env.MAX_TOTAL_UNHANDLED_REQUESTS) || 11;
+
 export const env = Object.freeze({
   todo: {
     server: {
@@ -60,5 +63,11 @@ export const env = Object.freeze({
     user: mangodbUser,
     password: mangodbPassword,
   },
+  limit: {
+    max: {
+      unhandledRequestsPerIP: maxUnhandledRequestsPerIP,
+      totalUnhandledRequests: maxTotalUnhandledRequests,
+    },
+  }
 });
 

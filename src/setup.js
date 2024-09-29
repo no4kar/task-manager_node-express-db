@@ -1,4 +1,3 @@
-// import 'dotenv/config';
 import { sequelize } from './store/sqlite.db.js';
 
 import { Token } from './models/sequelize/Token.model.js';

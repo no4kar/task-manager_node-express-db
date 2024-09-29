@@ -31,7 +31,7 @@ async function get(req, res) {
   } = req.query;
 
   if (['undefined', 'string'].every(option => option !== typeof title)) {
-    throw ApiError.UnprocessableEntity(
+    throw ApiError.UnprocessableContent(
       `Type error`, {
       expected: {
         title: 'undefined | string',
@@ -44,7 +44,7 @@ async function get(req, res) {
   }
 
   if (typeof page === 'undefined' || typeof size === 'undefined') {
-    throw ApiError.UnprocessableEntity(`'page' and 'size' are required`);
+    throw ApiError.UnprocessableContent(`'page' and 'size' are required`);
   }
 
   const limit = parseInt(String(size), 10) || Number.MAX_SAFE_INTEGER;
@@ -102,7 +102,7 @@ async function post(req, res) {
     || typeof userId !== 'string'
     || typeof title !== 'string'
   ) {
-    throw ApiError.UnprocessableEntity(
+    throw ApiError.UnprocessableContent(
       `Type error`,
       {
         expected: {
@@ -155,7 +155,7 @@ async function put(req, res) {
   };
 
   if (errors.userId || errors.title || errors.completed) {
-    throw ApiError.UnprocessableEntity(
+    throw ApiError.UnprocessableContent(
       `Type error`,
       {
         expected: {
@@ -187,7 +187,7 @@ async function put(req, res) {
     return;
   }
 
-  await todoService.setDataValues(
+  await todoService.update(
     foundTodo,
     { userId, title, completed },
   );
@@ -287,7 +287,7 @@ async function removeMany(req, res) {
   const { ids } = req.body;
 
   if (!Array.isArray(ids)) {
-    throw ApiError.UnprocessableEntity('Expected', {
+    throw ApiError.UnprocessableContent('Expected', {
       ids: 'string[]',
     });
   }

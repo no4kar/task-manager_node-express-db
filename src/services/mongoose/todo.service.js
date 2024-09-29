@@ -11,7 +11,7 @@ import { Todo as Todos } from '../../models/mongoose/Todo.model.js';
  * @typedef {import('src/types/todo.type.js').TyTodo.ItemExtended} TyTodoExtended 
  * @typedef {import('src/types/todo.type.js').TyTodo.CreationAttributes} TyTodoCreationAttributes 
  * @typedef {import('src/types/db.type.js').TyMongoose.Query.Filter<TyTodo>} TyTodoFilterQuery
- * @typedef {import('src/types/db.type.js').TyMongoose.FoundDocument<unknown,{},TyTodo>} TyTodoFoundDocument
+ * @typedef {import('src/types/db.type.js').TyMongoose.Document<unknown,{},TyTodo>} TyTodoDocument
  */
 
 export const todoService = {
@@ -20,7 +20,7 @@ export const todoService = {
   getAllByUser,
   getAndCountAllByOptions,
   getById,
-  setDataValues,
+  update,
   create,
   updateById,
   removeById,
@@ -113,10 +113,10 @@ function getById(id) {
 }
 
 /**
- * @param {TyTodoFoundDocument} document
+ * @param {TyTodoDocument} document
  * @param {TyTodoPartial} properties
  * @returns */
-function setDataValues(document, properties) {
+function update(document, properties) {
   return document.set(properties).save();
 }
 
@@ -130,7 +130,7 @@ function create(properties) {
 /**
  * @param {TyTodoPartial} updatedProps
  * @param {import('mongoose').ClientSession} [session] 
- * @returns {Promise<[affectedCount: number, affectedRows: TyTodoFoundDocument[]]>}*/
+ * @returns {Promise<[affectedCount: number, affectedRows: TyTodoDocument[]]>}*/
 async function updateById(updatedProps, session) {
   const { id, ...restProps } = updatedProps;
 

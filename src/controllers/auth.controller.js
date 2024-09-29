@@ -46,7 +46,7 @@ async function activate(req, res) {
     throw ApiError.NotFound(`Can't find user by activationToken`);
   }
 
-  await userService.setDataValues(foundUser, { activationToken: null });
+  await userService.update(foundUser, { activationToken: null });
 
   await sendAuthentication(res, foundUser.toObject());
 }
@@ -136,7 +136,7 @@ async function sendAuthentication(res, user) {
   const accessToken = jwtService.generateAccessToken(user);
   const refreshToken = jwtService.generateRefreshToken(user);
 
-  await tokenService.save({ userId: user.id, refreshToken });
+  await tokenService.update({ userId: user.id, refreshToken });
 
   res.cookie('refreshToken', refreshToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,

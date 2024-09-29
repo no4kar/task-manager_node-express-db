@@ -27,7 +27,7 @@ passport.use(
         });
 
         if (foundUser) {
-          await userService.setDataValues(foundUser, { activationToken: profile.id });
+          await userService.update(foundUser, { activationToken: profile.id });
 
           return done(null, foundUser.toObject());
         }
