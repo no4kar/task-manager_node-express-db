@@ -9,9 +9,6 @@ const unhandledRequests = new Map();
 export function limiter(req, res, next) {
   const ip = req.headers['x-forwarded-for'] || req.ip;
 
-  console.info('START'
-    + `\n\treq.headers['x-forwarded-for'] || req.ip: ${ip}`);
-
   if (!unhandledRequests.has(ip)) {
     unhandledRequests.set(ip, 0);
   }
@@ -27,6 +24,12 @@ export function limiter(req, res, next) {
 
   unhandledRequests.set(ip, unhandledRequests.get(ip) + 1);
 
+  console.info('START'
+    + `\n\treq.headers['x-forwarded-for'] || req.ip: ${ip}`
+    + `\n\tunhandledRequests.get(${ip}): ${unhandledRequests.get(ip)}`
+    + `\n\tunhandledRequests.size: ${unhandledRequests.size}`
+  );
+
   const decrementRequestCount = () => {
     if (res.locals.countDecremented) return;  // Check if the count has already been decremented
     res.locals.countDecremented = true;        // Set the flag to prevent future calls
@@ -39,7 +42,9 @@ export function limiter(req, res, next) {
 
     console.info('FINISH'
       + `\n\treq.headers['x-forwarded-for'] || req.ip: ${ip}`
-      + `\n\tunhandledRequests.size: ${unhandledRequests.size}`);
+      + `\n\tunhandledRequests.get(${ip}): ${unhandledRequests.get(ip)}`
+      + `\n\tunhandledRequests.size: ${unhandledRequests.size}`
+    );
   };
 
   // Called when response is fully sent
