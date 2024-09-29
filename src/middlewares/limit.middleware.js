@@ -9,9 +9,8 @@ const unhandledRequests = new Map();
 export function limiter(req, res, next) {
   const ip = req.headers['x-forwarded-for'] || req.ip;
 
-  console.info(`
-    START processing the request from
-      req.headers['x-forwarded-for'] || req.ip: ${ip}`);
+  console.info('START'
+    + `\n\treq.headers['x-forwarded-for'] || req.ip: ${ip}`);
 
   if (!unhandledRequests.has(ip)) {
     unhandledRequests.set(ip, 0);
@@ -38,10 +37,9 @@ export function limiter(req, res, next) {
       unhandledRequests.delete(ip);
     }
 
-    console.info(`
-      FINISH processing the request from
-        req.headers['x-forwarded-for'] || req.ip: ${ip}
-        unhandledRequests.size: ${unhandledRequests.size}`);
+    console.info('FINISH'
+      + `\n\treq.headers['x-forwarded-for'] || req.ip: ${ip}`
+      + `\n\tunhandledRequests.size: ${unhandledRequests.size}`);
   };
 
   // Called when response is fully sent
