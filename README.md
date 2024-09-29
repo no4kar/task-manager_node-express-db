@@ -1,6 +1,6 @@
-# Node Task Manager with SQLite Database
+# Node Task Manager with MangoDB(by Mongoose) or SQLiteDB(by Sequelize)
 
-This project is a simple [task manager server](https://node-todos-with-db.onrender.com/) built with Node.js with [Express.js](https://expressjs.com/) and SQLite3 DB controlled by [Sequelize ORM](https://sequelize.org/). It includes [API documentation using Swagger](https://node-todos-with-db.onrender.com/api-docs/) and is configured to support TypeScript for development.
+This project is a simple [task manager server](https://node-todos-with-db.onrender.com/) built with Node.js with [Express.js](https://expressjs.com/) and DB implemented with [Mongoose](https://mongoosejs.com/) or [Sequelize ORM](https://sequelize.org/). It includes [API documentation using Swagger](https://node-todos-with-db.onrender.com/api-docs/) and is configured to support TypeScript for development.
 
 ## Warning
 
@@ -21,7 +21,7 @@ This project is a simple [task manager server](https://node-todos-with-db.onrend
 ## Features
 
 - Node.js server with Express
-- SQLite3 database integration
+- DataBase has two implementations, with Mongoose(remote mongoDB) and with Sequelize(local sqlite)
 - Environment variable management with dotenv
 - Swagger for API documentation
 - Nodemon for development
