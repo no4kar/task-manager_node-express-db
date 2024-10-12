@@ -10,9 +10,9 @@ import { bcryptService } from '../bcrypt.service.js';
 
 /**
  * @typedef {import('src/types/user.type.js').TyUser.Item} TyUser
- * @typedef {import('src/types/user.type.js').TyUser.ItemExtended} TyUserExtended
- * @typedef {import('src/types/user.type.js').TyUser.ItemNormalized} TyUserNormalized
- * @typedef {import('src/types/user.type.js').TyUser.ItemPartial} TyUserPartial
+ * @typedef {import('src/types/user.type.js').TyUser.Extended} TyUserExtended
+ * @typedef {import('src/types/user.type.js').TyUser.Normalized} TyUserNormalized
+ * @typedef {import('src/types/user.type.js').TyUser.GetParams} TyUserGetParams
  * @typedef {import('src/types/user.type.js').TyUser.CreationAttributes} TyUserCreationAttributes
  * @typedef {import('src/types/db.type.js').TyMongoose.Query.Filter<TyUser>} TyUserFilterQuery
  * @typedef {import('src/types/db.type.js').TyMongoose.Document<unknown,{},TyUser>} TyUserDocument
@@ -52,7 +52,7 @@ function getDataValue(document) {
 }
 
 /**
- * @param {TyUserPartial} param0
+ * @param {TyUserGetParams} param0
  * @returns */
 function getByOptions({
   id,
@@ -80,7 +80,7 @@ function getByOptions({
 }
 
 /**
- * @param {TyUserPartial} param0
+ * @param {TyUserGetParams} param0
  * @param {number} limit
  * @param {number} offset
  * @returns */
@@ -122,7 +122,7 @@ async function getAndCountAllByOptions({
 
 /**
  * @param {TyUserDocument} document
- * @param {TyUserPartial} properties
+ * @param {TyUserGetParams} properties
  * @returns */
 function update(document, properties) {
   return document.set(properties).save();

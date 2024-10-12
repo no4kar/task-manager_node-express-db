@@ -24,7 +24,7 @@ export function limiter(req, res, next) {
 
   unhandledRequests.set(ip, unhandledRequests.get(ip) + 1);
 
-  console.info('START'
+  console.info('\n\nSTART'
     + `\n\treq.headers['x-forwarded-for'] || req.ip: ${ip}`
     + `\n\tunhandledRequests.get(${ip}): ${unhandledRequests.get(ip)}`
     + `\n\tunhandledRequests.size: ${unhandledRequests.size}`
@@ -40,7 +40,7 @@ export function limiter(req, res, next) {
       unhandledRequests.delete(ip);
     }
 
-    console.info('FINISH'
+    console.info('\nFINISH'
       + `\n\treq.headers['x-forwarded-for'] || req.ip: ${ip}`
       + `\n\tunhandledRequests.get(${ip}): ${unhandledRequests.get(ip)}`
       + `\n\tunhandledRequests.size: ${unhandledRequests.size}`

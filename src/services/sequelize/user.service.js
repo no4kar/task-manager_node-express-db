@@ -10,8 +10,8 @@ import { bcryptService } from '../bcrypt.service.js';
 
 /** @typedef {import('src/types/user.type.js').TyUser.Item} TyUser */
 /** @typedef {import('src/types/user.type.js').TyUser.Model} TyUserModel */
-/** @typedef {import('src/types/user.type.js').TyUser.ItemNormalized} TyUserNormalized */
-/** @typedef {import('src/types/user.type.js').TyUser.ItemPartial} TyUserPartial */
+/** @typedef {import('src/types/user.type.js').TyUser.Normalized} TyUserNormalized */
+/** @typedef {import('src/types/user.type.js').TyUser.GetParams} TyUserGetParams */
 
 export const userService = {
   normalize,
@@ -23,7 +23,7 @@ export const userService = {
   register,
 };
 
-/** @param {TyUserNormalized} itemNormalized */
+/** @param {TyUserNormalized} Normalized */
 function normalize({ id, email }) {
   return { id, email };
 }
@@ -38,7 +38,7 @@ function getAllActive() {
 }
 
 /**
- * @param {TyUserPartial} itemPartial */
+ * @param {TyUserGetParams} GetParams */
 function getByOptions({
   id,
   email,
@@ -67,7 +67,7 @@ function getByOptions({
 }
 
 /**
- * @param {TyUserPartial} itemPartial
+ * @param {TyUserGetParams} GetParams
  * @param {number} [limit]
  * @param {number} [offset] */
 function getAndCountAllByOptions({
@@ -105,7 +105,7 @@ function getAndCountAllByOptions({
 
 /**
  * @param {TyUserModel} model
- * @param {TyUserPartial} properties
+ * @param {TyUserGetParams} properties
  * @returns */
 function setDataValues(model, properties) {
   return model.set(properties).save();

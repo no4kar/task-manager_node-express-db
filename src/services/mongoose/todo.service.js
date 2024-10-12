@@ -6,10 +6,11 @@ import { Todo as Todos } from '../../models/mongoose/Todo.model.js';
 
 /**
  * @typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodo
- * @typedef {import('src/types/todo.type.js').TyTodo.ItemPartial} TyTodoPartial
- * @typedef {import('src/types/todo.type.js').TyTodo.ItemNormalized} TyTodoNormalized 
- * @typedef {import('src/types/todo.type.js').TyTodo.ItemExtended} TyTodoExtended 
- * @typedef {import('src/types/todo.type.js').TyTodo.CreationAttributes} TyTodoCreationAttributes 
+ * @typedef {import('src/types/todo.type.js').TyTodo.GetParams} TyTodoGetParams
+ * @typedef {import('src/types/todo.type.js').TyTodo.UpdateParams} TyTodoUpdateParams
+ * @typedef {import('src/types/todo.type.js').TyTodo.Normalized} TyTodoNormalized
+ * @typedef {import('src/types/todo.type.js').TyTodo.Extended} TyTodoExtended
+ * @typedef {import('src/types/todo.type.js').TyTodo.CreationAttributes} TyTodoCreationAttributes
  * @typedef {import('src/types/db.type.js').TyMongoose.Query.Filter<TyTodo>} TyTodoFilterQuery
  * @typedef {import('src/types/db.type.js').TyMongoose.Document<unknown,{},TyTodo>} TyTodoDocument
  */
@@ -54,7 +55,7 @@ function getAll() {
 }
 
 /**
- * @param {TyTodoPartial} param0
+ * @param {TyTodoGetParams} param0
  * @param {number} limit
  * @param {number} offset */
 async function getAndCountAllByOptions(
@@ -114,10 +115,25 @@ function getById(id) {
 
 /**
  * @param {TyTodoDocument} document
- * @param {TyTodoPartial} properties
+ * @param {TyTodoGetParams} properties
  * @returns */
 function update(document, properties) {
   return document.set(properties).save();
+}
+
+/**
+ * @param {TyTodoUpdateParams[]} items
+ * @returns */
+function updateMany(items) {
+  const bulkOps = items.map(item => ({
+    updateOne: {
+      filter: { _id: item.id },    // Find the todo by ID
+      update: { $set: item }       // Update the fields in the todo object
+    }
+  }));
+
+  // const result = Todos.bulkWrite(bulkOps);
+  return Todos.bulkWrite(bulkOps);
 }
 
 /**
@@ -128,7 +144,7 @@ function create(properties) {
 }
 
 /**
- * @param {TyTodoPartial} updatedProps
+ * @param {TyTodoGetParams} updatedProps
  * @param {import('mongoose').ClientSession} [session] 
  * @returns {Promise<[affectedCount: number, affectedRows: TyTodoDocument[]]>}*/
 async function updateById(updatedProps, session) {
@@ -140,7 +156,9 @@ async function updateById(updatedProps, session) {
     { session } // Pass the session if any (for transactions)
   );
 
-  const updatedTodo = await Todos.findOne({ _id: id }).session(session || null); // Optional session
+  const updatedTodo
+    = await Todos.findOne({ _id: id })
+      .session(session || null); // Optional session
 
   if (!updatedTodo) {
     throw new Error(`Can't get updated todo`);
@@ -160,7 +178,7 @@ function removeById(id) {
 }
 
 /**
- * @param {TyTodoPartial} updatedProps */
+ * @param {TyTodoGetParams} updatedProps */
 async function updateByIdWithTransaction(updatedProps) {
   const { id, ...restProps } = updatedProps;
 

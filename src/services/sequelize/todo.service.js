@@ -6,7 +6,7 @@ import { sequelize } from '../../store/sqlite.db.js';
 import { Todo as Todos } from '../../models/sequelize/Todo.model.js';
 
 /**@typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodo */
-/**@typedef {import('src/types/todo.type.js').TyTodo.ItemPartial} TyTodoPartial */
+/**@typedef {import('src/types/todo.type.js').TyTodo.GetParams} TyTodoGetParams */
 /**@typedef {import('src/types/todo.type.js').TyTodo.Model} TyTodoModel */
 
 export const todoService = {
@@ -37,7 +37,7 @@ function getAll() {
 }
 
 /**
- * @param {TyTodoPartial} itemPartial
+ * @param {TyTodoGetParams} GetParams
  * @param {number} [limit]
  * @param {number} [offset] */
 function getAndCountAllByOptions(
@@ -97,7 +97,7 @@ function getById(id) {
 
 /**
  * @param {TyTodoModel} model
- * @param {TyTodoPartial} properties
+ * @param {TyTodoGetParams} properties
  * @returns */
 function setDataValues(model, properties) {
   return model.set(properties).save();
@@ -113,7 +113,7 @@ function create(properties) {
 }
 
 /**
- * @param {TyTodoPartial} updatedTodo
+ * @param {TyTodoGetParams} updatedTodo
  * @param {import('sequelize').Transaction | null | undefined} [transaction] */
 function updateById(updatedTodo, transaction) {
   const { id, ...restProps } = updatedTodo;

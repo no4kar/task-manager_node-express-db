@@ -9,9 +9,12 @@ export namespace TyToken {
     updatedAt: string;
   };
 
-  export type ItemPartial = Partial<Item>;
-  export type ItemNormalized = Pick<Item, 'userId' | 'refreshToken'>;
-  export type ItemExtended = ItemNormalized & Record<string, unknown>;
+  export type GetParams = Partial<Item>;
+  export type UpdateParams = Pick<Item, 'userId'>
+  & Partial<Omit<Item, 'createdAt' | 'updatedAt'>>
+  & Record<string, unknown>;
+  export type Normalized = Pick<Item, 'userId' | 'refreshToken'>;
+  export type Extended = Normalized & Record<string, unknown>;
 
   export type ModelAttributes = Item;
   export type CreationAttributes = Omit<Item, 'createdAt' | 'updatedAt'>;
