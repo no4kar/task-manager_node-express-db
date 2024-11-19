@@ -17,12 +17,15 @@ import { catchError, errorMiddleware } from './middlewares/error.middleware.js';
 import { swaggerSpec } from './api-docs/swagger.js';
 import { authMiddleware } from './middlewares/auth.middleware.js';
 import { corsConfig } from './configs/cors.config.js';
-import { limiter } from './middlewares/limit.middleware.js';
+import { getLimiter } from './middlewares/limit.middleware.js';
 
 export const app = express();
 
 app.use(
-  limiter,            // Rate limiter middleware
+  getLimiter({
+    unhandledRequestsPerIP: 2,
+    totalUnhandledRequests: 7,
+  }),       // Rate limiter middleware
   cookieParser(),     // Parse cookies
   cors(corsConfig),   // Enable CORS
   express.json(),     // Parse JSON requests

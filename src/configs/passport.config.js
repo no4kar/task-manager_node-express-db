@@ -1,8 +1,10 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { userService } from '../services/mongoose/user.service.js';
+
 import { env } from './env.config.js';
+import { userService } from '../services/mongoose/user.service.js';
 import { bcryptService } from '../services/bcrypt.service.js';
+import { tokenService } from '../services/mongoose/token.service.js';
 import { ApiError } from '../exceptions/api.error.js';
 
 passport.use(
@@ -22,22 +24,28 @@ passport.use(
     ) {
       try {
         // Check if the user already exists in the database
-        const foundUser = await userService.getByOptions({
-          email: profile.emails[0].value,
-        });
+        const foundUser
+          = await userService.getByOptions({
+            email: profile.emails[0].value,
+          });
 
         if (foundUser) {
-          await userService.update(foundUser, { activationToken: profile.id });
+          const userToken
+            = await tokenService.put({
+              userId: foundUser.id,
+              refresh: null,
+              activation: profile.id,
+            });
 
           return done(null, foundUser.toObject());
         }
 
         // If user does not exist, create a new user with Google profile info
-        const createdUser = await userService.create({
-          email: profile.emails[0].value,
-          password: await bcryptService.hash(profile.id),
-          activationToken: profile.id,
-        });
+        const createdUser
+          = await userService.create({
+            email: profile.emails[0].value,
+            password: await bcryptService.hash(profile.id),
+          });
 
         return done(null, createdUser.toObject());
       } catch (error) {

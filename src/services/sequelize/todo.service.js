@@ -5,9 +5,10 @@ import { Op } from 'sequelize';
 import { sequelize } from '../../store/sqlite.db.js';
 import { Todo as Todos } from '../../models/sequelize/Todo.model.js';
 
-/**@typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodo */
-/**@typedef {import('src/types/todo.type.js').TyTodo.GetParams} TyTodoGetParams */
-/**@typedef {import('src/types/todo.type.js').TyTodo.Model} TyTodoModel */
+/** @typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodo */
+/** @typedef {import('src/types/todo.type.js').TyTodo.CreationAttributes} TyTodoCreationAttributes */
+/** @typedef {import('src/types/todo.type.js').TyTodo.GetParams} TyTodoGetParams */
+/** @typedef {import('src/types/db.type.js').TySequelize.Model<TyTodo, TyTodoCreationAttributes>} TyTodoModel */
 
 export const todoService = {
   normalize,

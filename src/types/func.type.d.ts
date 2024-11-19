@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '../exceptions/api.error';
-import Sequelize from 'sequelize';
+import type Sequelize from 'sequelize';
 import type Mongoose from 'mongoose';
 
 export declare namespace TyFunc {

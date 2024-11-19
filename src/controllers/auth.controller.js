@@ -39,28 +39,54 @@ async function register(req, res) {
 async function activate(req, res) {
   const { activationToken } = req.params;
 
-  const foundUser
-    = await userService.getByOptions({ activationToken });
+  const foundToken
+    = await tokenService.getByOptions({
+      activation: activationToken,
+    });
 
-  if (!foundUser) {
-    throw ApiError.NotFound(`Can't find user by activationToken`);
+  if (!foundToken) {
+    throw ApiError.NotFound(
+      `Can't find userId by activationToken`);
   }
 
-  await userService.update(foundUser, { activationToken: null });
+  const foundUser
+    = await userService.getByOptions({
+      id: foundToken.userId,
+    });
 
-  await sendAuthentication(res, foundUser.toObject());
+  if (!foundUser) {
+    throw ApiError.NotFound(
+      `Can't find user by activationToken`);
+  }
+
+  await tokenService.update(
+    foundToken,
+    { activation: null },
+  );
+
+  await sendAuthentication(
+    res,
+    userService.getDataValue(foundUser),
+  );
 }
 
 /** @type {import('src/types/func.type').Middleware} */
 async function activateByGoogle(req, res) {
-  /** @type {import('src/types/user.type').TyUser.Item | undefined} */
-  const user = req.user; // This is the user returned by Passport
+  /** @type {import('src/types/user.type').TyUser.Item | null} */
+  const user = req.user || null; // This is the user returned by Passport
 
   if (!user) {
     throw ApiError.Unauthorized('Google authentication failed');
   }
 
-  res.redirect(`${env.todo.client.host}/task-manager_react-vite/activate/${user.activationToken}`);
+  const foundToken
+    = await tokenService.getByOptions({ userId: user.id });
+
+  if (!foundToken) {
+    throw ApiError.Unauthorized('Google authentication failed');
+  }
+
+  res.redirect(`${env.todo.client.host}/task-manager_react-vite/activate/${foundToken.activation}`);
 }
 
 /** @type {import('src/types/func.type').Middleware} */
@@ -72,7 +98,10 @@ async function login(req, res) {
     throw ApiError.NotFound('The user with this email does not exist');
   }
 
-  if (foundUser.activationToken) {
+  const foundToken
+    = await tokenService.getByUserId(foundUser._id);
+
+  if (!foundToken || foundToken.activation) {
     throw ApiError.Forbidden('The user is not yet activated');
   }
 
@@ -83,7 +112,10 @@ async function login(req, res) {
     throw ApiError.BadRequest('Login details are wrong');
   }
 
-  await sendAuthentication(res, foundUser.toObject());
+  await sendAuthentication(
+    res,
+    userService.getDataValue(foundUser),
+  );
 }
 
 /** @type {import('src/types/func.type').Middleware} */
@@ -111,7 +143,10 @@ async function refresh(req, res) {
     throw ApiError.Unauthorized();
   }
 
-  await sendAuthentication(res, foundUser.toObject());
+  await sendAuthentication(
+    res,
+    userService.getDataValue(foundUser),
+  );
 }
 
 /** @type {import('src/types/func.type').Middleware} */
@@ -135,10 +170,18 @@ async function logout(req, res) {
 async function sendAuthentication(res, user) {
   const accessToken = jwtService.generateAccessToken(user);
   const refreshToken = jwtService.generateRefreshToken(user);
+  const foundToken = await tokenService.getByUserId(user.id);
 
-  await tokenService.update({ userId: user.id, refreshToken });
+  if (!foundToken) {
+    throw ApiError.NotFound(`Can't find token by user.id`);
+  }
 
-  res.cookie('refreshToken', refreshToken, {
+  await tokenService.update(
+    foundToken,
+    { refresh: refreshToken },
+  );
+
+  res.cookie('refreshToken', foundToken.refresh, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
     httpOnly: true,
     sameSite: 'none', // or 'strict'

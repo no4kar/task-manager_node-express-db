@@ -5,6 +5,7 @@ import { v1 as uuidv1 } from 'uuid';
 
 import { ApiError } from '../../exceptions/api.error.js';
 import { User as Users } from '../../models/mongoose/User.model.js';
+import { tokenService } from '../mongoose/token.service.js';
 import { emailService } from '../email.service.js';
 import { bcryptService } from '../bcrypt.service.js';
 
@@ -21,9 +22,9 @@ import { bcryptService } from '../bcrypt.service.js';
 export const userService = {
   normalize,
   getAllActive,
-  getDataValue,
   getByOptions,
   getAndCountAllByOptions,
+  getDataValue,
   update,
   create,
   removeById,
@@ -57,7 +58,6 @@ function getDataValue(document) {
 function getByOptions({
   id,
   email,
-  activationToken,
 }) {
   /** @type {TyUserFilterQuery} */
   const whereConditions = {};
@@ -68,10 +68,6 @@ function getByOptions({
 
   if (email !== undefined) {
     whereConditions.email = email;
-  }
-
-  if (activationToken !== undefined) {
-    whereConditions.activationToken = activationToken;
   }
 
   const query = Users.findOne(whereConditions);
@@ -87,7 +83,6 @@ function getByOptions({
 async function getAndCountAllByOptions({
   id,
   email,
-  activationToken,
 },
   limit = Number.MAX_SAFE_INTEGER,
   offset = 0,
@@ -101,10 +96,6 @@ async function getAndCountAllByOptions({
 
   if (email !== undefined) {
     whereConditions.email = email;
-  }
-
-  if (activationToken !== undefined) {
-    whereConditions.activationToken = activationToken;
   }
 
   return {
@@ -165,16 +156,27 @@ async function register({ email, password }) {
   const createdUser = await Users.create({
     email,
     password: hashedPassword,
-    activationToken,
   });
 
-  if (!createdUser.activationToken) {
-    throw new Error('something went wrong');
+  if (!createdUser) {
+    throw ApiError.UnprocessableContent(
+      'Something went wrong');
+  }
+
+  const createdToken = await tokenService.create({
+    userId: createdUser._id,
+    refresh: null,
+    activation: activationToken,
+  });
+
+  if (!createdToken || !createdToken.activation) {
+    throw ApiError.UnprocessableContent(
+      'Something went wrong');
   }
 
   await emailService.sendActivationLink(
     createdUser.email,
-    createdUser.activationToken,
+    createdToken.activation,
   );
 }
 

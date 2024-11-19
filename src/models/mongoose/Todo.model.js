@@ -24,6 +24,11 @@ export const todoSchema = new Schema(
       ref: modelName.user,
       required: true,
     },
+    taskId: {
+      type: Schema.Types.ObjectId,
+      ref: modelName.task,
+      required: true,
+    },
     title: {
       type: String,
       default: 'none',

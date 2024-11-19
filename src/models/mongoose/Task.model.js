@@ -22,12 +22,16 @@ export const taskSchema = new Schema(
         return this._id.toString(); // Assigns the MongoDB-generated `_id` to the `id` field
       },
     },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: modelName.user,
+      required: true,
+    },
     name: {
       type: String,
       required: true,
-      unique: true,
+      unique: false,
       trim: true,
-      // lowercase: true,
     },
   },
   {
@@ -35,13 +39,6 @@ export const taskSchema = new Schema(
   }
 );
 
-// Pre-save hook to copy the MongoDB `_id` to the custom `id` field
-taskSchema.pre('save', function (next) {
-  if (!this.id) {
-    this.id = this._id.toString();
-  }
-  next();
-});
 
 // Middleware to delete the associated Todos when a Task is removed
 taskSchema.post('deleteOne', { document: true, query: false }, async function (doc, next) {

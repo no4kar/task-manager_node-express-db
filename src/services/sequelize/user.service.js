@@ -9,7 +9,8 @@ import { emailService } from '../email.service.js';
 import { bcryptService } from '../bcrypt.service.js';
 
 /** @typedef {import('src/types/user.type.js').TyUser.Item} TyUser */
-/** @typedef {import('src/types/user.type.js').TyUser.Model} TyUserModel */
+/** @typedef {import('src/types/user.type.js').TyUser.CreationAttributes} TyUserCreationAttributes */
+/** @typedef {import('src/types/db.type.js').TySequelize.Model<TyUser, TyUserCreationAttributes>} TyUserModel */
 /** @typedef {import('src/types/user.type.js').TyUser.Normalized} TyUserNormalized */
 /** @typedef {import('src/types/user.type.js').TyUser.GetParams} TyUserGetParams */
 
