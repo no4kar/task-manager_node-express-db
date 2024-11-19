@@ -10,7 +10,7 @@ import { connectDB } from './store/mongoose.db.js';
  * @param {Object} configs */
 function serverRunInfo(serverName, configs) {
   return (`
-${serverName} is running 
+${serverName} is running
 server: ${configs.server.host}
 client: ${configs.client.host}
 `);

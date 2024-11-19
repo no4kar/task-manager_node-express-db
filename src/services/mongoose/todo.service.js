@@ -21,6 +21,7 @@ export const todoService = {
   getAllByUser,
   getAndCountAllByOptions,
   getById,
+  getDataValue,
   update,
   create,
   updateById,
@@ -55,32 +56,28 @@ function getAll() {
 }
 
 /**
- * @param {TyTodoGetParams} param0
+ * @param {TyTodoFilterQuery} whereConditions
  * @param {number} limit
  * @param {number} offset */
 async function getAndCountAllByOptions(
-  {
-    userId,
-    title,
-    completed,
-  },
+  whereConditions,
   limit = Number.MAX_SAFE_INTEGER,
   offset = 0,
 ) {
-  /** @type {TyTodoFilterQuery} */
-  const whereConditions = {};
+  // /** @type {TyTodoFilterQuery} */
+  // const whereConditions = {};
 
-  if (userId !== undefined) {
-    whereConditions.userId = userId;
-  }
+  // if (userId !== undefined) {
+  //   whereConditions.userId = userId;
+  // }
 
-  if (title !== undefined) {
-    whereConditions.title = new RegExp(title, 'i');;
-  }
+  // if (title !== undefined) {
+  //   whereConditions.title = new RegExp(title, 'i');;
+  // }
 
-  if (completed !== undefined) {
-    whereConditions.completed = completed;
-  }
+  // if (completed !== undefined) {
+  //   whereConditions.completed = completed;
+  // }
 
   return {
     rows:
@@ -102,6 +99,13 @@ function getAllByUser(userId) {
   const query = Todos.find({ userId });
 
   return query.sort({ createdAt: 'asc' }).exec();
+}
+
+/**
+ * @param {TyTodoDocument} document 
+ * @returns */
+function getDataValue(document) {
+  return document.toObject();
 }
 
 /**

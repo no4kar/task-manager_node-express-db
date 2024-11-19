@@ -20,9 +20,13 @@ export const tokenSchema = new Schema(
       ref: modelName.user,
       required: true,
     },
-    refreshToken: {
+    refresh: {
       type: String,
-      required: true,
+      default: null,
+    },
+    activation: {
+      type: String,
+      default: null,
     },
   },
   {

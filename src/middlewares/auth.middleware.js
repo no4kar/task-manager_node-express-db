@@ -6,7 +6,7 @@ import { jwtService } from '../services/jwt.service.js';
 
 /** @type {import('src/types/func.type.js').Middleware} */
 export function authMiddleware(req, res, next) {
-  // Simplified check for Google authorization 
+  // Simplified check for Google authorization
   if (req.user) {
     next();
   }

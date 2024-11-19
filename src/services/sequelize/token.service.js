@@ -3,7 +3,7 @@
 
 import { Token } from '../../models/sequelize/Token.model.js';
 
-/** @typedef {import('src/types/token.type.js').TyToken.Item} TyTokenItem*/
+/** @typedef {import('src/types/token.type.js').TyToken.Item} TyToken*/
 /** @typedef {import('src/types/token.type.js').TyToken.CreationAttributes} TyTokenCreationAttributes*/
 
 export const tokenService = {
@@ -13,7 +13,7 @@ export const tokenService = {
 };
 
 /** @param {TyTokenCreationAttributes} tokenCreationAttributes*/
-async function save({ userId, refreshToken }) {
+async function save({ userId, refresh }) {
   const foundToken = await Token.findOne({
     where: { userId },
   });
@@ -21,24 +21,24 @@ async function save({ userId, refreshToken }) {
   if (foundToken) {
     Object.assign(foundToken, {
       ...foundToken.dataValues,
-      refreshToken,
+      refresh,
     });
 
     return foundToken.save();
 
   }
 
-  return Token.create({ userId, refreshToken });
+  return Token.create({ userId, refresh });
 }
 
-/** @param {TyTokenItem['refreshToken']} refreshToken */
-function getByRefreshToken(refreshToken) {
+/** @param {TyToken['refresh']} refresh */
+function getByRefreshToken(refresh) {
   return Token.findOne({
-    where: { refreshToken },
+    where: { refresh },
   });
 }
 
-/** @param {TyTokenItem['userId']} userId */
+/** @param {TyToken['userId']} userId */
 function remove(userId) {
   return Token.destroy({
     where: { userId },

@@ -6,7 +6,7 @@ import {
   model,
 } from 'mongoose';
 import { Token as Tokens } from './Token.model.js';
-import { Todo as Todos } from './Todo.model.js';
+import { Task as Tasks } from './Task.model.js';
 import modelName from '../modelName.js';
 
 /**
@@ -34,10 +34,10 @@ export const userSchema = new Schema(
       type: String,
       required: true,
     },
-    activationToken: {
-      type: String,
-      default: null,
-    },
+    // activationToken: {
+    //   type: String,
+    //   default: null,
+    // },
   },
   {
     timestamps: true, // Automatically manage createdAt and updatedAt fields
@@ -58,8 +58,8 @@ userSchema.pre('save', function (next) {
 userSchema.post('deleteOne', { document: true, query: false }, async function (doc, next) {
   try {
     // Remove the associated token
+    await Tasks.deleteMany({ userId: doc._id });
     await Tokens.deleteOne({ userId: doc._id });
-    await Todos.deleteMany({ userId: doc._id });
     next();
   } catch (error) {
     next(error);

@@ -1,56 +1,72 @@
 import { ApiError } from '../exceptions/api.error.js';
-import { env } from '../configs/env.config.js';
 
-// Middleware to track unhandled requests
-const unhandledRequests = new Map();
+/** 
+* @param {Object} [options]
+* @param {number} [options.unhandledRequestsPerIP]
+* @param {number} [options.totalUnhandledRequests] */
+export function getLimiter(options = {}) {
+  // Middleware to track unhandled requests
+  const unhandledRequests = new Map();
 
-/**
- * @type {import("src/types/func.type").Middleware} */
-export function limiter(req, res, next) {
-  const ip = req.headers['x-forwarded-for'] || req.ip;
+  const {
+    unhandledRequestsPerIP = 3,
+    totalUnhandledRequests = 11,
+  } = options;
 
-  if (!unhandledRequests.has(ip)) {
-    unhandledRequests.set(ip, 0);
-  }
+  /** @type {import("src/types/func.type").Middleware} */
+  const limiter =
+    function (req, res, next) {
+      const ip = req.headers['x-forwarded-for'] || req.ip;
 
-  const errors = {
-    tooManyFromSameIP: unhandledRequests.get(ip) >= env.limit.max.unhandledRequestsPerIP,
-    tooManyUnhandled: unhandledRequests.size >= env.limit.max.totalUnhandledRequests,
-  };
+      if (!unhandledRequests.has(ip)) {
+        unhandledRequests.set(ip, 0);
+      }
 
-  if (errors.tooManyFromSameIP || errors.tooManyUnhandled) {
-    throw ApiError.TooManyRequests('Too many requests - try again later');
-  }
+      const errors = {
+        tooManyFromSameIP:
+          unhandledRequests.get(ip) >= unhandledRequestsPerIP,
+        tooManyUnhandled:
+          unhandledRequests.size >= totalUnhandledRequests,
+      };
 
-  unhandledRequests.set(ip, unhandledRequests.get(ip) + 1);
+      if (errors.tooManyFromSameIP
+        || errors.tooManyUnhandled) {
+        throw ApiError.TooManyRequests(
+          'Too many requests - try again later');
+      }
 
-  console.info('\n\nSTART'
-    + `\n\treq.headers['x-forwarded-for'] || req.ip: ${ip}`
-    + `\n\tunhandledRequests.get(${ip}): ${unhandledRequests.get(ip)}`
-    + `\n\tunhandledRequests.size: ${unhandledRequests.size}`
-  );
+      unhandledRequests.set(ip, unhandledRequests.get(ip) + 1);
 
-  const decrementRequestCount = () => {
-    if (res.locals.countDecremented) return;  // Check if the count has already been decremented
-    res.locals.countDecremented = true;        // Set the flag to prevent future calls
+      console.info('\n\nSTART'
+        + `\n\treq.headers['x-forwarded-for'] || req.ip: ${ip}`
+        + `\n\tunhandledRequests.get(${ip}): ${unhandledRequests.get(ip)}`
+        + `\n\tunhandledRequests.size: ${unhandledRequests.size}`
+      );
 
-    unhandledRequests.set(ip, unhandledRequests.get(ip) - 1);
+      const decrementRequestCount = () => {
+        if (res.locals.countDecremented) return;  // Check if the count has already been decremented
+        res.locals.countDecremented = true;        // Set the flag to prevent future calls
 
-    if (unhandledRequests.get(ip) === 0) {
-      unhandledRequests.delete(ip);
-    }
+        unhandledRequests.set(ip, unhandledRequests.get(ip) - 1);
 
-    console.info('\nFINISH'
-      + `\n\treq.headers['x-forwarded-for'] || req.ip: ${ip}`
-      + `\n\tunhandledRequests.get(${ip}): ${unhandledRequests.get(ip)}`
-      + `\n\tunhandledRequests.size: ${unhandledRequests.size}`
-    );
-  };
+        if (unhandledRequests.get(ip) === 0) {
+          unhandledRequests.delete(ip);
+        }
 
-  // Called when response is fully sent
-  res.once('finish', decrementRequestCount);
-  // Called if the client disconnects
-  res.once('close', decrementRequestCount);
+        console.info('\nFINISH'
+          + `\n\treq.headers['x-forwarded-for'] || req.ip: ${ip}`
+          + `\n\tunhandledRequests.get(${ip}): ${unhandledRequests.get(ip)}`
+          + `\n\tunhandledRequests.size: ${unhandledRequests.size}`
+        );
+      };
 
-  next();
+      // Called when response is fully sent
+      res.once('finish', decrementRequestCount);
+      // Called if the client disconnects
+      res.once('close', decrementRequestCount);
+
+      next();
+    };
+
+  return limiter;
 }

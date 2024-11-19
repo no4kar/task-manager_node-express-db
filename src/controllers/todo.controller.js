@@ -26,6 +26,7 @@ async function get(req, res) {
     page,
     size,
     userId,
+    taskName,
     title,
     completed,
   } = req.query;
@@ -43,29 +44,50 @@ async function get(req, res) {
     );
   }
 
-  if (typeof page === 'undefined' || typeof size === 'undefined') {
+  if (typeof page === 'undefined'
+    || typeof size === 'undefined') {
     throw ApiError.UnprocessableContent(`'page' and 'size' are required`);
   }
 
-  const limit = parseInt(String(size), 10) || Number.MAX_SAFE_INTEGER;
-  const offset = ((parseInt(String(page), 10) || 1) - 1) * limit;
+  const limit
+    = parseInt(String(size), 10) || Number.MAX_SAFE_INTEGER;
+  const offset
+    = ((parseInt(String(page), 10) || 1) - 1) * limit;
+
+  /** @type {import('../services/mongoose/todo.service.js').TyTodoFilterQuery} */
+  const whereConditions = {};
+
+  if (userId !== undefined) {
+    whereConditions.userId = String(userId);
+  }
+
+  if (title !== undefined) {
+    whereConditions.title = new RegExp(String(title), 'i');;
+  }
+
+  if (completed !== undefined) {
+    whereConditions.completed = completed === 'true';
+  }
 
   const {
     rows,
     count,
   } = await todoService.getAndCountAllByOptions(
-    {
-      userId: typeof userId !== 'undefined'
-        ? String(userId)
-        : userId,
-      title: typeof title !== 'undefined'
-        ? String(title)
-        : title,
-      completed:
-        typeof completed !== 'undefined'
-          ? completed === 'true'
-          : completed,
-    },
+    // {
+    //   userId:
+    //     typeof userId !== 'undefined'
+    //       ? String(userId)
+    //       : userId,
+    //   title:
+    //     typeof title !== 'undefined'
+    //       ? String(title)
+    //       : title,
+    //   completed:
+    //     typeof completed !== 'undefined'
+    //       ? completed === 'true'
+    //       : completed,
+    // },
+    whereConditions,
     limit,
     offset,
   );
@@ -94,24 +116,30 @@ async function post(req, res) {
   // express.json() can parse types correctly
   const {
     userId,
+    taskId = '111100001111000011110000',
     title,
     completed,
   } = req.body;
 
-  if (!title || !userId
-    || typeof userId !== 'string'
-    || typeof title !== 'string'
-  ) {
+  const errors = {
+    userId: !userId || typeof userId !== 'string',
+    taskId: !taskId || typeof userId !== 'string',
+    title: !title || typeof title !== 'string',
+  };
+
+  if (errors.userId || errors.taskId || errors.title) {
     throw ApiError.UnprocessableContent(
       `Type error`,
       {
         expected: {
           userId: 'string',
+          taskId: 'string',
           title: 'string',
           completed: 'undefined | boolean',
         },
         got: {
           userId: `${typeof userId}: ${userId}`,
+          taskId: `${typeof taskId}: ${taskId}`,
           title: `${typeof title}: ${title}`,
           completed: `${typeof completed}: ${completed}`,
         },
@@ -119,20 +147,16 @@ async function post(req, res) {
     );
   }
 
-  // console.info(`{
-  //       ${userId}:${typeof userId},
-  //       ${title}:${typeof title},
-  //       ${completed}:${typeof completed},
-  //     }`);
-
-  const todo = await todoService.create({
-    userId,
-    title,
-    completed:
-      typeof completed === 'boolean'
-        ? completed
-        : false,
-  });
+  const todo
+    = await todoService.create({
+      userId,
+      taskId,
+      title,
+      completed:
+        typeof completed === 'boolean'
+          ? completed
+          : false,
+    });
 
   res.status(201)
     .send(todoService.normalize(todo.toObject()));
@@ -144,39 +168,49 @@ async function put(req, res) {
   const { id } = req.params;
   const {
     userId,
+    taskId = '111100001111000011110000',
     title,
     completed,
   } = req.body;
 
   const errors = {
+    id: !id || typeof id !== 'string',
     userId: !userId || typeof userId !== 'string',
+    taskId: !taskId || typeof userId !== 'string',
     title: !title || typeof title !== 'string',
     completed: typeof completed !== 'boolean',
   };
 
-  if (errors.userId || errors.title || errors.completed) {
-    throw ApiError.UnprocessableContent(
-      `Type error`,
-      {
-        expected: {
-          userId: 'string',
-          title: 'string',
-          completed: 'boolean',
-        },
-        got: {
-          userId: `${typeof userId}: ${userId}`,
-          title: `${typeof title}: ${title}`,
-          completed: `${typeof completed}: ${completed}`,
-        }
-      },
-    );
-  }
-
+  // if no id then no foundTodo
   const foundTodo = await todoService.getById(id);
 
   if (!foundTodo) {
+    if (errors.userId
+      || errors.taskId
+      || errors.title
+      || errors.completed) {
+      throw ApiError.UnprocessableContent(
+        `Type error`,
+        {
+          expected: {
+            userId: 'string',
+            taskId: 'string',
+            title: 'string',
+            completed: 'boolean',
+          },
+          got: {
+            userId: `${typeof userId}: ${userId}`,
+            taskId: `${typeof taskId}: ${taskId}`,
+            title: `${typeof title}: ${title}`,
+            completed: `${typeof completed}: ${completed}`,
+          }
+        },
+      );
+    }
+
     const todo = await todoService.create({
       userId,
+      taskId,
       title,
       completed,
     });
@@ -189,7 +223,7 @@ async function put(req, res) {
 
   await todoService.update(
     foundTodo,
-    { userId, title, completed },
+    { title, completed },
   );
 
   res.send(todoService.normalize(
