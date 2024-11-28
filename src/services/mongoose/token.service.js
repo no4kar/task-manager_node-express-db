@@ -17,7 +17,7 @@ export const tokenService = {
   getByOptions,
   getByUserId,
   getByRefreshToken,
-  getDataValue,
+  toObject,
   update,
   put,
   remove,
@@ -64,29 +64,10 @@ async function put({
 
 
 /**
- * @param {TyTokenGetParams} param0
+ * @param {TyTokenFilterQuery} whereConditions
  * @returns */
-function getByOptions({
-  userId,
-  activation,
-  refresh,
-}) {
-  /** @type {TyTokenFilterQuery} */
-  const whereConditions = {};
-
-  if (userId !== undefined) {
-    whereConditions.userId = userId;
-  }
-
-  if (activation !== undefined) {
-    whereConditions.activation = activation;
-  }
-
-  if (refresh !== undefined) {
-    whereConditions.refresh = refresh;
-  }
-
-  const query = Tokens.findOne(whereConditions);
+function getByOptions(whereConditions) {
+  const query = Tokens.find(whereConditions);
 
   return query.exec();
 }
@@ -94,7 +75,7 @@ function getByOptions({
 /**
  * @param {TyTokenDocument} document 
  * @returns */
-function getDataValue(document) {
+function toObject(document) {
   return document.toObject();
 }
 

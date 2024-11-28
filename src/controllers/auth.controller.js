@@ -66,7 +66,7 @@ async function activate(req, res) {
 
   await sendAuthentication(
     res,
-    userService.getDataValue(foundUser),
+    userService.toObject(foundUser),
   );
 }
 
@@ -114,7 +114,7 @@ async function login(req, res) {
 
   await sendAuthentication(
     res,
-    userService.getDataValue(foundUser),
+    userService.toObject(foundUser),
   );
 }
 
@@ -145,7 +145,7 @@ async function refresh(req, res) {
 
   await sendAuthentication(
     res,
-    userService.getDataValue(foundUser),
+    userService.toObject(foundUser),
   );
 }
 

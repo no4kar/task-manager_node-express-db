@@ -19,9 +19,9 @@ export const todoService = {
   normalize,
   getAll,
   getAllByUser,
-  getAndCountAllByOptions,
+  getAndCountByOptions,
   getById,
-  getDataValue,
+  toObject,
   update,
   create,
   updateById,
@@ -59,7 +59,7 @@ function getAll() {
  * @param {TyTodoFilterQuery} whereConditions
  * @param {number} limit
  * @param {number} offset */
-async function getAndCountAllByOptions(
+async function getAndCountByOptions(
   whereConditions,
   limit = Number.MAX_SAFE_INTEGER,
   offset = 0,
@@ -104,7 +104,7 @@ function getAllByUser(userId) {
 /**
  * @param {TyTodoDocument} document 
  * @returns */
-function getDataValue(document) {
+function toObject(document) {
   return document.toObject();
 }
 

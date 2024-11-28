@@ -72,7 +72,7 @@ async function get(req, res) {
   const {
     rows,
     count,
-  } = await todoService.getAndCountAllByOptions(
+  } = await todoService.getAndCountByOptions(
     // {
     //   userId:
     //     typeof userId !== 'undefined'

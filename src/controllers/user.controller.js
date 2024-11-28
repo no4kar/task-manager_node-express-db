@@ -1,7 +1,7 @@
 'use strict';
 // @ts-check
 
-import { userService } from '../services/sequelize/user.service.js';
+import { userService } from '../services/mongoose/user.service.js';
 
 export const userController = {
   getAll,
@@ -9,7 +9,7 @@ export const userController = {
 
 /** @type {import('src/types/func.type.js').Middleware} */
 async function getAll(req, res) {
-  const users = await userService.getAllActive();
+  const users = await userService.getActives();
 
-  res.send(users.map(item => userService.normalize(item.dataValues)));
+  res.send(users.map(item => userService.normalize(userService.toObject(item))));
 }

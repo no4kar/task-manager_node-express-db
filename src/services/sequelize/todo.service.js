@@ -14,7 +14,7 @@ export const todoService = {
   normalize,
   getAll,
   getAllByUser,
-  getAndCountAllByOptions,
+  getAndCountByOptions,
   getById,
   setDataValues,
   create,
@@ -41,7 +41,7 @@ function getAll() {
  * @param {TyTodoGetParams} GetParams
  * @param {number} [limit]
  * @param {number} [offset] */
-function getAndCountAllByOptions(
+function getAndCountByOptions(
   {
     userId,
     title,

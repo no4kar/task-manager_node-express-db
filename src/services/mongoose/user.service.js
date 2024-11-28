@@ -5,6 +5,7 @@ import { v1 as uuidv1 } from 'uuid';
 
 import { ApiError } from '../../exceptions/api.error.js';
 import { User as Users } from '../../models/mongoose/User.model.js';
+// import { Token as Tokens } from '../../models/mongoose/Token.model.js';
 import { tokenService } from '../mongoose/token.service.js';
 import { emailService } from '../email.service.js';
 import { bcryptService } from '../bcrypt.service.js';
@@ -21,10 +22,11 @@ import { bcryptService } from '../bcrypt.service.js';
 
 export const userService = {
   normalize,
-  getAllActive,
+  getActives,
   getByOptions,
-  getAndCountAllByOptions,
-  getDataValue,
+  getOneByOptions,
+  getAndCountByOptions,
+  toObject,
   update,
   create,
   removeById,
@@ -39,65 +41,52 @@ function normalize({ id, email }) {
 }
 
 /** Retrieves all active users (i.e., users with no activation token) */
-function getAllActive() {
-  const query = Users.find({ activationToken: null });
+async function getActives() {
+  const tokens = await tokenService.getByOptions({ activation: null });
 
-  return query.sort({ createdAt: 'asc' }).exec();
+  const usersQuery = Users.find({
+    // id: { $in: ['New Task', 'First Task', 'Other Task'] },
+    id: { $in: tokens.map(token => token.userId) }
+  });
+
+  return usersQuery.sort({ createdAt: 'asc' }).exec();
 }
 
 /**
  * @param {TyUserDocument} document 
  * @returns */
-function getDataValue(document) {
+function toObject(document) {
   return document.toObject();
 }
 
 /**
- * @param {TyUserGetParams} param0
+ * @param {TyUserFilterQuery} whereConditions
  * @returns */
-function getByOptions({
-  id,
-  email,
-}) {
-  /** @type {TyUserFilterQuery} */
-  const whereConditions = {};
+function getByOptions(whereConditions) {
+  const query = Users.find(whereConditions);
 
-  if (id !== undefined) {
-    whereConditions.id = id;
-  }
+  return query.exec();
+}
 
-  if (email !== undefined) {
-    whereConditions.email = email;
-  }
-
+/**
+ * @param {TyUserFilterQuery} whereConditions
+ * @returns */
+function getOneByOptions(whereConditions) {
   const query = Users.findOne(whereConditions);
 
   return query.exec();
 }
 
 /**
- * @param {TyUserGetParams} param0
+ * @param {TyUserFilterQuery} whereConditions
  * @param {number} limit
  * @param {number} offset
  * @returns */
-async function getAndCountAllByOptions({
-  id,
-  email,
-},
+async function getAndCountByOptions(
+  whereConditions,
   limit = Number.MAX_SAFE_INTEGER,
   offset = 0,
 ) {
-  /** @type {TyUserFilterQuery} */
-  const whereConditions = {};
-
-  if (id !== undefined) {
-    whereConditions.id = id;
-  }
-
-  if (email !== undefined) {
-    whereConditions.email = email;
-  }
-
   return {
     rows:
       await Users.find(whereConditions)

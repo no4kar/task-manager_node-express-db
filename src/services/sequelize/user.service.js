@@ -16,9 +16,9 @@ import { bcryptService } from '../bcrypt.service.js';
 
 export const userService = {
   normalize,
-  getAllActive,
+  getActives,
   getByOptions,
-  getAndCountAllByOptions,
+  getAndCountByOptions,
   setDataValues,
   create,
   register,
@@ -29,7 +29,7 @@ function normalize({ id, email }) {
   return { id, email };
 }
 
-function getAllActive() {
+function getActives() {
   return Users.findAll({
     where: {
       activationToken: null,
@@ -39,63 +39,22 @@ function getAllActive() {
 }
 
 /**
- * @param {TyUserGetParams} GetParams */
-function getByOptions({
-  id,
-  email,
-  activationToken,
-}) {
-  /**@type {import('sequelize').WhereOptions<TyUser>} */
-  const whereConditions = {};
-
-  if (id !== undefined) {
-    whereConditions.id = id;
-  }
-
-  if (email !== undefined) {
-    whereConditions.email = email;
-  }
-
-  if (activationToken !== undefined) {
-    whereConditions.activationToken = activationToken;
-  }
-
-  console.info(whereConditions);
-
-  return Users.findOne({
+ * @param {import('sequelize').WhereOptions<TyUser>} whereConditions */
+function getByOptions(whereConditions) {
+  return Users.findAll({
     where: whereConditions,
   });
 }
 
 /**
- * @param {TyUserGetParams} GetParams
+ * @param {import('sequelize').WhereOptions<TyUser>} whereConditions
  * @param {number} [limit]
  * @param {number} [offset] */
-function getAndCountAllByOptions({
-  id,
-  email,
-  activationToken,
-},
+function getAndCountByOptions(
+  whereConditions,
   limit,
   offset,
 ) {
-  /**@type {import('sequelize').WhereOptions<TyUser>} */
-  const whereConditions = {};
-
-  if (id !== undefined) {
-    whereConditions.id = id;
-  }
-
-  if (email !== undefined) {
-    whereConditions.email = email;
-  }
-
-  if (activationToken !== undefined) {
-    whereConditions.activationToken = activationToken;
-  }
-
-  console.info(whereConditions);
-
   return Users.findAndCountAll({
     where: whereConditions,
     limit,

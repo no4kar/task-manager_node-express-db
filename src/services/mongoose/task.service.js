@@ -16,7 +16,7 @@ export const taskService = {
   create,
   getByOptions,
   getByUserId,
-  getDataValue,
+  toObject,
   update,
   put,
   remove,
@@ -60,7 +60,7 @@ async function put({
  * @param {TyTaskFilterQuery} whereConditions
  * @returns */
 function getByOptions(whereConditions) {
-  const query = Tasks.findOne(whereConditions);
+  const query = Tasks.find(whereConditions);
 
   return query.exec();
 }
@@ -68,7 +68,7 @@ function getByOptions(whereConditions) {
 /**
  * @param {TyTaskDocument} document 
  * @returns */
-function getDataValue(document) {
+function toObject(document) {
   return document.toObject();
 }
 
