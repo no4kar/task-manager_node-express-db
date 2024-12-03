@@ -13,7 +13,7 @@ import { Todo as Todos } from '../../models/sequelize/Todo.model.js';
 export const todoService = {
   normalize,
   getAll,
-  getAllByUser,
+  getByUserId,
   getAndCountByOptions,
   getById,
   setDataValues,
@@ -78,7 +78,7 @@ function getAndCountByOptions(
 
 /**
  * @param {string} userId */
-function getAllByUser(userId) {
+function getByUserId(userId) {
   return Todos.findAll({
     where: {
       userId,

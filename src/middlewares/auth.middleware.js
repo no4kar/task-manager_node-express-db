@@ -4,7 +4,7 @@
 import { ApiError } from '../exceptions/api.error.js';
 import { jwtService } from '../services/jwt.service.js';
 
-/** @type {import('src/types/func.type.js').Middleware} */
+/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 export function authMiddleware(req, res, next) {
   // Simplified check for Google authorization
   if (req.user) {

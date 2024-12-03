@@ -1,3 +1,10 @@
+'use strict';
+// @ts-check
+
+/**
+ * @typedef {import('src/types/func.type.js').TyFunc.ApiError.StaticMethod} ApiErrorStaticMethod
+*/
+
 export class ApiError extends Error {
   /**
    * @param {number} status
@@ -17,7 +24,8 @@ export class ApiError extends Error {
     return new ApiError(400, message, errors);
   }
 
-  /** Indicates that a request was not successful because it lacks valid authentication credentials for the requested resource */
+  /** Indicates that a request was not successful because it lacks valid authentication credentials for the requested resource 
+   * @type {ApiErrorStaticMethod} */
   static Unauthorized(message = 'User is not authorized') {
     return new ApiError(401, message);
   }
@@ -27,14 +35,16 @@ export class ApiError extends Error {
     return new ApiError(403, message);
   }
 
-  /** Indicates that the server cannot find the requested resource */
-  static NotFound(message = 'Not found') {
-    return new ApiError(404, message);
+  /** Indicates that the server cannot find the requested resource
+   * @type {ApiErrorStaticMethod} */
+  static NotFound(message = 'Not found', errors) {
+    return new ApiError(404, message, errors);
   }
 
-  /** Indicates a request conflict with the current state of the target resource */
-  static Conflict(message = 'Conflict') {
-    return new ApiError(409, message);
+  /** Indicates a request conflict with the current state of the target resource
+   * @type {ApiErrorStaticMethod} */
+  static Conflict(message = 'Conflict', errors) {
+    return new ApiError(409, message, errors);
   }
 
   /** The client has sent too many requests in a given amount of time */
@@ -43,8 +53,7 @@ export class ApiError extends Error {
   }
 
   /** The server understood the content type of the request entity, and the syntax of the request entity was correct, but it was unable to process the contained instructions
-   * @param {string} message
-   * @param {Error | Object} [errors={}] */
+   * @type {ApiErrorStaticMethod} */
   static UnprocessableContent(message = 'Invalid Data', errors) {
     return new ApiError(422, message, errors);
   }

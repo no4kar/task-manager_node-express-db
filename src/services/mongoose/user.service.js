@@ -119,7 +119,7 @@ function create(properties) {
  * @param {TyUser['id']} id
  * @returns {Promise<{ acknowledged: boolean, deletedCount: number }>} */
 function removeById(id) {
-  const query = Users.findOne({ id });
+  const query = Users.findById(id);
 
   return query.deleteOne().exec();
 }

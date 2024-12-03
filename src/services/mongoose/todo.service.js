@@ -17,11 +17,11 @@ import { Todo as Todos } from '../../models/mongoose/Todo.model.js';
 
 export const todoService = {
   normalize,
+  toObject,
   getAll,
-  getAllByUser,
+  getByUserId,
   getAndCountByOptions,
   getById,
-  toObject,
   update,
   create,
   updateById,
@@ -34,6 +34,7 @@ export const todoService = {
 function normalize({
   id,
   userId,
+  taskId,
   title,
   completed,
   createdAt,
@@ -42,6 +43,7 @@ function normalize({
   return {
     id,
     userId,
+    taskId,
     title,
     completed,
     createdAt,
@@ -64,21 +66,6 @@ async function getAndCountByOptions(
   limit = Number.MAX_SAFE_INTEGER,
   offset = 0,
 ) {
-  // /** @type {TyTodoFilterQuery} */
-  // const whereConditions = {};
-
-  // if (userId !== undefined) {
-  //   whereConditions.userId = userId;
-  // }
-
-  // if (title !== undefined) {
-  //   whereConditions.title = new RegExp(title, 'i');;
-  // }
-
-  // if (completed !== undefined) {
-  //   whereConditions.completed = completed;
-  // }
-
   return {
     rows:
       await Todos.find(whereConditions)
@@ -95,7 +82,7 @@ async function getAndCountByOptions(
 /**
  * @param {string} userId 
  * @returns */
-function getAllByUser(userId) {
+function getByUserId(userId) {
   const query = Todos.find({ userId });
 
   return query.sort({ createdAt: 'asc' }).exec();
@@ -201,7 +188,7 @@ async function updateByIdWithTransaction(updatedProps) {
 }
 
 /** Function to update a todo item within a transaction
- * @type {import('src/types/func.type.js').MongooseSessionTransaction} */
+ * @type {import('src/types/func.type.js').TyFunc.MongooseSessionTransaction} */
 async function sessionTransaction(cb) {
   const session = await mongoose.startSession();
 

@@ -7,20 +7,44 @@ import { Task as Tasks } from '../../models/mongoose/Task.model.js';
  * @typedef {import('src/types/task.type.js').TyTask.Item} TyTask
  * @typedef {import('src/types/task.type.js').TyTask.GetParams} TyTaskGetParams
  * @typedef {import('src/types/task.type.js').TyTask.UpdateParams} TyTaskUpdateParams
+ * @typedef {import('src/types/task.type.js').TyTask.Normalized} TyTaskNormalized
+ * @typedef {import('src/types/task.type.js').TyTask.Extended} TyTaskExtended
  * @typedef {import('src/types/db.type.js').TyMongoose.Document<unknown,{},TyTask>} TyTaskDocument
  * @typedef {import('src/types/db.type.js').TyMongoose.Query.Filter<TyTask>} TyTaskFilterQuery
  * @typedef {import('src/types/task.type.js').TyTask.CreationAttributes} TyTaskCreationAttributes
 */
 
 export const taskService = {
-  create,
+  normalize,
+  toObject,
+  getOneById,
+  getOneByOptions,
+  getAndCountByOptions,
   getByOptions,
   getByUserId,
-  toObject,
+  create,
   update,
-  put,
-  remove,
+  removeById,
 };
+
+/** 
+ * @param {TyTaskExtended} param0
+ * @returns {TyTaskNormalized} */
+function normalize({
+  id,
+  userId,
+  name,
+  createdAt,
+  updatedAt,
+}) {
+  return {
+    id,
+    userId,
+    name,
+    createdAt,
+    updatedAt,
+  };
+}
 
 /**
  * @param {TyTaskCreationAttributes} properties
@@ -38,22 +62,21 @@ function update(document, properties) {
 }
 
 /**
- * @param {TyTaskCreationAttributes} properties
+ * @param {TyTask['id']} id
  * @returns */
-async function put({
-  userId,
-  name,
-}) {
-  const query
-    = Tasks.findOne({ userId });
+function getOneById(id) {
+  const query = Tasks.findById(id);
 
-  const foundTask = await query.exec();
+  return query.exec();
+}
 
-  if (foundTask) {
-    return foundTask.set({ name }).save();
-  }
+/**
+ * @param {TyTaskFilterQuery} whereConditions
+ * @returns */
+function getOneByOptions(whereConditions) {
+  const query = Tasks.findOne(whereConditions);
 
-  return Tasks.create({ userId, name });
+  return query.exec();
 }
 
 /**
@@ -63,6 +86,28 @@ function getByOptions(whereConditions) {
   const query = Tasks.find(whereConditions);
 
   return query.exec();
+}
+
+/**
+ * @param {TyTaskFilterQuery} whereConditions
+ * @param {number} limit
+ * @param {number} offset */
+async function getAndCountByOptions(
+  whereConditions,
+  limit = Number.MAX_SAFE_INTEGER,
+  offset = 0,
+) {
+  return {
+    rows:
+      await Tasks.find(whereConditions)
+        .limit(limit)
+        .skip(offset)
+        .exec(),
+    count:
+      await Tasks.find(whereConditions)
+        .countDocuments()
+        .exec(),
+  };
 }
 
 /**
@@ -77,17 +122,17 @@ function toObject(document) {
  * @returns */
 function getByUserId(userId) {
   const query
-    = Tasks.findOne({ userId });
+    = Tasks.find({ userId });
 
   return query.exec();
 }
 
 /**
- * @param {TyTask['userId']} userId
+ * @param {TyTask['id']} id
  * @returns {Promise<{ acknowledged: boolean, deletedCount: number }>}*/
-function remove(userId) {
+function removeById(id) {
   const query
-    = Tasks.findOne({ userId });
+    = Tasks.findById(id);
 
   return query.deleteOne().exec();
 }

@@ -17,7 +17,7 @@ export const authController = {
   refresh,
 };
 
-/** @type {import('src/types/func.type').Middleware} */
+/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function register(req, res) {
   const { email, password } = req.body;
 
@@ -35,22 +35,33 @@ async function register(req, res) {
   res.send({ message: 'OK' });
 }
 
-/** @type {import('src/types/func.type').Middleware} */
+/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function activate(req, res) {
   const { activationToken } = req.params;
 
-  const foundToken
+  const foundTokens
     = await tokenService.getByOptions({
       activation: activationToken,
     });
 
+  if (foundTokens.length > 1) { // Some
+    throw ApiError.Conflict(
+      `Expected only one instance, but multiple were found.`,
+      { details: { instancesFound: 3 } }
+    );
+  }
+
+  const foundToken = foundTokens.at(0);
+
   if (!foundToken) {
     throw ApiError.NotFound(
-      `Can't find userId by activationToken`);
+      `Can't find userId by activationToken`,
+      { details: { activationToken } }
+    );
   }
 
   const foundUser
-    = await userService.getByOptions({
+    = await userService.getOneByOptions({
       id: foundToken.userId,
     });
 
@@ -70,7 +81,7 @@ async function activate(req, res) {
   );
 }
 
-/** @type {import('src/types/func.type').Middleware} */
+/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function activateByGoogle(req, res) {
   /** @type {import('src/types/user.type').TyUser.Item | null} */
   const user = req.user || null; // This is the user returned by Passport
@@ -89,17 +100,17 @@ async function activateByGoogle(req, res) {
   res.redirect(`${env.todo.client.host}/task-manager_react-vite/activate/${foundToken.activation}`);
 }
 
-/** @type {import('src/types/func.type').Middleware} */
+/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function login(req, res) {
   const { email, password } = req.body;
-  const foundUser = await userService.getByOptions({ email });
+  const foundUser = await userService.getOneByOptions({ email });
 
   if (!foundUser) {
     throw ApiError.NotFound('The user with this email does not exist');
   }
 
   const foundToken
-    = await tokenService.getByUserId(foundUser._id);
+    = await tokenService.getOneByUserId(foundUser._id);
 
   if (!foundToken || foundToken.activation) {
     throw ApiError.Forbidden('The user is not yet activated');
@@ -118,7 +129,7 @@ async function login(req, res) {
   );
 }
 
-/** @type {import('src/types/func.type').Middleware} */
+/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function refresh(req, res) {
   const { refreshToken } = req.cookies;
 
@@ -137,7 +148,7 @@ async function refresh(req, res) {
   }
 
   const foundUser
-    = await userService.getByOptions({ email: userData.email });
+    = await userService.getOneByOptions({ email: userData.email });
 
   if (!foundUser) {
     throw ApiError.Unauthorized();
@@ -149,7 +160,7 @@ async function refresh(req, res) {
   );
 }
 
-/** @type {import('src/types/func.type').Middleware} */
+/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function logout(req, res) {
   const { refreshToken } = req.cookies;
   const userData
@@ -170,7 +181,7 @@ async function logout(req, res) {
 async function sendAuthentication(res, user) {
   const accessToken = jwtService.generateAccessToken(user);
   const refreshToken = jwtService.generateRefreshToken(user);
-  const foundToken = await tokenService.getByUserId(user.id);
+  const foundToken = await tokenService.getOneByUserId(user.id);
 
   if (!foundToken) {
     throw ApiError.NotFound(`Can't find token by user.id`);

@@ -3,7 +3,7 @@
 
 import { ApiError } from '../exceptions/api.error.js';
 
-/** @type {import('src/types/func.type.js').ErrorMiddleware} */
+/** @type {import('src/types/func.type.js').TyFunc.ErrorMiddleware} */
 export function errorMiddleware(error, req, res, next) {
   console.error(error);
 

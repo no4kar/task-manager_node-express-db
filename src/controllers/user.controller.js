@@ -7,7 +7,7 @@ export const userController = {
   getAll,
 };
 
-/** @type {import('src/types/func.type.js').Middleware} */
+/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function getAll(req, res) {
   const users = await userService.getActives();
 

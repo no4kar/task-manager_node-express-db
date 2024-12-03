@@ -11,6 +11,7 @@ import './configs/passport.config.js';
 
 import { rootRouter } from './routers/root.router.js';
 import { todoRouter } from './routers/todo.router.js';
+import { taskRouter } from './routers/task.router.js';
 import { authRouter } from './routers/auth.router.js';
 
 import { catchError, errorMiddleware } from './middlewares/error.middleware.js';
@@ -41,6 +42,7 @@ app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 // Routers
 app.use('/', rootRouter);
 app.use('/todos', catchError(authMiddleware), todoRouter);
+app.use('/tasks', catchError(authMiddleware), taskRouter);
 app.use('/auth', authRouter);
 
 // Intercept of the errors

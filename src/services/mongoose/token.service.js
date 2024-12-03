@@ -15,7 +15,9 @@ import { Token as Tokens } from '../../models/mongoose/Token.model.js';
 export const tokenService = {
   create,
   getByOptions,
+  getOneByOptions,
   getByUserId,
+  getOneByUserId,
   getByRefreshToken,
   toObject,
   update,
@@ -62,12 +64,20 @@ async function put({
   return Tokens.create({ userId, refresh, activation });
 }
 
-
 /**
  * @param {TyTokenFilterQuery} whereConditions
  * @returns */
 function getByOptions(whereConditions) {
   const query = Tokens.find(whereConditions);
+
+  return query.exec();
+}
+
+/**
+ * @param {TyTokenFilterQuery} whereConditions
+ * @returns */
+function getOneByOptions(whereConditions) {
+  const query = Tokens.findOne(whereConditions);
 
   return query.exec();
 }
@@ -83,8 +93,16 @@ function toObject(document) {
  * @param {TyToken['userId']} userId
  * @returns */
 function getByUserId(userId) {
-  const query
-    = Tokens.findOne({ userId });
+  const query = Tokens.find({ userId });
+
+  return query.sort({ createdAt: 'asc' }).exec();
+}
+
+/**
+ * @param {TyToken['userId']} userId
+ * @returns */
+function getOneByUserId(userId) {
+  const query = Tokens.findOne({ userId });
 
   return query.exec();
 }
