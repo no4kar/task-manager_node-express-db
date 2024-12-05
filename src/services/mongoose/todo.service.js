@@ -23,8 +23,9 @@ export const todoService = {
   getAndCountByOptions,
   getById,
   update,
-  create,
   updateById,
+  create,
+  remove,
   removeById,
 };
 
@@ -161,11 +162,22 @@ async function updateById(updatedProps, session) {
   ];
 }
 
-/** @param {TyTodo['id']} id */
+/**
+ * @param {TyTodoDocument} document
+ * @returns */
+function remove(document) {
+  return document.deleteOne()
+    .then(res => res.deletedCount);
+}
+
+/**
+ * @param {TyTodo['id']} id
+ * @returns {Promise<number>} */
 function removeById(id) {
   const query = Todos.findOne({ id });
 
-  return query.deleteOne().exec();
+  return query.deleteOne().exec()
+    .then(res => res.deletedCount);
 }
 
 /**

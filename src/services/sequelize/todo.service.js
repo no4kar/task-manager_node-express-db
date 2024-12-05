@@ -143,6 +143,14 @@ async function updateManyById(items) {
   });
 }
 
+/**
+ * @param {TyTodoModel} model
+ * @returns */
+function remove(model) {
+  return model.destroy()
+    .then(() => 1);
+}
+
 /** @param {TyTodo['id']} id */
 function removeById(id) {
   return Todos.destroy({

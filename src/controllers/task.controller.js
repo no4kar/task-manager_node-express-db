@@ -13,6 +13,9 @@ import { taskService } from '../services/mongoose/task.service.js';
 export const taskController = {
   get,
   getById,
+  post,
+  put,
+  remove,
 };
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
@@ -66,7 +69,7 @@ async function get(req, res) {
   }
 
   if (!errors.name) {
-    whereConditions.taskId = name;
+    whereConditions.name = name;
   }
 
   const {
@@ -85,17 +88,111 @@ async function get(req, res) {
   });
 }
 
-// // By ID
-// app.get('/tasks/:id', async (req, res) => {
-//   const { id } = req.params;
-//   const task = await taskService.getById(id);
-//   if (!task) return res.status(404).send({ error: 'Task not found' });
-//   res.send(task);
-// });
+/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+async function post(req, res) {
+  const {
+    userId,
+    name,
+  } = req.body;
 
-// // By search parameters
-// app.get('/tasks', async (req, res) => {
-//   const { userId, name } = req.query;
-//   const tasks = await taskService.getByOptions({ userId, name });
-//   res.send(tasks);
-// });
+  const errors = {
+    userId: !userId || typeof userId !== 'string',
+    name: !name || typeof name !== 'string',
+  };
+
+  if (errors.userId || errors.name) {
+    throw ApiError.UnprocessableContent(
+      `Can't create the task`,
+      {
+        expected: {
+          userId: 'string',
+          name: 'string',
+        },
+        got: {
+          userId: `${typeof userId}: ${userId}`,
+          name: `${typeof name}: ${name}`,
+        },
+      },
+    );
+  }
+
+  const createdTask
+    = await taskService.create({
+      userId,
+      name,
+    });
+
+  res.status(201)
+    .send(taskService.normalize(createdTask.toObject()));
+}
+
+/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+async function put(req, res) {
+  const { id } = req.params;
+  const {
+    userId,
+    name,
+  } = req.body;
+
+  const errors = {
+    userId: !userId || typeof userId !== 'string',
+    name: !name || typeof name !== 'string',
+  };
+
+  // if no id then no foundTodo
+  const foundTask = await taskService.getOneById(id);
+
+  if (!foundTask) {
+    if (errors.userId
+      || errors.name) {
+      throw ApiError.UnprocessableContent(
+        `Type error`,
+        {
+          expected: {
+            userId: 'string',
+            name: 'string',
+          },
+          got: {
+            userId: `${typeof userId}: ${userId}`,
+            name: `${typeof name}: ${name}`,
+          }
+        },
+      );
+    }
+
+    const createdTask
+      = await taskService.create({
+        userId,
+        name,
+      });
+
+    res.status(201)
+      .send(taskService.normalize(createdTask.toObject()));
+
+    return;
+  }
+
+  await taskService.update(
+    foundTask,
+    { userId, name },
+  );
+
+  res.send(taskService.normalize(
+    foundTask.toObject(),
+  ));
+}
+
+/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+async function remove(req, res) {
+  const { id } = req.params;
+  const foundTodo = await taskService.getOneById(id);
+
+  if (!foundTodo) {
+    throw ApiError.NotFound(`Cant find todo by id=${id}`);
+  }
+
+  const count
+    = await taskService.remove(foundTodo);
+
+  res.status(200).send(`${count}`);
+}

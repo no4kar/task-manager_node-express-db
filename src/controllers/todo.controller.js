@@ -12,10 +12,10 @@ export const todoController = {
   post,
   put,
   patchById,
+  remove,
   removeMany,
   updateMany,
   patchBulkUnknown,
-  remove,
 };
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
@@ -154,7 +154,6 @@ async function post(req, res) {
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function put(req, res) {
-  console.info(`app.put('/todos/:id=${req.params.id}')`);
   const { id } = req.params;
   const {
     userId,
@@ -299,7 +298,8 @@ async function remove(req, res) {
     throw ApiError.NotFound(`Cant find todo by id=${id}`);
   }
 
-  const count = await todoService.removeById(foundTodo.id);
+  const count
+    = await todoService.remove(foundTodo);
 
   res.status(200).send(`${count}`);
 }

@@ -16,13 +16,11 @@ export const tokenService = {
   create,
   getByOptions,
   getOneByOptions,
-  getByUserId,
-  getOneByUserId,
-  getByRefreshToken,
   toObject,
   update,
   put,
   remove,
+  removeByUserId,
 };
 
 /**
@@ -90,39 +88,20 @@ function toObject(document) {
 }
 
 /**
- * @param {TyToken['userId']} userId
+ * @param {TyTokenDocument} document
  * @returns */
-function getByUserId(userId) {
-  const query = Tokens.find({ userId });
-
-  return query.sort({ createdAt: 'asc' }).exec();
+function remove(document) {
+  return document.deleteOne()
+    .then(res => res.deletedCount);
 }
 
 /**
  * @param {TyToken['userId']} userId
- * @returns */
-function getOneByUserId(userId) {
-  const query = Tokens.findOne({ userId });
-
-  return query.exec();
-}
-
-/**
- * @param {TyToken['refresh']} refreshToken
- * @returns */
-function getByRefreshToken(refreshToken) {
-  const query
-    = Tokens.findOne({ refresh: refreshToken });
-
-  return query.exec();
-}
-
-/**
- * @param {TyToken['userId']} userId
- * @returns {Promise<{ acknowledged: boolean, deletedCount: number }>}*/
-function remove(userId) {
+ * @returns {Promise<number>}*/
+function removeByUserId(userId) {
   const query
     = Tokens.findOne({ userId });
 
-  return query.deleteOne().exec();
+  return query.deleteOne().exec()
+    .then(res => res.deletedCount);
 }
