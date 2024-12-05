@@ -91,7 +91,9 @@ async function activateByGoogle(req, res) {
   }
 
   const foundToken
-    = await tokenService.getByOptions({ userId: user.id });
+    = await tokenService.getOneByOptions({
+      userId: user.id,
+    });
 
   if (!foundToken) {
     throw ApiError.Unauthorized('Google authentication failed');
@@ -110,7 +112,9 @@ async function login(req, res) {
   }
 
   const foundToken
-    = await tokenService.getOneByUserId(foundUser._id);
+    = await tokenService.getOneByOptions({
+      userId: foundUser._id,
+    });
 
   if (!foundToken || foundToken.activation) {
     throw ApiError.Forbidden('The user is not yet activated');
@@ -141,7 +145,7 @@ async function refresh(req, res) {
   }
 
   const token
-    = await tokenService.getByRefreshToken(refreshToken);
+    = await tokenService.getOneByOptions({ refresh: refreshToken });
 
   if (!token) {
     throw ApiError.Unauthorized();
@@ -169,7 +173,7 @@ async function logout(req, res) {
   res.clearCookie('refreshToken');
 
   if (userData) {
-    await tokenService.remove(userData.id);
+    await tokenService.removeByUserId(userData.id);
   }
 
   res.sendStatus(204);
@@ -181,7 +185,10 @@ async function logout(req, res) {
 async function sendAuthentication(res, user) {
   const accessToken = jwtService.generateAccessToken(user);
   const refreshToken = jwtService.generateRefreshToken(user);
-  const foundToken = await tokenService.getOneByUserId(user.id);
+  const foundToken
+    = await tokenService.getOneByOptions({
+      userId: user.id,
+    });
 
   if (!foundToken) {
     throw ApiError.NotFound(`Can't find token by user.id`);

@@ -9,5 +9,13 @@ import { catchError } from '../middlewares/error.middleware.js';
 
 taskRouter
   .get('/:id', catchError(taskController.getById))
-  .get('/', catchError(taskController.get))
-  ;
+  .get('/', catchError(taskController.get));
+
+taskRouter
+  .post('/', catchError(taskController.post));
+
+taskRouter
+  .put('/:id', catchError(taskController.put));
+
+taskRouter
+  .delete('/:id', catchError(taskController.remove));

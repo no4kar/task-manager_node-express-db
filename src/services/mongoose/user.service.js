@@ -29,6 +29,7 @@ export const userService = {
   toObject,
   update,
   create,
+  remove,
   removeById,
   register,
 };
@@ -115,13 +116,23 @@ function create(properties) {
   return Users.create({ ...properties });
 }
 
+
+/**
+ * @param {TyUserDocument} document
+ * @returns */
+function remove(document) {
+  return document.deleteOne()
+    .then(res => res.deletedCount);
+}
+
 /**
  * @param {TyUser['id']} id
- * @returns {Promise<{ acknowledged: boolean, deletedCount: number }>} */
+ * @returns {Promise<number>} */
 function removeById(id) {
   const query = Users.findById(id);
 
-  return query.deleteOne().exec();
+  return query.deleteOne().exec()
+    .then(res => res.deletedCount);
 }
 
 /**

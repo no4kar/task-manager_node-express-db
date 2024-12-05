@@ -17,13 +17,14 @@ import { Task as Tasks } from '../../models/mongoose/Task.model.js';
 export const taskService = {
   normalize,
   toObject,
-  getOneById,
+  getByOptions,
   getOneByOptions,
   getAndCountByOptions,
-  getByOptions,
+  getOneById,
   getByUserId,
   create,
   update,
+  remove,
   removeById,
 };
 
@@ -128,11 +129,22 @@ function getByUserId(userId) {
 }
 
 /**
+ * @param {TyTaskDocument} document
+ * @returns */
+function remove(document) {
+  return document.deleteOne()
+    .then(res => res.deletedCount);
+}
+
+/**
  * @param {TyTask['id']} id
- * @returns {Promise<{ acknowledged: boolean, deletedCount: number }>}*/
+ * @returns {Promise<number>} */
 function removeById(id) {
   const query
     = Tasks.findById(id);
 
-  return query.deleteOne().exec();
+  // @returns {Promise<{ acknowledged: boolean, deletedCount: number }>}
+
+  return query.deleteOne().exec()
+    .then(res => res.deletedCount);
 }
