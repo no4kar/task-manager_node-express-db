@@ -106,7 +106,7 @@ async function post(req, res) {
   // express.json() can parse types correctly
   const {
     userId,
-    taskId = '111100001111000011110000',
+    taskId,
     title,
     completed,
   } = req.body;
@@ -157,7 +157,7 @@ async function put(req, res) {
   const { id } = req.params;
   const {
     userId,
-    taskId = '111100001111000011110000',
+    taskId,
     title,
     completed,
   } = req.body;
@@ -307,6 +307,7 @@ async function remove(req, res) {
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function removeMany(req, res) {
   console.info(`\napp.patch('/todos?action=${req.query.action}')`);
+
   /**@type {{ids: string[]}} */
   const { ids } = req.body;
 
@@ -316,7 +317,8 @@ async function removeMany(req, res) {
     });
   }
 
-  const count = await todoService.removeManyById(ids);
+  const count
+    = await todoService.removeManyById(ids);
 
   if (!count) {
     throw ApiError.NotFound();

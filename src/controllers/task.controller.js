@@ -19,21 +19,6 @@ export const taskController = {
 };
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
-async function getById(req, res) {
-  const { id } = req.params;
-  const task
-    = await taskService.getOneById(id);
-
-  if (!task) {
-    throw ApiError.NotFound(
-      `Can't find task by id`,
-    );
-  }
-
-  res.send(taskService.normalize(taskService.toObject(task)));
-}
-
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function get(req, res) {
   const {
     page,
@@ -69,7 +54,7 @@ async function get(req, res) {
   }
 
   if (!errors.name) {
-    whereConditions.name = name;
+    whereConditions.name = new RegExp(String(name), 'i');
   }
 
   const {
@@ -86,6 +71,21 @@ async function get(req, res) {
     content: rows.map(row =>
       taskService.normalize(taskService.toObject(row))),
   });
+}
+
+/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+async function getById(req, res) {
+  const { id } = req.params;
+  const task
+    = await taskService.getOneById(id);
+
+  if (!task) {
+    throw ApiError.NotFound(
+      `Can't find task by id`,
+    );
+  }
+
+  res.send(taskService.normalize(taskService.toObject(task)));
 }
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
@@ -140,7 +140,8 @@ async function put(req, res) {
   };
 
   // if no id then no foundTodo
-  const foundTask = await taskService.getOneById(id);
+  const foundTask
+    = await taskService.getOneById(id);
 
   if (!foundTask) {
     if (errors.userId
@@ -167,7 +168,9 @@ async function put(req, res) {
       });
 
     res.status(201)
-      .send(taskService.normalize(createdTask.toObject()));
+      .send(taskService.normalize(
+        createdTask.toObject()
+      ));
 
     return;
   }
@@ -185,7 +188,8 @@ async function put(req, res) {
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function remove(req, res) {
   const { id } = req.params;
-  const foundTodo = await taskService.getOneById(id);
+  const foundTodo
+    = await taskService.getOneById(id);
 
   if (!foundTodo) {
     throw ApiError.NotFound(`Cant find todo by id=${id}`);
