@@ -75,7 +75,7 @@ async function get(req, res) {
 
   const {
     rows,
-    count,
+    count: total,
   } = await todoService.getAndCountByOptions(
     whereConditions,
     limit,
@@ -83,7 +83,7 @@ async function get(req, res) {
   );
 
   res.send({
-    count,
+    total,
     content: rows.map(row => todoService.normalize(row.toObject())),
   });
 }

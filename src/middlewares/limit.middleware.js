@@ -13,7 +13,7 @@ export function getLimiter(options = {}) {
     totalUnhandledRequests = 11,
   } = options;
 
-  /** @type {import("src/types/func.type").Middleware} */
+  /** @type {import("src/types/func.type").TyFunc.Middleware} */
   const limiter =
     function (req, res, next) {
       const ip = req.headers['x-forwarded-for'] || req.ip;

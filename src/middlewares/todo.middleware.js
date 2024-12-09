@@ -3,7 +3,7 @@
 
 /**
  * @param { ('delete' | 'update') } action
- * @returns {import("src/types/func.type").Middleware} */
+ * @returns {import("src/types/func.type").TyFunc.Middleware} */
 export function isAction(action) {
   return (req, res, next) => {
     if (req.query.action === action) {

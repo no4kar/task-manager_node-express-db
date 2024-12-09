@@ -1,13 +1,12 @@
 'use strict';
 // @ts-check
 
-
 /**
  * @typedef {import('src/types/func.type.js').TyFunc.Middleware} TyFuncMiddleware
  * @typedef {import('../services/mongoose/task.service.js').TyTaskFilterQuery} TyTaskFilterQuery
  */
 
-import { ApiError } from 'src/exceptions/api.error.js';
+import { ApiError } from '../exceptions/api.error.js';
 import { taskService } from '../services/mongoose/task.service.js';
 
 export const taskController = {
@@ -21,23 +20,33 @@ export const taskController = {
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function get(req, res) {
   const {
-    page,
-    size,
     userId,
     name,
   } = req.query;
 
+  const page = Number(req.query.page) || 1;
+  const size = Number(req.query.size) || 10;
+
   const errors = {
-    userId: !userId || typeof userId !== 'string',
-    name: !name || typeof name !== 'string',
-    page: !page || typeof page !== 'number',
-    size: !size || typeof size !== 'number',
+    userId: !userId,
+    name: !name,
+    page: !Number.isInteger(page),
+    size: !Number.isInteger(size),
   };
 
   if (errors.page || errors.size) {
     throw ApiError.UnprocessableContent(
       `'page' and 'size' are required`,
-      { details: { page, size } }
+      {
+        expected: {
+          page: 'integer',
+          size: 'integer',
+        },
+        got: {
+          page,
+          size,
+        },
+      }
     );
   }
 
@@ -59,7 +68,7 @@ async function get(req, res) {
 
   const {
     rows,
-    count,
+    count: total,
   } = await taskService.getAndCountByOptions(
     whereConditions,
     limit,
@@ -67,9 +76,11 @@ async function get(req, res) {
   );
 
   res.send({
-    count,
+    total,
     content: rows.map(row =>
       taskService.normalize(taskService.toObject(row))),
+    page,
+    size,
   });
 }
 
@@ -139,7 +150,7 @@ async function put(req, res) {
     name: !name || typeof name !== 'string',
   };
 
-  // if no id then no foundTodo
+  // if no id then no foundTask
   const foundTask
     = await taskService.getOneById(id);
 
@@ -188,15 +199,15 @@ async function put(req, res) {
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function remove(req, res) {
   const { id } = req.params;
-  const foundTodo
+  const foundTask
     = await taskService.getOneById(id);
 
-  if (!foundTodo) {
+  if (!foundTask) {
     throw ApiError.NotFound(`Cant find todo by id=${id}`);
   }
 
   const count
-    = await taskService.remove(foundTodo);
+    = await taskService.remove(foundTask);
 
   res.status(200).send(`${count}`);
 }
