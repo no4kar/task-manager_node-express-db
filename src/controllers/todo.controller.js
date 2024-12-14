@@ -1,6 +1,7 @@
 'use strict';
 // @ts-check
 
+import * as Helpers from '../utils/helpers.js';
 import { todoService } from '../services/mongoose/todo.service.js';
 import { ApiError } from '../exceptions/api.error.js';
 
@@ -23,53 +24,61 @@ async function get(req, res) {
   // console.info(`\napp.get('/todos')`);
   // query variables have 'undefined', 'string', 'string[]'
   const {
-    page,
-    size,
     userId,
     taskId,
     title,
     completed,
   } = req.query;
 
-  if (['undefined', 'string'].every(option => option !== typeof title)) {
+  const page = Number(req.query.page) || 1;
+  const size = Number(req.query.size) || 10;
+
+  const errors = {
+    userId: !userId,
+    taskId: !taskId,
+    title: !title,
+    completed: !completed,
+    page: !Helpers.isNatural(page),
+    size: !Helpers.isNatural(size),
+  };
+
+  if (errors.page || errors.size) {
     throw ApiError.UnprocessableContent(
-      `Type error`, {
-      expected: {
-        title: 'undefined | string',
-      },
-      got: {
-        title: `${typeof title}: ${title}`,
+      `'page' and 'size' are required`,
+      {
+        expected: {
+          page: 'integer',
+          size: 'integer',
+        },
+        got: {
+          page,
+          size,
+        },
       }
-    }
     );
   }
 
-  if (typeof page === 'undefined'
-    || typeof size === 'undefined') {
-    throw ApiError.UnprocessableContent(`'page' and 'size' are required`);
-  }
-
   const limit
-    = parseInt(String(size), 10) || Number.MAX_SAFE_INTEGER;
+    = size;
   const offset
-    = ((parseInt(String(page), 10) || 1) - 1) * limit;
+    = (page - 1) * size;
 
   /** @type {import('../services/mongoose/todo.service.js').TyTodoFilterQuery} */
   const whereConditions = {};
 
-  if (userId !== undefined) {
+  if (!errors.userId) {
     whereConditions.userId = String(userId);
   }
 
-  if (taskId !== undefined) {
+  if (!errors.taskId) {
     whereConditions.taskId = String(taskId);
   }
 
-  if (title !== undefined) {
+  if (!errors.title) {
     whereConditions.title = new RegExp(String(title), 'i');;
   }
 
-  if (completed !== undefined) {
+  if (!errors.completed) {
     whereConditions.completed = completed === 'true';
   }
 
@@ -84,7 +93,10 @@ async function get(req, res) {
 
   res.send({
     total,
-    content: rows.map(row => todoService.normalize(row.toObject())),
+    content: rows.map(row =>
+      todoService.normalize(row.toObject())),
+    limit,
+    offset,
   });
 }
 
@@ -295,7 +307,10 @@ async function remove(req, res) {
   const foundTodo = await todoService.getById(id);
 
   if (!foundTodo) {
-    throw ApiError.NotFound(`Cant find todo by id=${id}`);
+    throw ApiError.NotFound(
+      `Cant find todo by the id`,
+      { id },
+    );
   }
 
   const count

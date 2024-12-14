@@ -4,10 +4,12 @@
 /**
  * @typedef {import('src/types/func.type.js').TyFunc.Middleware} TyFuncMiddleware
  * @typedef {import('../services/mongoose/task.service.js').TyTaskFilterQuery} TyTaskFilterQuery
- */
+*/
 
+import * as Helpers from '../utils/helpers.js';
 import { ApiError } from '../exceptions/api.error.js';
 import { taskService } from '../services/mongoose/task.service.js';
+import { userService } from '../services/mongoose/user.service.js';
 
 export const taskController = {
   get,
@@ -30,17 +32,17 @@ async function get(req, res) {
   const errors = {
     userId: !userId,
     name: !name,
-    page: !Number.isInteger(page),
-    size: !Number.isInteger(size),
+    page: !Helpers.isNatural(page),
+    size: !Helpers.isNatural(size),
   };
 
   if (errors.page || errors.size) {
     throw ApiError.UnprocessableContent(
-      `'page' and 'size' are required`,
+      `'page', 'size' must be natural numbers`,
       {
         expected: {
-          page: 'integer',
-          size: 'integer',
+          page: 'natural num',
+          size: 'natural num',
         },
         got: {
           page,
@@ -51,9 +53,11 @@ async function get(req, res) {
   }
 
   const limit
-    = parseInt(String(size), 10) || Number.MAX_SAFE_INTEGER;
+    = size;
+  // = parseInt(String(size), 10) || Number.MAX_SAFE_INTEGER;
   const offset
-    = ((parseInt(String(page), 10) || 1) - 1) * limit;
+    = (page - 1) * size;
+  // = ((parseInt(String(page), 10) || 1) - 1) * limit;
 
   /** @type {TyTaskFilterQuery} */
   const whereConditions = {};
@@ -79,8 +83,8 @@ async function get(req, res) {
     total,
     content: rows.map(row =>
       taskService.normalize(taskService.toObject(row))),
-    page,
-    size,
+    limit,
+    offset,
   });
 }
 
@@ -127,6 +131,16 @@ async function post(req, res) {
     );
   }
 
+  const foundUser
+    = await userService.getOneByOptions({ id: userId });
+
+  if (!foundUser) {
+    throw ApiError.NotFound(
+      `Cant find user by the userId`,
+      { userId },
+    );
+  }
+
   const createdTask
     = await taskService.create({
       userId,
@@ -149,6 +163,16 @@ async function put(req, res) {
     userId: !userId || typeof userId !== 'string',
     name: !name || typeof name !== 'string',
   };
+
+  const foundUser
+    = await userService.getOneByOptions({ id: userId });
+
+  if (!foundUser) {
+    throw ApiError.NotFound(
+      `Cant find user by the userId`,
+      { userId },
+    );
+  }
 
   // if no id then no foundTask
   const foundTask
@@ -203,7 +227,10 @@ async function remove(req, res) {
     = await taskService.getOneById(id);
 
   if (!foundTask) {
-    throw ApiError.NotFound(`Cant find todo by id=${id}`);
+    throw ApiError.NotFound(
+      `Cant find todo by the id`, {
+      id,
+    });
   }
 
   const count

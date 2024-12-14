@@ -41,10 +41,16 @@ app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 
 // Routers
 app.use('/', rootRouter);
-app.use('/todos', todoRouter);
-// app.use('/todos', catchError(authMiddleware), todoRouter);
-app.use('/tasks', taskRouter);
-// app.use('/tasks', catchError(authMiddleware), taskRouter);
+app.use(
+  '/todos',
+  // catchError(authMiddleware),
+  todoRouter,
+);
+app.use(
+  '/tasks',
+  // catchError(authMiddleware),
+  taskRouter,
+);
 app.use('/auth', authRouter);
 
 // Intercept of the errors

@@ -104,11 +104,17 @@ async function activateByGoogle(req, res) {
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function login(req, res) {
-  const { email, password } = req.body;
-  const foundUser = await userService.getOneByOptions({ email });
+  const {
+    email,
+    password,
+  } = req.body;
+  const foundUser
+    = await userService.getOneByOptions({ email });
 
   if (!foundUser) {
-    throw ApiError.NotFound('The user with this email does not exist');
+    throw ApiError.NotFound(
+      'The user with this email does not exist'
+    );
   }
 
   const foundToken
@@ -121,7 +127,10 @@ async function login(req, res) {
   }
 
   const isPasswordValid
-    = await bcryptService.compare(password, foundUser.password);
+    = await bcryptService.compare(
+      password,
+      foundUser.password,
+    );
 
   if (!isPasswordValid) {
     throw ApiError.BadRequest('Login details are wrong');
@@ -145,14 +154,18 @@ async function refresh(req, res) {
   }
 
   const token
-    = await tokenService.getOneByOptions({ refresh: refreshToken });
+    = await tokenService.getOneByOptions({
+      refresh: refreshToken,
+    });
 
   if (!token) {
     throw ApiError.Unauthorized();
   }
 
   const foundUser
-    = await userService.getOneByOptions({ email: userData.email });
+    = await userService.getOneByOptions({
+      email: userData.email,
+    });
 
   if (!foundUser) {
     throw ApiError.Unauthorized();
