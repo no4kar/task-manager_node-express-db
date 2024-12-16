@@ -2,11 +2,15 @@
 // @ts-check
 
 import { ApiError } from '../exceptions/api.error.js';
+import { env } from '../configs/env.config.js';
 import { jwtService } from '../services/jwt.service.js';
 import { tokenService } from '../services/mongoose/token.service.js';
 import { userService } from '../services/mongoose/user.service.js';
 import { bcryptService } from '../services/bcrypt.service.js';
-import { env } from '../configs/env.config.js';
+
+/**
+ * @typedef {import('src/types/user.type.js').TyUser.Item} TyUser
+ */
 
 export const authController = {
   register,
@@ -83,8 +87,9 @@ async function activate(req, res) {
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function activateByGoogle(req, res) {
-  /** @type {import('src/types/user.type').TyUser.Item | null} */
-  const user = req.user || null; // This is the user returned by Passport
+  /** @type {TyUser | null} */
+  const user
+    = req.user || null; // This is the user returned by Passport
 
   if (!user) {
     throw ApiError.Unauthorized('Google authentication failed');
@@ -145,7 +150,7 @@ async function login(req, res) {
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function refresh(req, res) {
   const { refreshToken } = req.cookies;
-
+  /** @type {TyUser | null} */
   const userData
     = jwtService.validateRefreshToken(refreshToken);
 
@@ -180,14 +185,28 @@ async function refresh(req, res) {
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function logout(req, res) {
   const { refreshToken } = req.cookies;
+  /** @type {TyUser | null} */
   const userData
     = jwtService.validateRefreshToken(refreshToken);
 
-  res.clearCookie('refreshToken');
-
-  if (userData) {
-    await tokenService.removeByUserId(userData.id);
+  if (!userData) {
+    throw ApiError.UnprocessableContent();
   }
+
+  const foundToken
+    = await tokenService.getOneByOptions({
+      userId: userData.id,
+    });
+
+  if (!foundToken) {
+    throw ApiError.NotFound(`Can't find token by userData.id`);
+  }
+
+  res.clearCookie('refreshToken');
+  await tokenService.update(
+    foundToken, {
+    refresh: null,
+  });
 
   res.sendStatus(204);
 }
@@ -212,7 +231,9 @@ async function sendAuthentication(res, user) {
     { refresh: refreshToken },
   );
 
-  res.cookie('refreshToken', foundToken.refresh, {
+  res.cookie(
+    'refreshToken',
+    foundToken.refresh, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
     httpOnly: true,
     sameSite: 'none', // or 'strict'

@@ -140,13 +140,17 @@ function create(properties) {
  * @param {import('mongoose').ClientSession} [session] 
  * @returns {Promise<[affectedCount: number, affectedRows: TyTodoDocument[]]>}*/
 async function updateById(updatedProps, session) {
-  const { id, ...restProps } = updatedProps;
+  const {
+    id,
+    ...restProps
+  } = updatedProps;
 
-  const result = await Todos.updateOne(
-    { _id: id }, // Filter by the document ID
-    { $set: restProps }, // Set the new properties
-    { session } // Pass the session if any (for transactions)
-  );
+  const result
+    = await Todos.updateOne(
+      { _id: id }, // Filter by the document ID
+      { $set: restProps }, // Set the new properties
+      { session } // Pass the session if any (for transactions)
+    );
 
   const updatedTodo
     = await Todos.findOne({ _id: id })
@@ -202,12 +206,14 @@ async function updateByIdWithTransaction(updatedProps) {
 /** Function to update a todo item within a transaction
  * @type {import('src/types/func.type.js').TyFunc.MongooseSessionTransaction} */
 async function sessionTransaction(cb) {
-  const session = await mongoose.startSession();
+  const session
+    = await mongoose.startSession();
 
   try {
     session.startTransaction();
 
-    const result = await cb(session);
+    const result
+      = await cb(session);
 
     await session.commitTransaction();
     return result;

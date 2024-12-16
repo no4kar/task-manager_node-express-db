@@ -326,10 +326,21 @@ async function removeMany(req, res) {
   /**@type {{ids: string[]}} */
   const { ids } = req.body;
 
-  if (!Array.isArray(ids)) {
-    throw ApiError.UnprocessableContent('Expected', {
-      ids: 'string[]',
-    });
+  const errors = {
+    ids: !Array.isArray(ids) || typeof ids[0] !== 'string',
+  };
+
+  if (errors.ids) {
+    throw ApiError.UnprocessableContent(
+      'Type error',
+      {
+        expected: {
+          ids: 'string[]',
+        },
+        got: {
+          ids: `${typeof ids}: ${ids}`,
+        },
+      });
   }
 
   const count
