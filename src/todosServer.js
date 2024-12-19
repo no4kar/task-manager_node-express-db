@@ -37,24 +37,30 @@ app.use(
 app.use(express.static(path.resolve('./public')));
 
 // Use swagger-ui-express for your app documentation endpoint
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
+app.use('/api-docs',
+  swaggerUI.serve,
+  swaggerUI.setup(swaggerSpec),
+);
 
 // Routers
-app.use('/', rootRouter);
-app.use(
-  '/todos',
-  // catchError(authMiddleware),
+app.use('/',
+  rootRouter,
+).use('/todos',
+  catchError(authMiddleware),
   todoRouter,
-);
-app.use(
-  '/tasks',
-  // catchError(authMiddleware),
+).use('/tasks',
+  catchError(authMiddleware),
   taskRouter,
+).use('/auth',
+  authRouter,
 );
-app.use('/auth', authRouter);
 
 // Intercept of the errors
 app.use(errorMiddleware);
 
 // Unhandled errors
-app.all('*', (req, res) => res.status(404).sendFile(path.resolve('./public/views/404.html')));
+app.all('*',
+  (req, res) => res.status(404).sendFile(
+    path.resolve('./public/views/404.html')
+  ),
+);

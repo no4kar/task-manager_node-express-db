@@ -25,7 +25,7 @@ passport.use(
       try {
         // Check if the user already exists in the database
         const foundUser
-          = await userService.getByOptions({
+          = await userService.getOneByOptions({
             email: profile.emails[0].value,
           });
 
@@ -37,7 +37,7 @@ passport.use(
               activation: profile.id,
             });
 
-          return done(null, foundUser.toObject());
+          return done(null, userService.toObject(foundUser));
         }
 
         // If user does not exist, create a new user with Google profile info
@@ -47,7 +47,7 @@ passport.use(
             password: await bcryptService.hash(profile.id),
           });
 
-        return done(null, createdUser.toObject());
+        return done(null, userService.toObject(createdUser));
       } catch (error) {
         return done(error, false);
       }
@@ -61,11 +61,14 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const foundUser = await userService.getByOptions({ id });
+    const foundUser
+      = await userService.getOneByOptions({ id });
 
-    if (!foundUser) throw ApiError.NotFound(`Can't find user by id`);;
+    if (!foundUser) {
+      throw ApiError.NotFound(`Can't find user by id`);
+    }
 
-    return done(null, foundUser.toObject());
+    return done(null, userService.toObject(foundUser));
   } catch (error) {
     return done(error, false);
   }
