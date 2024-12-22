@@ -20,13 +20,13 @@ export class ApiError extends Error {
   /** Indicates that a request was not successful because it lacks valid authentication credentials for the requested resource
    * @param {string} message
    * @param {Error | Object} [errors={}] */
-  static BadRequest(message, errors) {
+  static BadRequest(message = 'Bad Request', errors) {
     return new ApiError(400, message, errors);
   }
 
   /** Indicates that a request was not successful because it lacks valid authentication credentials for the requested resource 
    * @type {ApiErrorStaticMethod} */
-  static Unauthorized(message = 'User is not authorized') {
+  static Unauthorized(message = 'Unauthorized') {
     return new ApiError(401, message);
   }
 
@@ -54,7 +54,7 @@ export class ApiError extends Error {
 
   /** The server understood the content type of the request entity, and the syntax of the request entity was correct, but it was unable to process the contained instructions
    * @type {ApiErrorStaticMethod} */
-  static UnprocessableContent(message = 'Invalid Data', errors) {
+  static UnprocessableContent(message = 'Unprocessable Entity', errors) {
     return new ApiError(422, message, errors);
   }
 };

@@ -7,6 +7,7 @@ import {
 } from 'mongoose';
 import { Token as Tokens } from './Token.model.js';
 import { Task as Tasks } from './Task.model.js';
+import { Todo as Todos } from './Todo.model.js';
 import modelName from '../modelName.js';
 
 /**
@@ -57,7 +58,7 @@ userSchema.pre('save', function (next) {
 // Middleware to delete the associated Token when a User is removed
 userSchema.post('deleteOne', { document: true, query: false }, async function (doc, next) {
   try {
-    // Remove the associated token
+    await Todos.deleteMany({ userId: doc._id });
     await Tasks.deleteMany({ userId: doc._id });
     await Tokens.deleteOne({ userId: doc._id });
     next();

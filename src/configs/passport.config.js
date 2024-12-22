@@ -30,12 +30,17 @@ passport.use(
           });
 
         if (foundUser) {
-          const userToken
+          // if the token exists, it needs to update the attributes
+          const foundToken
             = await tokenService.put({
               userId: foundUser.id,
               refresh: null,
               activation: profile.id,
             });
+
+          if (!foundToken) {
+            throw ApiError.NotFound(`Can't find token by user`);
+          }
 
           return done(null, userService.toObject(foundUser));
         }
@@ -47,8 +52,21 @@ passport.use(
             password: await bcryptService.hash(profile.id),
           });
 
+        const createdToken
+          = await tokenService.create({
+            userId: createdUser.id,
+            refresh: null,
+            activation: profile.id,
+          });
+
+        if (!createdUser || !createdToken) {
+          throw ApiError.UnprocessableContent(
+            'Google authentication failed');
+        }
+
         return done(null, userService.toObject(createdUser));
       } catch (error) {
+        console.error('Google Auth Error:', error); // Log error for debugging
         return done(error, false);
       }
     },

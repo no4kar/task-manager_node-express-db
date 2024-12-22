@@ -43,24 +43,15 @@ async function register(req, res) {
 async function activate(req, res) {
   const { activationToken } = req.params;
 
-  const foundTokens
-    = await tokenService.getByOptions({
+  const foundToken
+    = await tokenService.getOneByOptions({
       activation: activationToken,
     });
 
-  if (foundTokens.length > 1) { // Some
-    throw ApiError.Conflict(
-      `Expected only one instance, but multiple were found.`,
-      { details: { instancesFound: 3 } }
-    );
-  }
-
-  const foundToken = foundTokens.at(0);
-
   if (!foundToken) {
     throw ApiError.NotFound(
-      `Can't find userId by activationToken`,
-      { details: { activationToken } }
+      `Can't find token by activation prop`,
+      { details: { token: { activation: activationToken } } }
     );
   }
 
