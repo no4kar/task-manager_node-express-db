@@ -138,12 +138,14 @@ function removeById(id) {
  * @param {{ email: string, password: string }} param0 
  * @returns {Promise<void>}*/
 async function register({ email, password }) {
-  const foundUser = await getByOptions({ email });
+  const foundUser
+    = await getOneByOptions({ email });
 
   if (foundUser) {
-    throw ApiError.BadRequest('Validation error', {
-      email: 'Email is already exist',
-    });
+    throw ApiError.BadRequest(
+      'User with this email is already exist',
+      { details: { user: { email: foundUser.email } } }
+    );
   }
 
   // get activation token
@@ -152,21 +154,23 @@ async function register({ email, password }) {
   const hashedPassword
     = await bcryptService.hash(password);
 
-  const createdUser = await Users.create({
-    email,
-    password: hashedPassword,
-  });
+  const createdUser
+    = await Users.create({
+      email,
+      password: hashedPassword,
+    });
 
   if (!createdUser) {
     throw ApiError.UnprocessableContent(
       'Something went wrong');
   }
 
-  const createdToken = await tokenService.create({
-    userId: createdUser._id,
-    refresh: null,
-    activation: activationToken,
-  });
+  const createdToken
+    = await tokenService.create({
+      userId: createdUser._id,
+      refresh: null,
+      activation: activationToken,
+    });
 
   if (!createdToken || !createdToken.activation) {
     throw ApiError.UnprocessableContent(

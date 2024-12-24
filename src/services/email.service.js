@@ -35,7 +35,7 @@ function send({ email, subject, html }) {
  * @param {string} email
  * @param {string} token */
 function sendActivationLink(email, token) {
-  const link = `${env.todo.client.host}/activate/${token}`;
+  const link = `${env.todo.client.host}/task-manager_react-vite/activate/${token}`;
 
   return send({
     email,

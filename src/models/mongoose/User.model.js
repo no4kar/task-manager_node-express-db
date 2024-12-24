@@ -56,16 +56,18 @@ userSchema.pre('save', function (next) {
 });
 
 // Middleware to delete the associated Token when a User is removed
-userSchema.post('deleteOne', { document: true, query: false }, async function (doc, next) {
-  try {
-    await Todos.deleteMany({ userId: doc._id });
-    await Tasks.deleteMany({ userId: doc._id });
-    await Tokens.deleteOne({ userId: doc._id });
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
+userSchema.post('deleteOne',
+  { document: true, query: false },
+  async function (doc, next) {
+    try {
+      await Todos.deleteMany({ userId: doc._id });
+      await Tasks.deleteMany({ userId: doc._id });
+      await Tokens.deleteOne({ userId: doc._id });
+      next();
+    } catch (error) {
+      next(error);
+    }
+  });
 
 // Transform the output to remove `_id` field from the final JSON
 // userSchema.set('toJSON', {

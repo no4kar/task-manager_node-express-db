@@ -23,18 +23,27 @@ export const authController = {
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function register(req, res) {
-  const { email, password } = req.body;
+  const {
+    email,
+    password,
+  } = req.body;
 
   const errors = {
-    email: validateEmail(email),
-    password: validatePassword(password),
+    email: !validateEmail(email),
+    password: !validatePassword(password),
   };
 
   if (errors.email || errors.password) {
-    throw ApiError.BadRequest('Validation error', errors);
+    throw ApiError.BadRequest(
+      'Validation error',
+      { details: { errors } },
+    );
   }
 
-  await userService.register({ email, password }); // a thrown error will be caught by a "catchError()"
+  await userService.register({
+    email,
+    password,
+  }); // a thrown error will be caught by a "catchError()"
 
   res.send({ message: 'OK' });
 }
@@ -240,23 +249,24 @@ async function sendAuthentication(res, user) {
 /** @param {string} value */
 function validateEmail(value) {
   if (!value) {
-    return 'Email is required';
+    return false;
   }
 
   const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
 
   if (!emailPattern.test(value)) {
-    return 'Email is not valid';
+    return false;
   }
+
+  return true;
 }
 
 /** @param {string} value */
 function validatePassword(value) {
-  if (!value) {
-    return 'Password is required';
+  if (!value
+    || value.length < 8) {
+    return false;
   }
 
-  if (value.length < 8) {
-    return 'At least 8 characters';
-  }
+  return true;
 }
