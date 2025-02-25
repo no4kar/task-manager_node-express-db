@@ -3,7 +3,7 @@
 
 import { v1 as uuidv1 } from 'uuid';
 
-import { ApiError } from '../../exceptions/api.error.js';
+import { ApiError } from '../../exceptions/apiError.js';
 import { User as Users } from '../../models/sequelize/User.model.js';
 import { emailService } from '../email.service.js';
 import { bcryptService } from '../bcrypt.service.js';

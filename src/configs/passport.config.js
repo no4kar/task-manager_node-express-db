@@ -5,7 +5,7 @@ import { env } from './env.config.js';
 import { userService } from '../services/mongoose/user.service.js';
 import { bcryptService } from '../services/bcrypt.service.js';
 import { tokenService } from '../services/mongoose/token.service.js';
-import { ApiError } from '../exceptions/api.error.js';
+import { ApiError } from '../exceptions/apiError.js';
 
 passport.use(
   new GoogleStrategy(

@@ -36,6 +36,11 @@ app.use(
 // Get all files from address
 app.use(express.static(path.resolve('./public')));
 
+// Get all files from address
+app.use('/images',
+  express.static(path.resolve('./images'))
+);
+
 // Use swagger-ui-express for your app documentation endpoint
 app.use('/api-docs',
   swaggerUI.serve,

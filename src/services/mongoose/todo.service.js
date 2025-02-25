@@ -18,6 +18,7 @@ import { Todo as Todos } from '../../models/mongoose/Todo.model.js';
 export const todoService = {
   normalize,
   toObject,
+  prepareToSend,
   getAll,
   getByUserId,
   getAndCountByOptions,
@@ -51,6 +52,14 @@ function normalize({
     updatedAt,
   };
 }
+
+/**
+ * @param {TyTodoDocument} document 
+ * @returns */
+function prepareToSend(document){
+  return normalize(toObject(document))
+}
+
 
 function getAll() {
   const query = Todos.find();

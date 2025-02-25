@@ -3,7 +3,7 @@
 
 import { v1 as uuidv1 } from 'uuid';
 
-import { ApiError } from '../../exceptions/api.error.js';
+import { ApiError } from '../../exceptions/apiError.js';
 import { User as Users } from '../../models/mongoose/User.model.js';
 import { tokenService } from '../mongoose/token.service.js';
 import { emailService } from '../email.service.js';
@@ -21,11 +21,12 @@ import { bcryptService } from '../bcrypt.service.js';
 
 export const userService = {
   normalize,
+  toObject,
+  prepareToSend,
   getActives,
   getByOptions,
   getOneByOptions,
   getAndCountByOptions,
-  toObject,
   update,
   create,
   remove,
@@ -40,9 +41,17 @@ function normalize({ id, email }) {
   return { id, email };
 }
 
+/**
+ * @param {TyUserDocument} document 
+ * @returns */
+function prepareToSend(document) {
+  return normalize(toObject(document))
+}
+
 /** Retrieves all active users (i.e., users with no activation token) */
 async function getActives() {
-  const tokens = await tokenService.getByOptions({ activation: null });
+  const tokens
+    = await tokenService.getByOptions({ activation: null });
 
   const usersQuery = Users.find({
     // id: { $in: ['New Task', 'First Task', 'Other Task'] },

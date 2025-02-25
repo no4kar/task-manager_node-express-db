@@ -1,7 +1,7 @@
 'use strict';
 // @ts-check
 
-import { ApiError } from '../exceptions/api.error.js';
+import { ApiError } from '../exceptions/apiError.js';
 
 /** @type {import('src/types/func.type.js').TyFunc.ErrorMiddleware} */
 export function errorMiddleware(error, req, res, next) {

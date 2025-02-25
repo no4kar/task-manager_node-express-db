@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import type Sequelize from 'sequelize';
 import type Mongoose from 'mongoose';
 
-import { ApiError } from '../exceptions/api.error';
+import { ApiError } from '../exceptions/apiError';
 
 export namespace TyFunc {
   // Type definition for a ApiError class

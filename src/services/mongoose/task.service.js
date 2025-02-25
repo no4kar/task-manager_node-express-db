@@ -17,6 +17,7 @@ import { Task as Tasks } from '../../models/mongoose/Task.model.js';
 export const taskService = {
   normalize,
   toObject,
+  prepareToSend,
   getByOptions,
   getOneByOptions,
   getAndCountByOptions,
@@ -45,6 +46,13 @@ function normalize({
     createdAt,
     updatedAt,
   };
+}
+
+/**
+ * @param {TyTaskDocument} document 
+ * @returns */
+function prepareToSend(document){
+  return normalize(toObject(document))
 }
 
 /**

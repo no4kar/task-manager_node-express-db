@@ -9,7 +9,9 @@ export const userController = {
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function getAll(req, res) {
-  const users = await userService.getActives();
+  const users
+    = await userService.getActives();
 
-  res.send(users.map(item => userService.normalize(userService.toObject(item))));
+  res.send(users.map(item =>
+    userService.prepareToSend(item)));
 }

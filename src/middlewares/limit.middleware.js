@@ -1,4 +1,4 @@
-import { ApiError } from '../exceptions/api.error.js';
+import { ApiError } from '../exceptions/apiError.js';
 
 /** 
 * @param {Object} [options]

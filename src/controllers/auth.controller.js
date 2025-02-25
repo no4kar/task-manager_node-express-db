@@ -1,7 +1,7 @@
 'use strict';
 // @ts-check
 
-import { ApiError } from '../exceptions/api.error.js';
+import { ApiError } from '../exceptions/apiError.js';
 import { env } from '../configs/env.config.js';
 import { jwtService } from '../services/jwt.service.js';
 import { tokenService } from '../services/mongoose/token.service.js';

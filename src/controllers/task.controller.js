@@ -3,11 +3,20 @@
 
 /**
  * @typedef {import('src/types/func.type.js').TyFunc.Middleware} TyFuncMiddleware
- * @typedef {import('../services/mongoose/task.service.js').TyTaskFilterQuery} TyTaskFilterQuery
+ * @typedef {import('src/services/mongoose/task.service.js').TyTaskFilterQuery} TyTaskFilterQuery
+ * @typedef {import('src/types/error.type.js').TyError.CodeReport} TyErrorCodeReport
 */
 
-import * as Helpers from '../utils/helpers.js';
-import { ApiError } from '../exceptions/api.error.js';
+/**
+ * @template {string} T1
+ * @typedef {import('src/types/error.type.js').TyError.FailedReport<T1>} TyFailedReport
+ */
+
+import {
+  isNatural,
+  checkUserIdOwnership,
+} from '../utils/helpers.js';
+import { ApiError } from '../exceptions/apiError.js';
 import { taskService } from '../services/mongoose/task.service.js';
 import { userService } from '../services/mongoose/user.service.js';
 
@@ -24,49 +33,50 @@ async function get(req, res) {
   const {
     userId,
     name,
-  } = req.query;
+  } = req.query; // ?userId=...&name=...&page=...&size=...
 
   const page = Number(req.query.page) || 1;
   const size = Number(req.query.size) || 10;
 
+  /** @type {TyFailedReport<'userId' | 'name' | 'page' | 'size'>} */
   const errors = {
-    userId: !userId,
-    name: !name,
-    page: !Helpers.isNatural(page),
-    size: !Helpers.isNatural(size),
+    userId: {
+      isInvalid: !userId,
+      expected: 'string',
+      got: typeof userId,
+    },
+    name: {
+      isInvalid: !name,
+      expected: 'string',
+      got: typeof name,
+    },
+    page: {
+      isInvalid: !isNatural(page),
+      expected: 'natural number',
+      got: typeof page,
+    },
+    size: {
+      isInvalid: !isNatural(size),
+      expected: 'natural number',
+      got: typeof size,
+    },
   };
 
-  if (errors.page || errors.size) {
-    throw ApiError.UnprocessableContent(
-      `'page', 'size' must be natural numbers`,
-      {
-        expected: {
-          page: 'natural num',
-          size: 'natural num',
-        },
-        got: {
-          page,
-          size,
-        },
-      }
-    );
+  if (errors.page.isInvalid
+    || errors.size.isInvalid
+    || errors.userId.isInvalid) {
+    throw ApiError.FailedReport(errors, 'Type error');
   }
 
-  const limit
-    = size;
-  // = parseInt(String(size), 10) || Number.MAX_SAFE_INTEGER;
-  const offset
-    = (page - 1) * size;
-  // = ((parseInt(String(page), 10) || 1) - 1) * limit;
+  checkUserIdOwnership(req.user.id, userId);
+
+  const limit = size;
+  const offset = (page - 1) * size;
 
   /** @type {TyTaskFilterQuery} */
-  const whereConditions = {};
+  const whereConditions = { userId };
 
-  if (!errors.userId) {
-    whereConditions.userId = userId;
-  }
-
-  if (!errors.name) {
+  if (!errors.name.isInvalid) {
     whereConditions.name = new RegExp(String(name), 'i');
   }
 
@@ -82,7 +92,7 @@ async function get(req, res) {
   res.send({
     total,
     content: rows.map(row =>
-      taskService.normalize(taskService.toObject(row))),
+      taskService.prepareToSend(row)),
     limit,
     offset,
   });
@@ -91,16 +101,18 @@ async function get(req, res) {
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function getById(req, res) {
   const { id } = req.params;
-  const task
+  const foundTask
     = await taskService.getOneById(id);
 
-  if (!task) {
+  if (!foundTask) {
     throw ApiError.NotFound(
       `Can't find task by id`,
     );
   }
 
-  res.send(taskService.normalize(taskService.toObject(task)));
+  checkUserIdOwnership(req.user.id, foundTask.userId);
+
+  res.send(taskService.prepareToSend(foundTask));
 }
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
@@ -110,26 +122,26 @@ async function post(req, res) {
     name,
   } = req.body;
 
+  /** @type {TyFailedReport<'userId' | 'name'>} */
   const errors = {
-    userId: !userId || typeof userId !== 'string',
-    name: !name || typeof name !== 'string',
+    userId: {
+      isInvalid: !userId,
+      expected: 'string',
+      got: typeof userId,
+    },
+    name: {
+      isInvalid: !name,
+      expected: 'string',
+      got: typeof name,
+    },
   };
 
-  if (errors.userId || errors.name) {
-    throw ApiError.UnprocessableContent(
-      `Can't create the task`,
-      {
-        expected: {
-          userId: 'string',
-          name: 'string',
-        },
-        got: {
-          userId: `${typeof userId}: ${userId}`,
-          name: `${typeof name}: ${name}`,
-        },
-      },
-    );
+  if (errors.userId.isInvalid
+    || errors.name.isInvalid) {
+    throw ApiError.FailedReport(errors, 'Can\'t create the task');
   }
+
+  checkUserIdOwnership(req.user.id, userId);
 
   const foundUser
     = await userService.getOneByOptions({ id: userId });
@@ -148,7 +160,7 @@ async function post(req, res) {
     });
 
   res.status(201)
-    .send(taskService.normalize(createdTask.toObject()));
+    .send(taskService.prepareToSend(createdTask));
 }
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
@@ -159,9 +171,18 @@ async function put(req, res) {
     name,
   } = req.body;
 
+  /** @type {TyFailedReport<'userId' | 'name'>} */
   const errors = {
-    userId: !userId || typeof userId !== 'string',
-    name: !name || typeof name !== 'string',
+    userId: {
+      isInvalid: !userId,
+      expected: 'string',
+      got: typeof userId,
+    },
+    name: {
+      isInvalid: !name,
+      expected: 'string',
+      got: typeof name,
+    },
   };
 
   const foundUser
@@ -174,26 +195,16 @@ async function put(req, res) {
     );
   }
 
+  checkUserIdOwnership(req.user.id, foundUser.id);
+
   // if no id then no foundTask
   const foundTask
     = await taskService.getOneById(id);
 
   if (!foundTask) {
-    if (errors.userId
-      || errors.name) {
-      throw ApiError.UnprocessableContent(
-        `Type error`,
-        {
-          expected: {
-            userId: 'string',
-            name: 'string',
-          },
-          got: {
-            userId: `${typeof userId}: ${userId}`,
-            name: `${typeof name}: ${name}`,
-          }
-        },
-      );
+    if (errors.userId.isInvalid
+      || errors.name.isInvalid) {
+      throw ApiError.FailedReport(errors);
     }
 
     const createdTask
@@ -203,21 +214,19 @@ async function put(req, res) {
       });
 
     res.status(201)
-      .send(taskService.normalize(
-        createdTask.toObject()
-      ));
+      .send(taskService.prepareToSend(createdTask));
 
     return;
   }
+
+  checkUserIdOwnership(req.user.id, foundTask.userId);
 
   await taskService.update(
     foundTask,
     { userId, name },
   );
 
-  res.send(taskService.normalize(
-    foundTask.toObject(),
-  ));
+  res.send(taskService.prepareToSend(foundTask));
 }
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
@@ -232,6 +241,8 @@ async function remove(req, res) {
       id,
     });
   }
+
+  checkUserIdOwnership(req.user.id, foundTask.userId);
 
   const count
     = await taskService.remove(foundTask);

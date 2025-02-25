@@ -3,7 +3,7 @@
 
 import * as Helpers from '../utils/helpers.js';
 import { todoService } from '../services/mongoose/todo.service.js';
-import { ApiError } from '../exceptions/api.error.js';
+import { ApiError } from '../exceptions/apiError.js';
 
 /**@typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodoItem */
 
@@ -94,7 +94,7 @@ async function get(req, res) {
   res.send({
     total,
     content: rows.map(row =>
-      todoService.normalize(row.toObject())),
+      todoService.prepareToSend(row)),
     limit,
     offset,
   });
@@ -110,7 +110,7 @@ async function getById(req, res) {
     throw ApiError.NotFound(`Cant find todo by id=${id}`);
   }
 
-  res.send(todoService.normalize(todo.toObject()));
+  res.send(todoService.prepareToSend(todo));
 }
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
@@ -161,7 +161,7 @@ async function post(req, res) {
     });
 
   res.status(201)
-    .send(todoService.normalize(todo.toObject()));
+    .send(todoService.prepareToSend(todo));
 }
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
@@ -209,7 +209,7 @@ async function put(req, res) {
       );
     }
 
-    const todo = await todoService.create({
+    const createdTodo = await todoService.create({
       userId,
       taskId,
       title,
@@ -217,7 +217,7 @@ async function put(req, res) {
     });
 
     res.status(201)
-      .send(todoService.normalize(todo.toObject()));
+      .send(todoService.prepareToSend(createdTodo));
 
     return;
   }
@@ -227,9 +227,7 @@ async function put(req, res) {
     { title, completed },
   );
 
-  res.send(todoService.normalize(
-    foundTodo.toObject(),
-  ));
+  res.send(todoService.prepareToSend(foundTodo));
 }
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
@@ -238,7 +236,8 @@ async function patchById(req, res) {// overwrites some fields except id
 
   const { id } = req.params;
 
-  const foundTodo = await todoService.getById(id);
+  const foundTodo
+    = await todoService.getById(id);
 
   if (!foundTodo) {
     throw ApiError.NotFound(`Can't find todo by id=${id}`);
@@ -272,7 +271,7 @@ async function patchById(req, res) {// overwrites some fields except id
   }
 
   res.send(
-    todoService.normalize(affectedRows[0].toObject())
+    todoService.prepareToSend(affectedRows[0])
   );
 }
 

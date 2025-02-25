@@ -6,7 +6,6 @@ export namespace TyUser {
     id: string | Mongoose.Types.ObjectId;
     email: string;
     password: string;
-    // activationToken: string | null;
     createdAt: string;
     updatedAt: string;
   };
