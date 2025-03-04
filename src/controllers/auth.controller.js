@@ -7,9 +7,15 @@ import { jwtService } from '../services/jwt.service.js';
 import { tokenService } from '../services/mongoose/token.service.js';
 import { userService } from '../services/mongoose/user.service.js';
 import { bcryptService } from '../services/bcrypt.service.js';
+import { testByRegEx } from 'src/utils/helpers.js';
 
 /**
  * @typedef {import('src/types/user.type.js').TyUser.Item} TyUser
+ */
+
+/**
+ * @template {string} T1
+ * @typedef {import('src/types/error.type.js').TyError.FailedReport<T1>} TyFailedReport
  */
 
 export const authController = {
@@ -28,16 +34,24 @@ async function register(req, res) {
     password,
   } = req.body;
 
+  /** @type {TyFailedReport<'email' | 'password'>} */
   const errors = {
-    email: !validateEmail(email),
-    password: !validatePassword(password),
+    email: {
+      isInvalid: !validateEmail(email),
+      expected: '^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$',
+      got: email,
+    },
+    password: {
+      isInvalid: !validatePassword(password),
+      expected: '^[A-Za-z0-9]{8}$',
+      got: password,
+    },
   };
 
-  if (errors.email || errors.password) {
-    throw ApiError.BadRequest(
-      'Validation error',
-      { details: { errors } },
-    );
+  if (errors.email.isInvalid
+    || errors.password.isInvalid) {
+    throw ApiError.FailedReport(errors,
+      'Validation error', ApiError.BadRequest);
   }
 
   await userService.register({
@@ -246,27 +260,17 @@ async function sendAuthentication(res, user) {
   });
 }
 
+const validaterFor = Object.freeze({
+  email: testByRegEx(/^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/),
+  password: testByRegEx(/^[A-Za-z0-9]{8}$/),
+});
+
 /** @param {string} value */
 function validateEmail(value) {
-  if (!value) {
-    return false;
-  }
-
-  const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
-
-  if (!emailPattern.test(value)) {
-    return false;
-  }
-
-  return true;
+  return validaterFor.email(value);
 }
 
 /** @param {string} value */
 function validatePassword(value) {
-  if (!value
-    || value.length < 8) {
-    return false;
-  }
-
-  return true;
+  return validaterFor.password(value);
 }
