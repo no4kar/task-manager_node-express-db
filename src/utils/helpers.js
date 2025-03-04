@@ -47,6 +47,25 @@ export function isNatural(val) {
   return Number.isInteger(val) && (val > 0)
 }
 
+/**
+ * 
+ * @param {RegExp} pattern -
+ * @returns {(value: string) => boolean} */
+export function testByRegEx(pattern) {
+  return (value) => {
+    if (!value) {
+      return false;
+    }
+
+    if (!pattern.test(value)) {
+      return false;
+    }
+
+    return true;
+  }
+}
+
+
 
 /**
  * Extract specified properties from an object.

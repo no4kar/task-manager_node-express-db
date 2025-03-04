@@ -86,18 +86,20 @@ export class ApiError extends Error {
     return new ApiError(429, message, errors);
   }
 
-  /**
+/**
    * Validates input data based on the given error flags and expected types.
-   * Usage: FailedReport(errors, { userId: 'string', name: 'string' });
+   * Usage: FailedReport(errors, "Validation failed", ApiError.BadRequest);
    * 
    * @template {string} T1
    * @param {TyFailedReport<T1>} errors - An object where keys represent field names and values indicate validation errors (truthy if invalid).
-   * @param {string} [message]
+   * @param {string} [message] - The error message. 'Type error' by default.
+   * @param {(message?: string, errors?: Object) => ApiError} [ApiErrorMethod] - A function that returns an ApiError instance. 'ApiError.UnprocessableContent' by default.
    * @returns {ApiError} If any validation fails, an error with expected and actual types is thrown.
    */
   static FailedReport(
     errors,
     message = 'Type error',
+    ApiErrorMethod = ApiError.UnprocessableContent,
   ) {
     const failed = Object.entries(errors)
       .reduce((acc, [key, error]) => {
@@ -109,6 +111,6 @@ export class ApiError extends Error {
         return acc;
       }, { expected: {}, got: {} });
 
-    return ApiError.UnprocessableContent(message, failed);
+    return ApiErrorMethod(message, failed);
   }
 };
