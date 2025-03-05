@@ -7,7 +7,7 @@ import { jwtService } from '../services/jwt.service.js';
 import { tokenService } from '../services/mongoose/token.service.js';
 import { userService } from '../services/mongoose/user.service.js';
 import { bcryptService } from '../services/bcrypt.service.js';
-import { testByRegEx } from 'src/utils/helpers.js';
+import { testByRegEx } from '../utils/helpers.js';
 
 /**
  * @typedef {import('src/types/user.type.js').TyUser.Item} TyUser
