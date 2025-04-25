@@ -12,11 +12,8 @@
  * @typedef {import('src/types/error.type.js').TyError.FailedReport<T1>} TyFailedReport
  */
 
-import {
-  isNatural,
-  checkUserIdOwnership,
-} from '../utils/helpers.js';
-import { ApiError } from '../exceptions/apiError.js';
+import { isNatural } from '../utils/helpers.js';
+import { ApiError, checkUserIdOwnership } from '../exceptions/apiError.js';
 import { taskService } from '../services/mongoose/task.service.js';
 import { userService } from '../services/mongoose/user.service.js';
 
@@ -68,7 +65,7 @@ async function get(req, res) {
     throw ApiError.FailedReport(errors, 'Type error');
   }
 
-  checkUserIdOwnership(req.user.id, userId);
+  checkUserIdOwnership(req?.user?.id, userId);
 
   const limit = size;
   const offset = (page - 1) * size;
@@ -110,7 +107,7 @@ async function getById(req, res) {
     );
   }
 
-  checkUserIdOwnership(req.user.id, foundTask.userId);
+  checkUserIdOwnership(req?.user?.id, foundTask.userId);
 
   res.send(taskService.prepareToSend(foundTask));
 }
@@ -141,7 +138,7 @@ async function post(req, res) {
     throw ApiError.FailedReport(errors, 'Can\'t create the task');
   }
 
-  checkUserIdOwnership(req.user.id, userId);
+  checkUserIdOwnership(req?.user?.id, userId);
 
   const foundUser
     = await userService.getOneByOptions({ id: userId });
@@ -195,7 +192,7 @@ async function put(req, res) {
     );
   }
 
-  checkUserIdOwnership(req.user.id, foundUser.id);
+  checkUserIdOwnership(req?.user?.id, foundUser.id);
 
   // if no id then no foundTask
   const foundTask
@@ -219,7 +216,7 @@ async function put(req, res) {
     return;
   }
 
-  checkUserIdOwnership(req.user.id, foundTask.userId);
+  checkUserIdOwnership(req?.user?.id, foundTask.userId);
 
   await taskService.update(
     foundTask,
@@ -242,7 +239,7 @@ async function remove(req, res) {
     });
   }
 
-  checkUserIdOwnership(req.user.id, foundTask.userId);
+  checkUserIdOwnership(req?.user?.id, foundTask.userId);
 
   const count
     = await taskService.remove(foundTask);

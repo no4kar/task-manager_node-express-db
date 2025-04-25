@@ -5,9 +5,9 @@ import {
   Schema,
   model,
 } from 'mongoose';
-import { Token as Tokens } from './Token.model.js';
-import { Task as Tasks } from './Task.model.js';
-import { Todo as Todos } from './Todo.model.js';
+import { TokenModel as Tokens } from './Token.model.js';
+import { TaskModel as Tasks } from './Task.model.js';
+import { TodoModel as Todos } from './Todo.model.js';
 import modelName from '../modelName.js';
 
 /**
@@ -35,10 +35,6 @@ export const userSchema = new Schema(
       type: String,
       required: true,
     },
-    // activationToken: {
-    //   type: String,
-    //   default: null,
-    // },
   },
   {
     timestamps: true, // Automatically manage createdAt and updatedAt fields
@@ -85,5 +81,5 @@ userSchema.post('deleteOne',
 //   }
 // });
 
-export const User
+export const UserModel
   = model(modelName.user, userSchema);

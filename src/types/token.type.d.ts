@@ -1,20 +1,16 @@
-import type Sequelize from 'sequelize';
-import type Mongoose from 'mongoose';
-
 export namespace TyToken {
   export type Item = {
-    userId: string | Mongoose.Types.ObjectId;
+    userId: string;
     refresh: string | null;
     activation: string | null;
-    createdAt: string;
-    updatedAt: string;
+    createdAt: Date;
+    updatedAt: Date;
   };
 
   export type GetParams = Partial<Item>;
   export type UpdateParams =
-    Partial<Omit<Item, 'userId' | 'createdAt' | 'updatedAt'>>
-    & Record<string, unknown>;
-  export type Normalized = Pick<Item, 'userId' | 'refresh' | 'activation'>;
+    Partial<Omit<Item, 'userId' | 'createdAt' | 'updatedAt'>>;
+  export type Normalized = Item;
   export type Extended = Normalized & Record<string, unknown>;
 
   export type ModelAttributes = Item;

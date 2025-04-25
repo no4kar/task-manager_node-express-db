@@ -1,18 +1,15 @@
-import type Mongoose from 'mongoose';
-
 export namespace TyTask {
   export type Item = {
-    id: string | Mongoose.Types.ObjectId;
-    userId: string | Mongoose.Types.ObjectId;
+    id: string;
+    userId: string;
     name: string;
-    createdAt: string;
-    updatedAt: string;
+    createdAt: Date;
+    updatedAt: Date;
   };
 
   export type GetParams = Partial<Item>;
   export type UpdateParams =
-    Partial<Omit<Item, 'id' | 'createdAt' | 'updatedAt'>>
-    & Record<string, unknown>;
+    Partial<Omit<Item, 'id' | 'createdAt' | 'updatedAt'>>;
   export type Normalized = Item;
   export type Extended = Normalized & Record<string, unknown>;
 

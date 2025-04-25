@@ -5,12 +5,13 @@ import {
   Schema,
   model,
 } from 'mongoose';
-import { Todo as Todos } from './Todo.model.js';
+import { TodoModel as Todos } from './Todo.model.js';
 import modelName from '../modelName.js';
 
 /**
  * @typedef {import('src/types/task.type.js').TyTask.Item} TyTask
  * @typedef {import('src/types/db.type.js').TyMongoose.Schema<TyTask>} TyTaskSchema
+ * @typedef {import('src/types/db.type.js').TyMongoose.Document<unknown,{},TyTask>} TyTaskDocument
  */
 
 /** @type {TyTaskSchema} */
@@ -19,11 +20,11 @@ export const taskSchema = new Schema(
     id: {
       type: String,
       default: function () {
-        return this._id.toString(); // Assigns the MongoDB-generated `_id` to the `id` field
+        return (/** @type {TyTaskDocument} */ (this))._id.toString(); // Assigns the MongoDB-generated `_id` to the `id` field
       },
     },
     userId: {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.String,
       ref: modelName.user,
       required: true,
     },
@@ -47,9 +48,9 @@ taskSchema.post('deleteOne', { document: true, query: false }, async function (d
     await Todos.deleteMany({ taskId: doc._id });
     next();
   } catch (error) {
-    next(error);
+    next(/** @type {Error} */(error));
   }
 });
 
-export const Task
+export const TaskModel
   = model(modelName.task, taskSchema);

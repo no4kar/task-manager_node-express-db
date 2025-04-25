@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { getFlagValues } from '../utils/helpers.js';
 
 const serverPort = Number(process.env.SERVER_PORT || 3001);
 const serverHost = process.env.SERVER_HOST || `http://localhost:${serverPort}`;
@@ -68,5 +69,8 @@ export const env = Object.freeze({
       unhandledRequestsPerIP: maxUnhandledRequestsPerIP,
       totalUnhandledRequests: maxTotalUnhandledRequests,
     },
+  },
+  flag: {
+    mode: getFlagValues('--mode'),
   }
 });

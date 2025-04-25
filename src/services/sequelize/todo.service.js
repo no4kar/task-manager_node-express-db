@@ -3,7 +3,7 @@
 
 import { Op } from 'sequelize';
 import { sequelize } from '../../store/sqlite.db.js';
-import { Todo as Todos } from '../../models/sequelize/Todo.model.js';
+import { TodoModel as Todos } from '../../models/sequelize/Todo.model.js';
 
 /** @typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodo */
 /** @typedef {import('src/types/todo.type.js').TyTodo.CreationAttributes} TyTodoCreationAttributes */
@@ -16,14 +16,12 @@ export const todoService = {
   getByUserId,
   getAndCountByOptions,
   getById,
-  setDataValues,
+  update,
   create,
   updateById,
   updateManyById,
   removeById,
   removeManyById,
-  findMatchProps,
-  findManyMatchProps,
 };
 
 /**@param {Object} item */
@@ -100,7 +98,7 @@ function getById(id) {
  * @param {TyTodoModel} model
  * @param {TyTodoGetParams} properties
  * @returns */
-function setDataValues(model, properties) {
+function update(model, properties) {
   return model.set(properties).save();
 }
 
@@ -145,7 +143,7 @@ async function updateManyById(items) {
 
 /**
  * @param {TyTodoModel} model
- * @returns */
+ * @returns {Promise<number>} */
 function remove(model) {
   return model.destroy()
     .then(() => 1);
@@ -165,29 +163,4 @@ function removeManyById(ids) {
       id: { [Op.in]: ids },
     },
   });
-}
-
-/**
- * @param {object} targetObj
- * @param {object} sourceObj */
-function findMatchProps(targetObj, sourceObj) {
-  const result = {};
-
-  for (const [targetKey, targetValue] of Object.entries(targetObj)) {
-    if (!(targetKey in sourceObj)
-      || typeof targetValue !== typeof sourceObj[targetKey]) {
-      continue;
-    }
-
-    result[targetKey] = sourceObj[targetKey];
-  }
-
-  return Object.keys(result).length ? result : null;
-}
-
-/**
- * @param {object} targetObj
- * @param {object[]} sourceObjs */
-function findManyMatchProps(targetObj, sourceObjs) {
-  return sourceObjs.map(compareObj => findMatchProps(targetObj, compareObj));
 }

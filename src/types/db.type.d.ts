@@ -28,4 +28,12 @@ export namespace TySequelize {
 
   export type ModelStatic<Model>
     = Sequelize.ModelStatic<Model>;
+
+  export namespace Query {
+    export type FindOptions<T>
+      = Sequelize.FindOptions<T>; // Model.findOne(FindOptions)
+
+    export type WhereOptions<T>
+      = Sequelize.WhereOptions<T>; // Model.findOne({where:WhereOptions})
+  }
 }

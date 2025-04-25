@@ -6,11 +6,15 @@ import eslintJs from '@eslint/js';
 export default [
   {
     languageOptions: {
-      globals: globals.browser,
+      ecmaVersion: 'latest', // Ensure latest ECMAScript support
+      sourceType: 'module', // Enable ES Modules
+      globals: {
+        ...globals.node,
+      },
     },
   },
-  eslintJs.configs.recommended,
   {
+    extends: [eslintJs.configs.recommended], // Apply recommended ESLint rules
     rules: {
       'no-unused-vars': ['warn', { 'args': 'all', 'argsIgnorePattern': '^_' }],
       'no-undef': 'warn',

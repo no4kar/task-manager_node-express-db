@@ -1,7 +1,7 @@
 'use strict';
 // @ts-check
 
-import { Token as Tokens } from '../../models/mongoose/Token.model.js';
+import { TokenModel as Tokens } from '../../models/mongoose/Token.model.js';
 
 /**
  * @typedef {import('src/types/token.type.js').TyToken.Item} TyToken
@@ -43,23 +43,21 @@ function update(document, properties) {
 }
 
 /**
- * @param {TyTokenCreationAttributes} param0
+ * @param {TyTokenCreationAttributes} tokenData
  * @returns */
 async function put({
   userId,
   refresh,
   activation,
 }) {
-  const query
-    = Tokens.findOne({ userId });
-
-  const foundToken = await query.exec();
+  const foundToken
+    = await getOneByOptions({ userId });
 
   if (foundToken) {
-    return foundToken.set({ refresh, activation }).save();
+    return update(foundToken, { refresh, activation });
   }
 
-  return Tokens.create({ userId, refresh, activation });
+  return create({ userId, refresh, activation });
 }
 
 /**

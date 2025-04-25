@@ -24,7 +24,7 @@ export const app = express();
 
 app.use(
   getLimiter({
-    unhandledRequestsPerIP: 2,
+    unhandledRequestsPerIP: 3,
     totalUnhandledRequests: 7,
   }),       // Rate limiter middleware
   cookieParser(),     // Parse cookies

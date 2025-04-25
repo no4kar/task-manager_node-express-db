@@ -83,30 +83,47 @@ export function extractProps(props, from) {
     }, {});
 }
 
+/**
+ * Retrieves the value(s) associated with a given command-line flag.
+ *
+ * This function searches for the specified flag in the command-line arguments (`process.argv`) 
+ * and extracts the values following it, stopping at the next flag or the end of the arguments.
+ * 
+ * Note: This implementation joins `process.argv` into a string and uses regex matching, 
+ * meaning it may not correctly handle cases where arguments contain special characters or quotes.
+ *
+ * @param {string} [flag='--mode'] - The flag to search for (e.g., `--mode`).
+ * @returns {string} - The matched value(s) as a single string, or an empty string if the flag is not found.
+ */
+export function getFlagValues(flag = '--mode') {
+  const pattern = new RegExp(`${flag}\\s+(.*?)(?=$|\\s+\\-{1,})`);
+  return process.argv
+    .join(' ')
+    .match(pattern)?.[1] || '';
+}
+
 
 /**
- * Checks if the provided user ID matches the expected user ID.
- * Throws an ApiError if the user ID does not match.
- *
- * @param {string} [expectedUserId] - The user ID that is expected (owner of the resource).
- * @param {string} [gotUserId] - The user ID that was provided (attempting access).
- * @throws {ApiError} If the provided user ID does not match the expected one, a Forbidden error is thrown.
- * @returns */
-export function checkUserIdOwnership(
-  expectedUserId,
-  gotUserId,
-) {
-  if (!expectedUserId || expectedUserId !== gotUserId) {
-    throw ApiError.Forbidden(
-      'You are not allowed to access these tasks',
-      {
-        expected: {
-          userId: expectedUserId,
-        },
-        got: {
-          userId: gotUserId,
-        },
-      }
-    );
+ * @param {object} targetObj
+ * @param {object} sourceObj */
+function findMatchProps(targetObj, sourceObj) {
+  const result = {};
+
+  for (const [targetKey, targetValue] of Object.entries(targetObj)) {
+    if (!(targetKey in sourceObj)
+      || typeof targetValue !== typeof sourceObj[targetKey]) {
+      continue;
+    }
+
+    result[targetKey] = sourceObj[targetKey];
   }
+
+  return Object.keys(result).length ? result : null;
+}
+
+/**
+ * @param {object} targetObj
+ * @param {object[]} sourceObjs */
+export function findManyMatchProps(targetObj, sourceObjs) {
+  return sourceObjs.map(compareObj => findMatchProps(targetObj, compareObj));
 }

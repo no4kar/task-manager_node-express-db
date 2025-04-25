@@ -1,42 +1,84 @@
 'use strict';
 // @ts-check
 
-import { DataTypes } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../../store/sqlite.db.js';
-import { User } from './User.model.js';
-
+import { UserModel } from './User.model.js';
+import { TaskModel } from './Task.model.js';
 
 /**
  * @typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodo
  * @typedef {import('src/types/todo.type.js').TyTodo.CreationAttributes} TyTodoCreationAttributes
- * @typedef {import('src/types/db.type.js').TySequelize.Model<TyTodo, TyTodoCreationAttributes>} TyTodoModel
+ * @typedef {import('src/types/db.type.js').TySequelize.Model<TyTodo,TyTodoCreationAttributes>} TyTodoModel
  * @typedef {import('src/types/db.type.js').TySequelize.ModelStatic<TyTodoModel>} TyTodoModelStatic
  */
 
-/** @type {TyTodoModelStatic} */
-export const Todo = sequelize.define('todo', {
-  id: {
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV1,
-    allowNull: false,
-    primaryKey: true,
-  },
-  userId: {
-    type: DataTypes.UUID,
-    allowNull: false,
-    references: {
-      model: User,
-      key: 'id',
+/** 
+ * @class TodoModelStatic
+ * @extends {Model<TyTodo, TyTodoCreationAttributes>}
+ * @implements {TyTodo} */
+export class TodoModelStatic extends Model {
+  id = '';
+  userId = '';
+  taskId = '';
+  title = '';
+  completed = false;
+  createdAt = new Date();
+  updatedAt = new Date();
+};
+
+
+TodoModelStatic.init(
+  {
+    id: {
+      type: DataTypes.UUIDV1,
+      defaultValue: DataTypes.UUIDV1,
+      allowNull: false,
+      primaryKey: true,
+    },
+    userId: {
+      type: DataTypes.UUIDV1,
+      allowNull: false,
+      references: {
+        model: UserModel,
+        key: 'id',
+      },
+    },
+    taskId: {
+      type: DataTypes.UUIDV1,
+      allowNull: false,
+      references: {
+        model: TaskModel,
+        key: 'id',
+      },
+    },
+    title: {
+      type: DataTypes.STRING,
+      defaultValue: 'none',
+      allowNull: false,
+    },
+    completed: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
     },
   },
-  title: {
-    type: DataTypes.STRING,
-    defaultValue: 'none',
-    allowNull: false,
-  },
-  completed: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
-    allowNull: false,
-  },
-});
+  {
+    sequelize,
+    modelName: 'Todo',
+    tableName: 'todos',
+    timestamps: true, // Sequelize will manage createdAt and updatedAt
+    underscored: false, // Optional: depends on your naming convention
+  }
+);
+
+/** @type {TyTodoModelStatic} */
+export const TodoModel = TodoModelStatic;

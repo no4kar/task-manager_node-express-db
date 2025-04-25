@@ -16,7 +16,7 @@ import modelName from '../modelName.js';
 export const tokenSchema = new Schema(
   {
     userId: {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.String,
       ref: modelName.user,
       required: true,
     },
@@ -35,6 +35,6 @@ export const tokenSchema = new Schema(
 );
 
 // Create and export the Token model using the defined schema
-export const Token
+export const TokenModel
   = model(modelName.token, tokenSchema);
 

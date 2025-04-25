@@ -114,3 +114,30 @@ export class ApiError extends Error {
     return ApiErrorMethod(message, failed);
   }
 };
+
+/**
+ * Checks if the provided user ID matches the expected user ID.
+ * Throws an ApiError if the user ID does not match.
+ *
+ * @param {string} [expectedUserId] - The user ID that is expected (owner of the resource).
+ * @param {string} [gotUserId] - The user ID that was provided (attempting access).
+ * @throws {ApiError} If the provided user ID does not match the expected one, a Forbidden error is thrown.
+ * @returns */
+export function checkUserIdOwnership(
+  expectedUserId,
+  gotUserId,
+) {
+  if (!expectedUserId || expectedUserId !== gotUserId) {
+    throw ApiError.Forbidden(
+      'You are not allowed to access these tasks',
+      {
+        expected: {
+          userId: expectedUserId ?? 'undefined',
+        },
+        got: {
+          userId: gotUserId,
+        },
+      }
+    );
+  }
+}

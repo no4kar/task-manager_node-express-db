@@ -4,7 +4,7 @@
 import { v1 as uuidv1 } from 'uuid';
 
 import { ApiError } from '../../exceptions/apiError.js';
-import { User as Users } from '../../models/mongoose/User.model.js';
+import { UserModel as Users } from '../../models/mongoose/User.model.js';
 import { tokenService } from '../mongoose/token.service.js';
 import { emailService } from '../email.service.js';
 import { bcryptService } from '../bcrypt.service.js';
@@ -20,17 +20,18 @@ import { bcryptService } from '../bcrypt.service.js';
  */
 
 export const userService = {
-  normalize,
-  toObject,
-  prepareToSend,
   getActives,
   getByOptions,
   getOneByOptions,
   getAndCountByOptions,
-  update,
   create,
+  update,
   remove,
   removeById,
+
+  normalize,
+  toObject,
+  prepareToSend,
   register,
 };
 
@@ -44,28 +45,31 @@ function normalize({ id, email }) {
 /**
  * @param {TyUserDocument} document 
  * @returns */
-function prepareToSend(document) {
-  return normalize(toObject(document))
-}
-
-/** Retrieves all active users (i.e., users with no activation token) */
-async function getActives() {
-  const tokens
-    = await tokenService.getByOptions({ activation: null });
-
-  const usersQuery = Users.find({
-    // id: { $in: ['New Task', 'First Task', 'Other Task'] },
-    id: { $in: tokens.map(token => token.userId) }
-  });
-
-  return usersQuery.sort({ createdAt: 'asc' }).exec();
+function toObject(document) {
+  return document.toObject();
 }
 
 /**
  * @param {TyUserDocument} document 
  * @returns */
-function toObject(document) {
-  return document.toObject();
+function prepareToSend(document) {
+  return normalize(toObject(document))
+}
+
+/** Retrieves all active users (i.e., users with no activation token) 
+ * @returns {Promise<TyUserDocument[]>}*/
+async function getActives() {
+  const tokens
+    = await tokenService.getByOptions({ activation: null });
+  const userIds
+    = tokens.map(token => token.userId);
+
+  const usersQuery = Users.find({
+    // id: { $in: ['New Task', 'First Task', 'Other Task'] },
+    id: { $in: userIds }
+  });
+
+  return usersQuery.sort({ createdAt: 'asc' }).exec();
 }
 
 /**
@@ -112,22 +116,21 @@ async function getAndCountByOptions(
 /**
  * @param {TyUserDocument} document
  * @param {TyUserGetParams} properties
- * @returns */
+ * @returns {Promise<TyUserDocument>}*/
 function update(document, properties) {
   return document.set(properties).save();
 }
 
 /**
  * @param {TyUserCreationAttributes} properties 
- * @returns */
+ * @returns {Promise<TyUserDocument | null>} */
 function create(properties) {
   return Users.create({ ...properties });
 }
 
-
 /**
  * @param {TyUserDocument} document
- * @returns */
+ * @returns {Promise<number>} */
 function remove(document) {
   return document.deleteOne()
     .then(res => res.deletedCount);
@@ -152,9 +155,9 @@ async function register({ email, password }) {
 
   if (foundUser) {
     throw ApiError.BadRequest(
-      'User with this email is already exist',
-      { details: { user: { email: foundUser.email } } }
-    );
+      'Validation error', {
+      email: 'User with this email is already exist',
+    });
   }
 
   // get activation token
@@ -164,7 +167,7 @@ async function register({ email, password }) {
     = await bcryptService.hash(password);
 
   const createdUser
-    = await Users.create({
+    = await create({
       email,
       password: hashedPassword,
     });
@@ -176,19 +179,22 @@ async function register({ email, password }) {
 
   const createdToken
     = await tokenService.create({
-      userId: createdUser._id,
+      userId: createdUser._id.toString(),
       refresh: null,
       activation: activationToken,
     });
 
-  if (!createdToken || !createdToken.activation) {
+  const activationFromToken
+    = createdToken.activation;
+
+  if (!createdToken || !activationFromToken) {
     throw ApiError.UnprocessableContent(
       'Something went wrong');
   }
 
   await emailService.sendActivationLink(
     createdUser.email,
-    createdToken.activation,
+    activationFromToken,
   );
 }
 

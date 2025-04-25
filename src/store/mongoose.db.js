@@ -1,20 +1,39 @@
 import mongoose from 'mongoose';
 
-import { env } from '../configs/env.config.js';
 // import modelName from 'src/models/modelName.js';
 // import { userSchema } from 'src/models/mongoose/User.model.js';
 // import { tokenSchema } from 'src/models/mongoose/Token.model.js';
 // import { todoSchema } from 'src/models/mongoose/Todo.model.js';
 
-export function connectDB() {
+/** 
+* @param {Object} param0 
+* @param {string} param0.usernanme 
+* @param {string} param0.password 
+* @param {string} param0.collection 
+* @returns */
+export function connectDB({
+  usernanme,
+  password,
+  collection,
+}) {
   return mongoose.connect(
-    `mongodb+srv://${env.mangodb.user}:${env.mangodb.password}@cluster-node.2f56p.mongodb.net/task-manager?retryWrites=true&w=majority&appName=cluster-node`,
+    `mongodb+srv://${usernanme}:${password}@cluster-node.2f56p.mongodb.net/${collection}?retryWrites=true&w=majority&appName=cluster-node`,
   );
 }
 
-export function createConnectionDB() {
+/** 
+* @param {Object} param0 
+* @param {string} param0.usernanme 
+* @param {string} param0.password 
+* @param {string} param0.collection 
+* @returns */
+export function createConnectionDB({
+  usernanme,
+  password,
+  collection,
+}) {
   return mongoose.createConnection(
-    `mongodb+srv://${env.mangodb.user}:${env.mangodb.password}@cluster-node.2f56p.mongodb.net/task-manager?retryWrites=true&w=majority&appName=cluster-node`,
+    `mongodb+srv://${usernanme}:${password}@cluster-node.2f56p.mongodb.net/${collection}?retryWrites=true&w=majority&appName=cluster-node`,
   );
 
   // const conn = mongoose.createConnection(

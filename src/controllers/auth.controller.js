@@ -38,12 +38,14 @@ async function register(req, res) {
   const errors = {
     email: {
       isInvalid: !validateEmail(email),
-      expected: '^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$',
+      expected: /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/,
+      // expected: '^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$',
       got: email,
     },
     password: {
       isInvalid: !validatePassword(password),
-      expected: '^[A-Za-z0-9]{8}$',
+      expected: /^[A-Za-z0-9]{8}$/,
+      // expected: '^[A-Za-z0-9]{8}$',
       got: password,
     },
   };
@@ -101,9 +103,8 @@ async function activate(req, res) {
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function activateByGoogle(req, res) {
-  /** @type {TyUser | null} */
   const user
-    = req.user || null; // This is the user returned by Passport
+    = /** @type {TyUser | null} */ (req.user || null); // This is the user returned by Passport
 
   if (!user) {
     throw ApiError.Unauthorized('Google authentication failed');
@@ -166,7 +167,7 @@ async function refresh(req, res) {
   const { refreshToken } = req.cookies;
   /** @type {TyUser | null} */
   const userData
-    = jwtService.validateRefreshToken(refreshToken);
+    = /** @type {TyUser | null} */ (jwtService.validateRefreshToken(refreshToken));
 
   if (!userData) {
     throw ApiError.Unauthorized();
@@ -199,9 +200,12 @@ async function refresh(req, res) {
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function logout(req, res) {
   const { refreshToken } = req.cookies;
-  /** @type {TyUser | null} */
+
   const userData
-    = jwtService.validateRefreshToken(refreshToken);
+    = /** @type {TyUser | null} */ (jwtService.validateRefreshToken(refreshToken));
+  /* Explicitly cast the return type of a function.
+  Same like TS "const userData = JwtService.validateRefreshToken(refreshToken) as TyUser | null;" */
+
 
   if (!userData) {
     throw ApiError.UnprocessableContent();
