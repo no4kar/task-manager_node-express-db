@@ -4,10 +4,10 @@
 import { v1 as uuidv1 } from 'uuid';
 
 import { ApiError } from '../../exceptions/apiError.js';
-import { UserModel as Users } from '../../models/mongoose/User.model.js';
-import { tokenService } from '../mongoose/token.service.js';
-import { emailService } from '../email.service.js';
-import { bcryptService } from '../bcrypt.service.js';
+import Users from '../../models/mongoose/User.js';
+import tknSrv from '../mongoose/token.js';
+import { emailService as emlSrv } from '../email.service.js';
+import { bcryptService as bcrSrv } from '../bcrypt.service.js';
 
 /**
  * @typedef {import('src/types/user.type.js').TyUser.Item} TyUser
@@ -19,7 +19,7 @@ import { bcryptService } from '../bcrypt.service.js';
  * @typedef {import('src/types/db.type.js').TyMongoose.Document<unknown,{},TyUser>} TyUserDocument
  */
 
-export const userService = {
+export default {
   getActives,
   getByOptions,
   getOneByOptions,
@@ -32,6 +32,7 @@ export const userService = {
   normalize,
   toObject,
   prepareToSend,
+  getValue,
   register,
 };
 
@@ -56,16 +57,26 @@ function prepareToSend(document) {
   return normalize(toObject(document))
 }
 
+/**
+ * Extracts a field value from a Mongoose document.
+ * @template {keyof TyUser} K
+ * @param {TyUserDocument} document
+ * @param {K} key
+ * @returns {TyUser[K]} */
+function getValue(document, key) {
+  return document.get(key);
+}
+
 /** Retrieves all active users (i.e., users with no activation token) 
  * @returns {Promise<TyUserDocument[]>}*/
 async function getActives() {
   const tokens
-    = await tokenService.getByOptions({ activation: null });
+    = await tknSrv.getByOptions({ activation: null });
   const userIds
     = tokens.map(token => token.userId);
 
   const usersQuery = Users.find({
-    // id: { $in: ['New Task', 'First Task', 'Other Task'] },
+    // id: { $in: ['New User', 'First User', 'Other User'] },
     id: { $in: userIds }
   });
 
@@ -164,7 +175,7 @@ async function register({ email, password }) {
   const activationToken = uuidv1();
   // hash the password
   const hashedPassword
-    = await bcryptService.hash(password);
+    = await bcrSrv.hash(password);
 
   const createdUser
     = await create({
@@ -178,7 +189,7 @@ async function register({ email, password }) {
   }
 
   const createdToken
-    = await tokenService.create({
+    = await tknSrv.create({
       userId: createdUser._id.toString(),
       refresh: null,
       activation: activationToken,
@@ -192,7 +203,7 @@ async function register({ email, password }) {
       'Something went wrong');
   }
 
-  await emailService.sendActivationLink(
+  await emlSrv.sendActivationLink(
     createdUser.email,
     activationFromToken,
   );

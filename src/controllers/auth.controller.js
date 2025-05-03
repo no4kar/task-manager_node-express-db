@@ -1,13 +1,14 @@
 'use strict';
 // @ts-check
 
+import validator from 'validator';
+
 import { ApiError } from '../exceptions/apiError.js';
 import { env } from '../configs/env.config.js';
-import { jwtService } from '../services/jwt.service.js';
-import { tokenService } from '../services/mongoose/token.service.js';
-import { userService } from '../services/mongoose/user.service.js';
-import { bcryptService } from '../services/bcrypt.service.js';
-import { testByRegEx } from '../utils/helpers.js';
+import { jwtService as jwtSrv } from '../services/jwt.service.js';
+import { tokenService as tknSrv } from '../services/token.service.js';
+import { userService as usrSrv } from '../services/user.service.js';
+import { bcryptService as bcrSrv } from '../services/bcrypt.service.js';
 
 /**
  * @typedef {import('src/types/user.type.js').TyUser.Item} TyUser
@@ -37,15 +38,22 @@ async function register(req, res) {
   /** @type {TyFailedReport<'email' | 'password'>} */
   const errors = {
     email: {
-      isInvalid: !validateEmail(email),
-      expected: /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/,
-      // expected: '^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$',
+      isInvalid:
+        !validator.matches(
+          email,
+          '^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$', // eslint-disable-line
+          'i'),
+      // isInvalid: !validateEmail(email),
+      expected: /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/i,
       got: email,
     },
     password: {
-      isInvalid: !validatePassword(password),
+      isInvalid:
+        !validator.matches(
+          password,
+          '^[A-Za-z0-9]{8}$'),
+      // isInvalid: !validatePassword(password),
       expected: /^[A-Za-z0-9]{8}$/,
-      // expected: '^[A-Za-z0-9]{8}$',
       got: password,
     },
   };
@@ -56,7 +64,7 @@ async function register(req, res) {
       'Validation error', ApiError.BadRequest);
   }
 
-  await userService.register({
+  await usrSrv.register({
     email,
     password,
   }); // a thrown error will be caught by a "catchError()"
@@ -69,7 +77,7 @@ async function activate(req, res) {
   const { activationToken } = req.params;
 
   const foundToken
-    = await tokenService.getOneByOptions({
+    = await tknSrv.getOneByOptions({
       activation: activationToken,
     });
 
@@ -81,8 +89,8 @@ async function activate(req, res) {
   }
 
   const foundUser
-    = await userService.getOneByOptions({
-      id: foundToken.userId,
+    = await usrSrv.getOneByOptions({
+      id: tknSrv.getValue(foundToken, 'userId'),
     });
 
   if (!foundUser) {
@@ -90,14 +98,14 @@ async function activate(req, res) {
       `Can't find user by activationToken`);
   }
 
-  await tokenService.update(
+  await tknSrv.update(
     foundToken,
     { activation: null },
   );
 
   await sendAuthentication(
     res,
-    userService.toObject(foundUser),
+    usrSrv.toObject(foundUser),
   );
 }
 
@@ -111,7 +119,7 @@ async function activateByGoogle(req, res) {
   }
 
   const foundToken
-    = await tokenService.getOneByOptions({
+    = await tknSrv.getOneByOptions({
       userId: user.id,
     });
 
@@ -119,7 +127,7 @@ async function activateByGoogle(req, res) {
     throw ApiError.Unauthorized('Google authentication failed');
   }
 
-  res.redirect(`${env.todo.client.host}/task-manager_react-vite/activate/${foundToken.activation}`);
+  res.redirect(`${env.todo.client.host}/task-manager_react-vite/activate/${tknSrv.getValue(foundToken, 'activation')}`);
 }
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
@@ -129,7 +137,7 @@ async function login(req, res) {
     password,
   } = req.body;
   const foundUser
-    = await userService.getOneByOptions({ email });
+    = await usrSrv.getOneByOptions({ email });
 
   if (!foundUser) {
     throw ApiError.NotFound(
@@ -138,18 +146,19 @@ async function login(req, res) {
   }
 
   const foundToken
-    = await tokenService.getOneByOptions({
-      userId: foundUser._id,
+    = await tknSrv.getOneByOptions({
+      userId: usrSrv.getValue(foundUser, 'id'),
     });
 
-  if (!foundToken || foundToken.activation) {
+  if (!foundToken
+    || tknSrv.getValue(foundToken, 'activation')) {
     throw ApiError.Forbidden('The user is not yet activated');
   }
 
   const isPasswordValid
-    = await bcryptService.compare(
+    = await bcrSrv.compare(
       password,
-      foundUser.password,
+      usrSrv.getValue(foundUser, 'password'),
     );
 
   if (!isPasswordValid) {
@@ -158,7 +167,7 @@ async function login(req, res) {
 
   await sendAuthentication(
     res,
-    userService.toObject(foundUser),
+    usrSrv.toObject(foundUser),
   );
 }
 
@@ -167,14 +176,14 @@ async function refresh(req, res) {
   const { refreshToken } = req.cookies;
   /** @type {TyUser | null} */
   const userData
-    = /** @type {TyUser | null} */ (jwtService.validateRefreshToken(refreshToken));
+    = /** @type {TyUser | null} */ (jwtSrv.validateRefreshToken(refreshToken));
 
   if (!userData) {
     throw ApiError.Unauthorized();
   }
 
   const token
-    = await tokenService.getOneByOptions({
+    = await tknSrv.getOneByOptions({
       refresh: refreshToken,
     });
 
@@ -183,7 +192,7 @@ async function refresh(req, res) {
   }
 
   const foundUser
-    = await userService.getOneByOptions({
+    = await usrSrv.getOneByOptions({
       email: userData.email,
     });
 
@@ -193,7 +202,7 @@ async function refresh(req, res) {
 
   await sendAuthentication(
     res,
-    userService.toObject(foundUser),
+    usrSrv.toObject(foundUser),
   );
 }
 
@@ -202,9 +211,9 @@ async function logout(req, res) {
   const { refreshToken } = req.cookies;
 
   const userData
-    = /** @type {TyUser | null} */ (jwtService.validateRefreshToken(refreshToken));
+    = /** @type {TyUser | null} */ (jwtSrv.validateRefreshToken(refreshToken));
   /* Explicitly cast the return type of a function.
-  Same like TS "const userData = JwtService.validateRefreshToken(refreshToken) as TyUser | null;" */
+  Same like TS "const userData = jwtSrv.validateRefreshToken(refreshToken) as TyUser | null;" */
 
 
   if (!userData) {
@@ -212,7 +221,7 @@ async function logout(req, res) {
   }
 
   const foundToken
-    = await tokenService.getOneByOptions({
+    = await tknSrv.getOneByOptions({
       userId: userData.id,
     });
 
@@ -221,7 +230,7 @@ async function logout(req, res) {
   }
 
   res.clearCookie('refreshToken');
-  await tokenService.update(
+  await tknSrv.update(
     foundToken, {
     refresh: null,
   });
@@ -233,10 +242,10 @@ async function logout(req, res) {
  * @param {import('express').Response} res
  * @param {import('src/types/user.type').TyUser.Item} user */
 async function sendAuthentication(res, user) {
-  const accessToken = jwtService.generateAccessToken(user);
-  const refreshToken = jwtService.generateRefreshToken(user);
+  const accessToken = jwtSrv.generateAccessToken(user);
+  const refreshToken = jwtSrv.generateRefreshToken(user);
   const foundToken
-    = await tokenService.getOneByOptions({
+    = await tknSrv.getOneByOptions({
       userId: user.id,
     });
 
@@ -244,14 +253,14 @@ async function sendAuthentication(res, user) {
     throw ApiError.NotFound(`Can't find token by user.id`);
   }
 
-  await tokenService.update(
+  await tknSrv.update(
     foundToken,
     { refresh: refreshToken },
   );
 
   res.cookie(
     'refreshToken',
-    foundToken.refresh, {
+    tknSrv.getValue(foundToken, 'refresh'), {
     maxAge: 30 * 24 * 60 * 60 * 1000,
     httpOnly: true,
     sameSite: 'none', // or 'strict'
@@ -259,22 +268,7 @@ async function sendAuthentication(res, user) {
   });
 
   res.send({
-    user: userService.normalize(user),
+    user: usrSrv.normalize(user),
     accessToken,
   });
-}
-
-const validaterFor = Object.freeze({
-  email: testByRegEx(/^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/),
-  password: testByRegEx(/^[A-Za-z0-9]{8}$/),
-});
-
-/** @param {string} value */
-function validateEmail(value) {
-  return validaterFor.email(value);
-}
-
-/** @param {string} value */
-function validatePassword(value) {
-  return validaterFor.password(value);
 }

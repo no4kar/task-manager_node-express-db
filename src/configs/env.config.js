@@ -20,8 +20,16 @@ const smtpPassword = process.env.SMTP_PASSWORD || 'example-password';
 const googleClientId = process.env.GOOGLE_CLIENT_ID || '';
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || '';
 
+const ormSolution = /**@type {'sequelize' | 'mongoose'}*/('mongoose'); // process.env.ORM_SOLUTION ||
+
 const mangodbUser = process.env.MANGO_USER || '';
 const mangodbPassword = process.env.MANGO_PASSWORD || '';
+
+const postgresdbHost = process.env.POSTGRES_HOST || 'localhost';
+const postgresdbPort = parseInt(process.env.POSTGRES_PORT || '5432', 10);
+const postgresdb = process.env.POSTGRES_DB || 'postgres';
+const postgresdbUsername = process.env.POSTGRES_USER || 'postgres';
+const postgresdbPassword = process.env.POSTGRES_PASSWORD || '1111';
 
 const maxUnhandledRequestsPerIP = Number(process.env.MAX_UNHANDLED_REQUESTS_PER_IP) || 3;
 const maxTotalUnhandledRequests = Number(process.env.MAX_TOTAL_UNHANDLED_REQUESTS) || 11;
@@ -60,9 +68,19 @@ export const env = Object.freeze({
       secret: googleClientSecret,
     },
   },
+  orm: {
+    solution: ormSolution,
+  },
   mangodb: {
     user: mangodbUser,
     password: mangodbPassword,
+  },
+  postgresdb: {
+    host: postgresdbHost,
+    port: postgresdbPort,
+    database: postgresdb,
+    username: postgresdbUsername,
+    password: postgresdbPassword,
   },
   limit: {
     max: {

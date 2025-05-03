@@ -1,9 +1,9 @@
-import { sequelize } from '../store/sqlite.db.js';
+import { sequelize } from '../store/sequelize.db.js';
 
-import { TokenModel } from '../models/sequelize/Token.model.js';
-import { UserModel } from '../models/sequelize/User.model.js';
-import { TodoModel } from '../models/sequelize/Todo.model.js';
-import { TaskModel } from 'src/models/sequelize/Task.model.js';
+import UserModel from '../models/sequelize/User.js';
+import TokenModel from '../models/sequelize/Token.js';
+import TodoModel from '../models/sequelize/Todo.js';
+import TaskModel from '../models/sequelize/Task.js';
 
 // User has one Token (one-to-one relationship)
 const UserHasOneToken
@@ -19,16 +19,15 @@ const TokenBelongsToUser
     onDelete: 'CASCADE',
   });
 
-// Todo belongs to User (many-to-one relationship)
-const TodoBelongsToUser
-  = TodoModel.belongsTo(UserModel, {
+// User has many Todos (one-to-many relationship)
+const UserHasManyTask
+  = UserModel.hasMany(TaskModel, {
     foreignKey: 'userId',
     onDelete: 'CASCADE',
   });
 
-// User has many Todos (one-to-many relationship)
-const UserHasManyTodo
-  = UserModel.hasMany(TodoModel, {
+const TaskBelongsToUser
+  = TaskModel.belongsTo(UserModel, {
     foreignKey: 'userId',
     onDelete: 'CASCADE',
   });
@@ -47,18 +46,22 @@ const TodoBelongsToTask
 
 await sequelize.sync({ force: true })
   .then(() => {
-    console.info('\n\n\tTokenBelongsToUser\n');
-    console.dir(TokenBelongsToUser);
+    /* eslint-disable no-console */
     console.info('\n\n\tUserHasOneToken\n');
     console.dir(UserHasOneToken);
-    console.info('\n\n\tTodoBelongsToUser\n');
-    console.dir(TodoBelongsToUser);
-    console.info('\n\n\tUserHasManyTodo\n');
-    console.dir(UserHasManyTodo);
+    console.info('\n\n\tTokenBelongsToUser\n');
+    console.dir(TokenBelongsToUser);
+
+    console.info('\n\n\tUserHasManyTask\n');
+    console.dir(UserHasManyTask);
+    console.info('\n\n\tTaskBelongsToUser\n');
+    console.dir(TaskBelongsToUser);
+
     console.info('\n\n\tTaskHasManyTodo\n');
     console.dir(TaskHasManyTodo);
     console.info('\n\n\tTodoBelongsToTask\n');
     console.dir(TodoBelongsToTask);
-    console.log('Database & tables created!');
+
+    console.info('\n\n\tDatabase & tables created!');
   })
   .catch(err => console.error('Error creating database tables:', err));

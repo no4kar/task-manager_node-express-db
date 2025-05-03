@@ -5,8 +5,8 @@ import {
   Schema,
   model,
 } from 'mongoose';
-import { TodoModel as Todos } from './Todo.model.js';
-import modelName from '../modelName.js';
+import Todos from './Todo.js';
+import { DB_IDENTIFIERS } from '../entities.js';
 
 /**
  * @typedef {import('src/types/task.type.js').TyTask.Item} TyTask
@@ -15,7 +15,7 @@ import modelName from '../modelName.js';
  */
 
 /** @type {TyTaskSchema} */
-export const taskSchema = new Schema(
+const taskSchema = new Schema(
   {
     id: {
       type: String,
@@ -25,7 +25,7 @@ export const taskSchema = new Schema(
     },
     userId: {
       type: Schema.Types.String,
-      ref: modelName.user,
+      ref: DB_IDENTIFIERS.USER.model,
       required: true,
     },
     name: {
@@ -52,5 +52,7 @@ taskSchema.post('deleteOne', { document: true, query: false }, async function (d
   }
 });
 
-export const TaskModel
-  = model(modelName.task, taskSchema);
+const TaskModel
+  = model(DB_IDENTIFIERS.TASK.model, taskSchema);
+
+export default TaskModel;

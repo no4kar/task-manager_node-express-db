@@ -3,8 +3,8 @@
 
 /**
  * @typedef {import('src/types/func.type.js').TyFunc.Middleware} TyFuncMiddleware
- * @typedef {import('src/services/mongoose/task.service.js').TyTaskFilterQuery} TyTaskFilterQuery
  * @typedef {import('src/types/error.type.js').TyError.CodeReport} TyErrorCodeReport
+ * @typedef {import('src/types/user.type.js').TyUser.Item} TyUser
 */
 
 /**
@@ -13,9 +13,15 @@
  */
 
 import { isNatural } from '../utils/helpers.js';
-import { ApiError, checkUserIdOwnership } from '../exceptions/apiError.js';
-import { taskService } from '../services/mongoose/task.service.js';
-import { userService } from '../services/mongoose/user.service.js';
+import { ApiError, checkUserIdOwnership as cuid } from '../exceptions/apiError.js';
+import { taskService as tskSrv } from '../services/task.service.js';
+import { userService as usrSrv } from '../services/user.service.js';
+import { env } from '../configs/env.config.js';
+
+const checkUserIdOwnership =
+  env.flag.mode.includes('no-auth')
+    ? () => { }
+    : cuid;
 
 export const taskController = {
   get,
@@ -65,22 +71,27 @@ async function get(req, res) {
     throw ApiError.FailedReport(errors, 'Type error');
   }
 
-  checkUserIdOwnership(req?.user?.id, userId);
+  checkUserIdOwnership(
+    /**@type {TyUser}*/(req.user).id,
+    String(userId),
+  );
 
   const limit = size;
   const offset = (page - 1) * size;
 
-  /** @type {TyTaskFilterQuery} */
-  const whereConditions = { userId };
+  /** @type {any} */
+  const whereConditions
+    = { userId };
 
   if (!errors.name.isInvalid) {
-    whereConditions.name = new RegExp(String(name), 'i');
+    whereConditions.name
+      = new RegExp(String(name), 'i');
   }
 
   const {
     rows,
     count: total,
-  } = await taskService.getAndCountByOptions(
+  } = await tskSrv.getAndCountByOptions(
     whereConditions,
     limit,
     offset,
@@ -88,8 +99,7 @@ async function get(req, res) {
 
   res.send({
     total,
-    content: rows.map(row =>
-      taskService.prepareToSend(row)),
+    content: rows.map(tskSrv.prepareToSend),
     limit,
     offset,
   });
@@ -99,7 +109,7 @@ async function get(req, res) {
 async function getById(req, res) {
   const { id } = req.params;
   const foundTask
-    = await taskService.getOneById(id);
+    = await tskSrv.getOneById(id);
 
   if (!foundTask) {
     throw ApiError.NotFound(
@@ -107,9 +117,12 @@ async function getById(req, res) {
     );
   }
 
-  checkUserIdOwnership(req?.user?.id, foundTask.userId);
+  checkUserIdOwnership(
+    /**@type {TyUser}*/(req.user).id,
+    tskSrv.getValue(foundTask, 'userId')
+  );
 
-  res.send(taskService.prepareToSend(foundTask));
+  res.send(tskSrv.prepareToSend(foundTask));
 }
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
@@ -138,10 +151,13 @@ async function post(req, res) {
     throw ApiError.FailedReport(errors, 'Can\'t create the task');
   }
 
-  checkUserIdOwnership(req?.user?.id, userId);
+  checkUserIdOwnership(
+    /**@type {TyUser}*/(req.user).id,
+    String(userId),
+  );
 
   const foundUser
-    = await userService.getOneByOptions({ id: userId });
+    = await usrSrv.getOneByOptions({ id: userId });
 
   if (!foundUser) {
     throw ApiError.NotFound(
@@ -151,13 +167,13 @@ async function post(req, res) {
   }
 
   const createdTask
-    = await taskService.create({
+    = await tskSrv.create({
       userId,
       name,
     });
 
   res.status(201)
-    .send(taskService.prepareToSend(createdTask));
+    .send(tskSrv.prepareToSend(createdTask));
 }
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
@@ -183,7 +199,7 @@ async function put(req, res) {
   };
 
   const foundUser
-    = await userService.getOneByOptions({ id: userId });
+    = await usrSrv.getOneByOptions({ id: userId });
 
   if (!foundUser) {
     throw ApiError.NotFound(
@@ -192,11 +208,13 @@ async function put(req, res) {
     );
   }
 
-  checkUserIdOwnership(req?.user?.id, foundUser.id);
+  checkUserIdOwnership(
+    /**@type {TyUser}*/(req.user).id,
+    usrSrv.getValue(foundUser, 'id')
+  );
 
-  // if no id then no foundTask
   const foundTask
-    = await taskService.getOneById(id);
+    = await tskSrv.getOneById(id);
 
   if (!foundTask) {
     if (errors.userId.isInvalid
@@ -205,32 +223,35 @@ async function put(req, res) {
     }
 
     const createdTask
-      = await taskService.create({
+      = await tskSrv.create({
         userId,
         name,
       });
 
     res.status(201)
-      .send(taskService.prepareToSend(createdTask));
+      .send(tskSrv.prepareToSend(createdTask));
 
     return;
   }
 
-  checkUserIdOwnership(req?.user?.id, foundTask.userId);
+  checkUserIdOwnership(
+    /**@type {TyUser}*/(req.user).id,
+    tskSrv.getValue(foundTask, 'userId'),
+  );
 
-  await taskService.update(
+  await tskSrv.update(
     foundTask,
     { userId, name },
   );
 
-  res.send(taskService.prepareToSend(foundTask));
+  res.send(tskSrv.prepareToSend(foundTask));
 }
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function remove(req, res) {
   const { id } = req.params;
   const foundTask
-    = await taskService.getOneById(id);
+    = await tskSrv.getOneById(id);
 
   if (!foundTask) {
     throw ApiError.NotFound(
@@ -239,10 +260,13 @@ async function remove(req, res) {
     });
   }
 
-  checkUserIdOwnership(req?.user?.id, foundTask.userId);
+  checkUserIdOwnership(
+    /**@type {TyUser}*/(req.user).id,
+    tskSrv.getValue(foundTask, 'userId'),
+  );
 
   const count
-    = await taskService.remove(foundTask);
+    = await tskSrv.remove(foundTask);
 
   res.status(200).send(`${count}`);
 }

@@ -2,10 +2,17 @@
 // @ts-check
 
 import * as Helpers from '../utils/helpers.js';
-import { todoService } from '../services/mongoose/todo.service.js';
+import { todoService as tdSrv } from '../services/todo.service.js';
 import { ApiError } from '../exceptions/apiError.js';
 
-/**@typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodoItem */
+/** 
+ * @typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodoItem
+ * */
+
+/**
+ * @template {string} T1
+ * @typedef {import('src/types/error.type.js').TyError.FailedReport<T1>} TyFailedReport
+ */
 
 export const todoController = {
   get,
@@ -18,6 +25,17 @@ export const todoController = {
   updateMany,
   patchBulkUnknown,
 };
+
+/**
+ * Extracts a field value from a Mongoose document.
+ * @param {keyof { string: string, boolean: boolean, number: number}} another
+ * @param {unknown} val
+ * @returns {boolean} */
+function undefOr(another, val) {
+  const typeoVal = typeof val;
+  return typeoVal === 'undefined'
+    || typeoVal === another;
+}
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function get(req, res) {
@@ -33,29 +51,48 @@ async function get(req, res) {
   const page = Number(req.query.page) || 1;
   const size = Number(req.query.size) || 10;
 
+  /** @type {TyFailedReport<'userId' | 'taskId' | 'title' | 'completed' | 'page' | 'size'>} */
   const errors = {
-    userId: !userId,
-    taskId: !taskId,
-    title: !title,
-    completed: !completed,
-    page: !Helpers.isNatural(page),
-    size: !Helpers.isNatural(size),
+    userId: {
+      isInvalid: !undefOr('string', userId),
+      expected: 'string',
+      got: typeof userId,
+    },
+    taskId: {
+      isInvalid: !undefOr('string', taskId),
+      expected: 'string',
+      got: typeof taskId,
+    },
+    title: {
+      isInvalid: !undefOr('string', title),
+      expected: 'string',
+      got: typeof title,
+    },
+    completed: {
+      isInvalid: !undefOr('boolean', Boolean(completed)),
+      expected: 'boolean',
+      got: typeof Boolean(completed),
+    },
+    page: {
+      isInvalid: !Helpers.isNatural(page),
+      expected: 'natural number',
+      got: typeof page,
+    },
+    size: {
+      isInvalid: !Helpers.isNatural(size),
+      expected: 'natural number',
+      got: typeof size,
+    },
   };
 
-  if (errors.page || errors.size) {
-    throw ApiError.UnprocessableContent(
-      `'page' and 'size' are required`,
-      {
-        expected: {
-          page: 'integer',
-          size: 'integer',
-        },
-        got: {
-          page,
-          size,
-        },
-      }
-    );
+  if (errors.page.isInvalid
+    || errors.size.isInvalid
+    || errors.userId.isInvalid
+    || errors.taskId.isInvalid
+    || errors.title.isInvalid
+    || errors.completed.isInvalid
+  ) {
+    throw ApiError.FailedReport(errors, 'Type error');
   }
 
   const limit
@@ -63,30 +100,11 @@ async function get(req, res) {
   const offset
     = (page - 1) * size;
 
-  /** @type {import('../services/mongoose/todo.service.js').TyTodoFilterQuery} */
-  const whereConditions = {};
-
-  if (!errors.userId) {
-    whereConditions.userId = String(userId);
-  }
-
-  if (!errors.taskId) {
-    whereConditions.taskId = String(taskId);
-  }
-
-  if (!errors.title) {
-    whereConditions.title = new RegExp(String(title), 'i');;
-  }
-
-  if (!errors.completed) {
-    whereConditions.completed = completed === 'true';
-  }
-
   const {
     rows,
     count: total,
-  } = await todoService.getAndCountByOptions(
-    whereConditions,
+  } = await tdSrv.getAndCountByOptions(
+    req.query,
     limit,
     offset,
   );
@@ -94,7 +112,7 @@ async function get(req, res) {
   res.send({
     total,
     content: rows.map(row =>
-      todoService.prepareToSend(row)),
+      tdSrv.prepareToSend(row)),
     limit,
     offset,
   });
@@ -104,13 +122,13 @@ async function get(req, res) {
 async function getById(req, res) {
   // console.info(`\napp.get('/todos/:id=${req.params.id}')`);
   const { id } = req.params;
-  const todo = await todoService.getById(id);
+  const todo = await tdSrv.getById(id);
 
   if (!todo) {
     throw ApiError.NotFound(`Cant find todo by id=${id}`);
   }
 
-  res.send(todoService.prepareToSend(todo));
+  res.send(tdSrv.prepareToSend(todo));
 }
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
@@ -150,7 +168,7 @@ async function post(req, res) {
   }
 
   const todo
-    = await todoService.create({
+    = await tdSrv.create({
       userId,
       taskId,
       title,
@@ -161,7 +179,7 @@ async function post(req, res) {
     });
 
   res.status(201)
-    .send(todoService.prepareToSend(todo));
+    .send(tdSrv.prepareToSend(todo));
 }
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
@@ -183,7 +201,7 @@ async function put(req, res) {
   };
 
   // if no id then no foundTodo
-  const foundTodo = await todoService.getById(id);
+  const foundTodo = await tdSrv.getById(id);
 
   if (!foundTodo) {
     if (errors.userId
@@ -209,7 +227,7 @@ async function put(req, res) {
       );
     }
 
-    const createdTodo = await todoService.create({
+    const createdTodo = await tdSrv.create({
       userId,
       taskId,
       title,
@@ -217,27 +235,25 @@ async function put(req, res) {
     });
 
     res.status(201)
-      .send(todoService.prepareToSend(createdTodo));
+      .send(tdSrv.prepareToSend(createdTodo));
 
     return;
   }
 
-  await todoService.update(
+  await tdSrv.update(
     foundTodo,
     { title, completed },
   );
 
-  res.send(todoService.prepareToSend(foundTodo));
+  res.send(tdSrv.prepareToSend(foundTodo));
 }
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function patchById(req, res) {// overwrites some fields except id
-  console.info(`\napp.patch('/todos/:id=${req.params.id}')\n`);
-
   const { id } = req.params;
 
   const foundTodo
-    = await todoService.getById(id);
+    = await tdSrv.getById(id);
 
   if (!foundTodo) {
     throw ApiError.NotFound(`Can't find todo by id=${id}`);
@@ -245,16 +261,15 @@ async function patchById(req, res) {// overwrites some fields except id
 
   // get updated values from req.body or use previous
   const {
-    userId = foundTodo.userId,
-    title = foundTodo.title,
-    completed = foundTodo.completed,
+    userId = tdSrv.getValue(foundTodo, 'userId'),
+    title = tdSrv.getValue(foundTodo, 'title'),
+    completed = tdSrv.getValue(foundTodo, 'completed'),
   } = req.body;
-
 
   const [
     affectedCount,
     affectedRows,
-  ] = await todoService.updateById({
+  ] = await tdSrv.updateById({
     id,
     userId,
     title,
@@ -271,20 +286,17 @@ async function patchById(req, res) {// overwrites some fields except id
   }
 
   res.send(
-    todoService.prepareToSend(affectedRows[0])
+    tdSrv.prepareToSend(affectedRows[0])
   );
 }
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
-function patchBulkUnknown(req, res) {// overwrites some fields except id
-  console.info(`\napp.patch('/todos?action=${req.query.action}')`);
+function patchBulkUnknown(req) {// overwrites some fields except id
   throw ApiError.NotFound(`action=${req.query.action} unknown`);
 }
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function updateMany(req, res) {
-  console.info(`\napp.patch('/todos?action=${req.query.action}')\n`);
-
   /**@type {{items: TyTodoItem[]}} */
   const { items } = req.body;
 
@@ -293,7 +305,7 @@ async function updateMany(req, res) {
     return;
   }
 
-  await todoService.updateManyById(items);
+  await tdSrv.updateManyById(items);
 
   res.sendStatus(204);
   return;
@@ -301,9 +313,8 @@ async function updateMany(req, res) {
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function remove(req, res) {
-  console.info(`\napp.delete('/todos/:id=${req.params.id}')\n`);
   const { id } = req.params;
-  const foundTodo = await todoService.getById(id);
+  const foundTodo = await tdSrv.getById(id);
 
   if (!foundTodo) {
     throw ApiError.NotFound(
@@ -313,15 +324,13 @@ async function remove(req, res) {
   }
 
   const count
-    = await todoService.remove(foundTodo);
+    = await tdSrv.remove(foundTodo);
 
   res.status(200).send(`${count}`);
 }
 
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function removeMany(req, res) {
-  console.info(`\napp.patch('/todos?action=${req.query.action}')`);
-
   /**@type {{ids: string[]}} */
   const { ids } = req.body;
 
@@ -343,7 +352,7 @@ async function removeMany(req, res) {
   }
 
   const count
-    = await todoService.removeManyById(ids);
+    = await tdSrv.removeByIds(ids);
 
   if (!count) {
     throw ApiError.NotFound();

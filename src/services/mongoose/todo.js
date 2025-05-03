@@ -2,7 +2,7 @@
 // @ts-check
 
 import mongoose from 'mongoose';
-import { Todo as Todos } from '../../models/mongoose/Todo.model.js';
+import Todos from '../../models/mongoose/Todo.js';
 
 /**
  * @typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodo
@@ -15,19 +15,24 @@ import { Todo as Todos } from '../../models/mongoose/Todo.model.js';
  * @typedef {import('src/types/db.type.js').TyMongoose.Document<unknown,{},TyTodo>} TyTodoDocument
  */
 
-export const todoService = {
-  normalize,
-  toObject,
-  prepareToSend,
+export default {
+  create,
   getAll,
   getByUserId,
   getAndCountByOptions,
   getById,
   update,
   updateById,
-  create,
+  updateByIdWithTransaction,
+  updateManyById,
   remove,
   removeById,
+  removeByIds,
+
+  normalize,
+  toObject,
+  prepareToSend,
+  getValue,
 };
 
 /** 
@@ -56,10 +61,19 @@ function normalize({
 /**
  * @param {TyTodoDocument} document 
  * @returns */
-function prepareToSend(document){
+function prepareToSend(document) {
   return normalize(toObject(document))
 }
 
+/**
+ * Extracts a field value from a Mongoose document.
+ * @template {keyof TyTodo} K
+ * @param {TyTodoDocument} document
+ * @param {K} key
+ * @returns {TyTodo[K]} */
+function getValue(document, key) {
+  return document.get(key);
+}
 
 function getAll() {
   const query = Todos.find();
@@ -68,14 +82,34 @@ function getAll() {
 }
 
 /**
- * @param {TyTodoFilterQuery} whereConditions
+ * @param {TyTodoGetParams} getParams
  * @param {number} limit
  * @param {number} offset */
 async function getAndCountByOptions(
-  whereConditions,
+  getParams,
   limit = Number.MAX_SAFE_INTEGER,
   offset = 0,
 ) {
+  /** @type {TyTodoFilterQuery} */
+  const whereConditions = {};
+
+  if (getParams.userId) {
+    whereConditions.userId
+      = getParams.userId;
+  }
+  if (getParams.taskId) {
+    whereConditions.taskId
+      = getParams.taskId;
+  }
+  if (getParams.title) {
+    whereConditions.title
+      = new RegExp(getParams.title, 'i');
+  }
+  if (getParams.completed) {
+    whereConditions.completed
+      = getParams.completed;
+  }
+
   return {
     rows:
       await Todos.find(whereConditions)
@@ -123,9 +157,9 @@ function update(document, properties) {
 }
 
 /**
- * @param {TyTodoUpdateParams[]} items
+ * @param {Array<TyTodo>} items
  * @returns */
-function updateMany(items) {
+function updateManyById(items) {
   const bulkOps = items.map(item => ({
     updateOne: {
       filter: { _id: item.id },    // Find the todo by ID
@@ -191,6 +225,13 @@ function removeById(id) {
 
   return query.deleteOne().exec()
     .then(res => res.deletedCount);
+}
+
+/** @param {string[]} ids */
+function removeByIds(ids) {
+  return Todos.deleteMany({
+    _id: { $in: ids },
+  });
 }
 
 /**

@@ -4,10 +4,10 @@
 import { v1 as uuidv1 } from 'uuid';
 
 import { ApiError } from '../../exceptions/apiError.js';
-import { UserModel as Users } from '../../models/sequelize/User.model.js';
-import { emailService } from '../email.service.js';
-import { tokenService } from '../sequelize/token.service.js';
-import { bcryptService } from '../bcrypt.service.js';
+import Users from '../../models/sequelize/User.js';
+import { emailService as emlSrv } from '../email.service.js';
+import tknSrv from './token.js';
+import { bcryptService as bcrSrv } from '../bcrypt.service.js';
 
 /** @typedef {import('src/types/user.type.js').TyUser.Item} TyUser */
 /** @typedef {import('src/types/user.type.js').TyUser.CreationAttributes} TyUserCreationAttributes */
@@ -16,7 +16,7 @@ import { bcryptService } from '../bcrypt.service.js';
 /** @typedef {import('src/types/user.type.js').TyUser.Normalized} TyUserNormalized */
 /** @typedef {import('src/types/user.type.js').TyUser.GetParams} TyUserGetParams */
 
-export const userService = {
+export default {
   getActives,
   getByOptions,
   getOneByOptions,
@@ -29,6 +29,7 @@ export const userService = {
   normalize,
   toObject,
   prepareToSend,
+  getValue,
   register,
 };
 
@@ -51,17 +52,27 @@ function prepareToSend(model) {
   return normalize(toObject(model))
 }
 
+/**
+ * Extracts a field value from a Mongoose document.
+ * @template {keyof TyUser} K
+ * @param {TyUserModel} model
+ * @param {K} key
+ * @returns {TyUser[K]} */
+function getValue(model, key) {
+  return model.getDataValue(key);
+}
+
 /** Retrieves all active users (i.e., users with no activation token) 
  * @returns {Promise<TyUserModel[]>}*/
 async function getActives() {
   const tokens
-    = await tokenService.getByOptions({ activation: null });
+    = await tknSrv.getByOptions({ activation: null });
   const userIds
     = tokens.map(token => token.getDataValue('userId'));
 
   return Users.findAll({
     where: {
-      // id: { in: ['New Task', 'First Task', 'Other Task'] }
+      // id: { in: ['New User', 'First User', 'Other User'] }
       id: { in: userIds },
     },
     order: [['id', 'ASC']],
@@ -128,16 +139,9 @@ function remove(model) {
  * @param {TyUser['id']} id
  * @returns {Promise<number>} */
 async function removeById(id) {
-  const foundUser = await Users.findByPk(id);
-
-  if (!foundUser) {
-    throw ApiError.BadRequest(
-      'Validation error', {
-      id: 'User isn\'t exist',
-    });
-  }
-
-  return remove(foundUser);
+  return Users.destroy({
+    where: { id },
+  });
 }
 
 /**
@@ -158,7 +162,7 @@ async function register({ email, password }) {
   const activationToken = uuidv1();
   // hash the password
   const hashedPassword
-    = await bcryptService.hash(password);
+    = await bcrSrv.hash(password);
 
   const createdUser
     = await create({
@@ -172,7 +176,7 @@ async function register({ email, password }) {
   }
 
   const createdToken
-    = await tokenService.create({
+    = await tknSrv.create({
       userId: createdUser.getDataValue('id'),
       refresh: null,
       activation: activationToken,
@@ -186,7 +190,7 @@ async function register({ email, password }) {
       'Something went wrong');
   }
 
-  await emailService.sendActivationLink(
+  await emlSrv.sendActivationLink(
     createdUser.getDataValue('email'),
     activationFromToken,
   );

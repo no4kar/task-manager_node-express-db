@@ -5,7 +5,7 @@ import {
   Schema,
   model,
 } from 'mongoose';
-import modelName from '../modelName.js';
+import { DB_IDENTIFIERS } from '../entities.js';
 
 /**
  * @typedef {import('src/types/token.type').TyToken.Item} TyToken
@@ -13,11 +13,11 @@ import modelName from '../modelName.js';
  */
 
 /** @type {TyTokenSchema} */
-export const tokenSchema = new Schema(
+const tokenSchema = new Schema(
   {
     userId: {
       type: Schema.Types.String,
-      ref: modelName.user,
+      ref: DB_IDENTIFIERS.USER.model,
       required: true,
     },
     refresh: {
@@ -35,6 +35,7 @@ export const tokenSchema = new Schema(
 );
 
 // Create and export the Token model using the defined schema
-export const TokenModel
-  = model(modelName.token, tokenSchema);
+const TokenModel
+  = model(DB_IDENTIFIERS.TOKEN.model, tokenSchema);
 
+export default TokenModel;

@@ -1,7 +1,7 @@
 'use strict';
 // @ts-check
 
-import { userService } from '../services/mongoose/user.service.js';
+import { userService as usrSrv } from '../services/user.service.js';
 
 export const userController = {
   getAll,
@@ -10,8 +10,8 @@ export const userController = {
 /** @type {import('src/types/func.type.js').TyFunc.Middleware} */
 async function getAll(req, res) {
   const users
-    = await userService.getActives();
+    = await usrSrv.getActives();
 
   res.send(users.map(item =>
-    userService.prepareToSend(item)));
+    usrSrv.prepareToSend(item)));
 }

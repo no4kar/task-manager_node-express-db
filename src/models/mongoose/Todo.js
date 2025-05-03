@@ -2,7 +2,7 @@
 // @ts-check
 
 import { Schema, model } from 'mongoose';
-import modelName from '../modelName.js';
+import { DB_IDENTIFIERS } from '../entities.js';
 
 /**
  * @typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodo
@@ -12,22 +12,22 @@ import modelName from '../modelName.js';
 
 // Define the schema for the User model
 /** @type {TyTodoSchema} */
-export const todoSchema = new Schema(
+const todoSchema = new Schema(
   {
     id: {
       type: String,
       default: function () {
-        return (/** @type {TyTodoDocument} */ (this))._id.toString(); // eslint-disable-line
+        return (/** @type {TyTodoDocument} */ (this))._id.toString();
       },
     },
     userId: {
       type: Schema.Types.String,
-      ref: modelName.user,
+      ref: DB_IDENTIFIERS.USER.model,
       required: true,
     },
     taskId: {
       type: Schema.Types.String,
-      ref: modelName.task,
+      ref: DB_IDENTIFIERS.TASK.model,
       required: true,
     },
     title: {
@@ -45,5 +45,7 @@ export const todoSchema = new Schema(
 );
 
 // Create and export the Model using the defined Schema
-export const TodoModel
-  = model(modelName.todo, todoSchema);
+const TodoModel
+  = model(DB_IDENTIFIERS.TODO.model, todoSchema);
+
+export default TodoModel;

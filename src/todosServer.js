@@ -65,7 +65,7 @@ app.use(errorMiddleware);
 
 // Unhandled errors
 app.all('*',
-  (req, res) => res.status(404).sendFile(
+  (_unused_req, res) => res.status(404).sendFile(
     path.resolve('./public/views/404.html')
   ),
 );

@@ -4,25 +4,25 @@
 import express from 'express';
 export const todoRouter = express.Router();
 
-import { todoController } from '../controllers/todo.controller.js';
+import { todoController as tdCntr } from '../controllers/todo.controller.js';
 import { isAction } from '../middlewares/todo.middleware.js';
 import { catchError } from '../middlewares/error.middleware.js';
 
 todoRouter
-  .get('/', catchError(todoController.get))
-  .get('/:id', catchError(todoController.getById));
+  .get('/', catchError(tdCntr.get))
+  .get('/:id', catchError(tdCntr.getById));
 
 todoRouter
-  .post('/', catchError(todoController.post));
+  .post('/', catchError(tdCntr.post));
 
 todoRouter
-  .put('/:id', catchError(todoController.put));
+  .put('/:id', catchError(tdCntr.put));
 
 todoRouter
-  .patch('/:id', catchError(todoController.patchById))
-  .patch('/', isAction('delete'), catchError(todoController.removeMany))// chain of responsibility
-  .patch('/', isAction('update'), catchError(todoController.updateMany))
-  .patch('/', catchError(todoController.patchBulkUnknown));
+  .patch('/:id', catchError(tdCntr.patchById))
+  .patch('/', isAction('delete'), catchError(tdCntr.removeMany))// chain of responsibility
+  .patch('/', isAction('update'), catchError(tdCntr.updateMany))
+  .patch('/', catchError(tdCntr.patchBulkUnknown));
 
 todoRouter
-  .delete('/:id', catchError(todoController.remove));
+  .delete('/:id', catchError(tdCntr.remove));

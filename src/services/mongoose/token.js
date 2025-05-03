@@ -1,7 +1,7 @@
 'use strict';
 // @ts-check
 
-import { TokenModel as Tokens } from '../../models/mongoose/Token.model.js';
+import Tokens from '../../models/mongoose/Token.js';
 
 /**
  * @typedef {import('src/types/token.type.js').TyToken.Item} TyToken
@@ -12,16 +12,35 @@ import { TokenModel as Tokens } from '../../models/mongoose/Token.model.js';
  * @typedef {import('src/types/token.type.js').TyToken.CreationAttributes} TyTokenCreationAttributes
 */
 
-export const tokenService = {
+export default {
   create,
   getByOptions,
   getOneByOptions,
-  toObject,
   update,
   put,
   remove,
   removeByUserId,
+
+  toObject,
+  getValue,
 };
+
+/**
+ * @param {TyTokenDocument} document 
+ * @returns */
+function toObject(document) {
+  return document.toObject();
+}
+
+/**
+ * Extracts a field value from a Mongoose document.
+ * @template {keyof TyToken} K
+ * @param {TyTokenDocument} document
+ * @param {K} key
+ * @returns {TyToken[K]} */
+function getValue(document, key) {
+  return document.get(key);
+}
 
 /**
  * @param {TyTokenCreationAttributes} param0
@@ -76,13 +95,6 @@ function getOneByOptions(whereConditions) {
   const query = Tokens.findOne(whereConditions);
 
   return query.exec();
-}
-
-/**
- * @param {TyTokenDocument} document 
- * @returns */
-function toObject(document) {
-  return document.toObject();
 }
 
 /**

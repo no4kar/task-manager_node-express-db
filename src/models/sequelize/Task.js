@@ -2,8 +2,9 @@
 // @ts-check
 
 import { DataTypes, Model } from 'sequelize';
-import { sequelize } from '../../store/sqlite.db.js';
-import { UserModel } from './User.model.js';
+import { sequelize } from '../../store/sequelize.db.js';
+import { DB_IDENTIFIERS } from '../entities.js';
+import UserModelStatic from './User.js';
 
 /**
  * @typedef {import('src/types/task.type.js').TyTask.Item} TyTask
@@ -14,29 +15,22 @@ import { UserModel } from './User.model.js';
 
 /**
  * @class TaskModelStatic
- * @extends {Model<TyTask, TyTaskCreationAttributes>}
- * @implements {TyTask} */
-export class TaskModelStatic extends Model {
-  id = '';
-  userId = '';
-  name = '';
-  createdAt = new Date();
-  updatedAt = new Date();
-}
+ * @extends {Model<TyTask, TyTaskCreationAttributes>} */
+class TaskModelStatic extends Model {}
 
 TaskModelStatic.init(
   {
     id: {
-      type: DataTypes.UUIDV1,
-      defaultValue: DataTypes.UUIDV1,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
       allowNull: false,
     },
     userId: {
-      type: DataTypes.UUIDV1,
+      type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: UserModel,
+        model: UserModelStatic,
         key: 'id',
       },
     },
@@ -56,8 +50,8 @@ TaskModelStatic.init(
   },
   {
     sequelize,
-    modelName: 'Task',
-    tableName: 'tasks',
+    modelName: DB_IDENTIFIERS.TASK.model,
+    tableName: DB_IDENTIFIERS.TASK.table,
     timestamps: true, // Sequelize will manage createdAt and updatedAt
     underscored: false, // Optional: depends on your naming convention
     // hooks: {
@@ -83,4 +77,4 @@ TaskModelStatic.init(
 );
 
 /** @type {TyTaskModelStatic} */
-export const TaskModel = TaskModelStatic;
+export default TaskModelStatic;

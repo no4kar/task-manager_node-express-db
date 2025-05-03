@@ -1,21 +1,30 @@
-import mongoose from 'mongoose';
+'use strict';
+// @ts-check
 
-// import modelName from 'src/models/modelName.js';
-// import { userSchema } from 'src/models/mongoose/User.model.js';
-// import { tokenSchema } from 'src/models/mongoose/Token.model.js';
-// import { todoSchema } from 'src/models/mongoose/Todo.model.js';
+/**
+ * @typedef {import('src/types/db.type').TyMongoose.Connection.Listeners} TyListeners
+*/
+
+import mongoose from 'mongoose';
 
 /** 
 * @param {Object} param0 
 * @param {string} param0.usernanme 
 * @param {string} param0.password 
 * @param {string} param0.collection 
+* @param {TyListeners} param0.on 
 * @returns */
 export function connectDB({
   usernanme,
   password,
   collection,
+  on,
 }) {
+  // Apply all event listeners dynamically
+  for (const [event, listener] of Object.entries(on)) {
+    mongoose.connection.on(event, listener);
+  }
+
   return mongoose.connect(
     `mongodb+srv://${usernanme}:${password}@cluster-node.2f56p.mongodb.net/${collection}?retryWrites=true&w=majority&appName=cluster-node`,
   );

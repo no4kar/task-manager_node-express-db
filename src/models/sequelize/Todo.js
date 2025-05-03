@@ -2,9 +2,10 @@
 // @ts-check
 
 import { DataTypes, Model } from 'sequelize';
-import { sequelize } from '../../store/sqlite.db.js';
-import { UserModel } from './User.model.js';
-import { TaskModel } from './Task.model.js';
+import { sequelize } from '../../store/sequelize.db.js';
+import { DB_IDENTIFIERS } from '../entities.js';
+import UserModelStatic from './User.js';
+import TaskModelStatic from './Task.js';
 
 /**
  * @typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodo
@@ -15,40 +16,30 @@ import { TaskModel } from './Task.model.js';
 
 /** 
  * @class TodoModelStatic
- * @extends {Model<TyTodo, TyTodoCreationAttributes>}
- * @implements {TyTodo} */
-export class TodoModelStatic extends Model {
-  id = '';
-  userId = '';
-  taskId = '';
-  title = '';
-  completed = false;
-  createdAt = new Date();
-  updatedAt = new Date();
-};
-
+ * @extends {Model<TyTodo, TyTodoCreationAttributes>} */
+class TodoModelStatic extends Model {};
 
 TodoModelStatic.init(
   {
     id: {
-      type: DataTypes.UUIDV1,
-      defaultValue: DataTypes.UUIDV1,
-      allowNull: false,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
+      allowNull: false,
     },
     userId: {
-      type: DataTypes.UUIDV1,
+      type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: UserModel,
+        model: UserModelStatic,
         key: 'id',
       },
     },
     taskId: {
-      type: DataTypes.UUIDV1,
+      type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: TaskModel,
+        model: TaskModelStatic,
         key: 'id',
       },
     },
@@ -73,12 +64,12 @@ TodoModelStatic.init(
   },
   {
     sequelize,
-    modelName: 'Todo',
-    tableName: 'todos',
+    modelName: DB_IDENTIFIERS.TODO.model,
+    tableName: DB_IDENTIFIERS.TODO.table,
     timestamps: true, // Sequelize will manage createdAt and updatedAt
     underscored: false, // Optional: depends on your naming convention
   }
 );
 
 /** @type {TyTodoModelStatic} */
-export const TodoModel = TodoModelStatic;
+export default TodoModelStatic;

@@ -2,8 +2,8 @@
 import globals from 'globals';
 import eslintJs from '@eslint/js';
 
-
 export default [
+  eslintJs.configs.recommended,
   {
     languageOptions: {
       ecmaVersion: 'latest', // Ensure latest ECMAScript support
@@ -12,13 +12,17 @@ export default [
         ...globals.node,
       },
     },
-  },
-  {
-    extends: [eslintJs.configs.recommended], // Apply recommended ESLint rules
     rules: {
-      'no-unused-vars': ['warn', { 'args': 'all', 'argsIgnorePattern': '^_' }],
+      // All unused vars = warn, except those starting with `_unused_` are ignored
+      'no-unused-vars': ['warn', {
+        vars: 'all',
+        args: 'all',
+        varsIgnorePattern: '^_unused_',
+        argsIgnorePattern: '^_unused_',
+      }],
       'no-undef': 'warn',
       'no-console': 'warn',
+      'no-useless-escape': 'warn',
     },
-  }
+  },
 ];

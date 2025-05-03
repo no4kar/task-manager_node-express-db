@@ -5,12 +5,12 @@ import express from 'express';
 export const authRouter = express.Router();
 import passport from 'passport';
 
-import { authController } from '../controllers/auth.controller.js';
+import { authController as authCntr } from '../controllers/auth.controller.js';
 import { catchError } from '../middlewares/error.middleware.js';
 
 authRouter
   .get('/refresh',
-    catchError(authController.refresh),
+    catchError(authCntr.refresh),
   )
   .get('/google',
     passport.authenticate('google', {
@@ -19,15 +19,15 @@ authRouter
   )
   .get('/google/callback',
     passport.authenticate('google', { session: false }),
-    catchError(authController.activateByGoogle), // here 'passport' attaches 'user' to 'req'
+    catchError(authCntr.activateByGoogle), // here 'passport' attaches 'user' to 'req'
   )
   .get('/activate/:activationToken',
-    catchError(authController.activate),
+    catchError(authCntr.activate),
   )
   ;
 
 authRouter
-  .post('/registration', catchError(authController.register))
-  .post('/login', catchError(authController.login))
-  .post('/logout', catchError(authController.logout))
+  .post('/registration', catchError(authCntr.register))
+  .post('/login', catchError(authCntr.login))
+  .post('/logout', catchError(authCntr.logout))
   ;

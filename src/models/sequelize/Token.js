@@ -2,8 +2,9 @@
 // @ts-check
 
 import { DataTypes, Model } from 'sequelize';
-import { sequelize } from '../../store/sqlite.db.js';
-import { UserModel } from './User.model.js';
+import { sequelize } from '../../store/sequelize.db.js';
+import { DB_IDENTIFIERS } from '../entities.js';
+import UserModelStatic from './User.js';
 
 /**
  * @typedef {import('src/types/token.type.js').TyToken.Item} TyToken
@@ -14,34 +15,27 @@ import { UserModel } from './User.model.js';
 
 /**
  * @class TokenModelStatic
- * @extends {Model<TyToken, TyTokenCreationAttributes>}
- * @implements {TyToken} */
-export class TokenModelStatic extends Model {
-  userId = '';
-  refresh = '';
-  activation = '';
-  createdAt = new Date();
-  updatedAt = new Date();
-}
+ * @extends {Model<TyToken, TyTokenCreationAttributes>} */
+class TokenModelStatic extends Model {}
 
 TokenModelStatic.init(
   {
     userId: {
-      type: DataTypes.UUIDV1,
+      type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: UserModel,
+        model: UserModelStatic,
         key: 'id',
       },
     },
     refresh: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT, // much longer than DataTypes.STRING
       allowNull: true,
       defaultValue: '',
       unique: true,
     },
     activation: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING, // VARCHAR(255)
       allowNull: true,
       defaultValue: '',
       unique: true,
@@ -57,12 +51,12 @@ TokenModelStatic.init(
   },
   {
     sequelize,
-    modelName: 'Token',
-    tableName: 'tokens',
+    modelName: DB_IDENTIFIERS.TOKEN.model,
+    tableName: DB_IDENTIFIERS.TOKEN.table,
     timestamps: true, // Sequelize will manage createdAt and updatedAt
     underscored: false, // Optional: depends on your naming convention
   }
 );
 
 /** @type {TyTokenModelStatic} */
-export const TokenModel = TokenModelStatic;
+export default TokenModelStatic;

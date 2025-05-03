@@ -1,7 +1,7 @@
 'use strict';
 // @ts-check
 
-import { TokenModel as Tokens } from '../../models/sequelize/Token.model.js';
+import Tokens from '../../models/sequelize/Token.js';
 
 /**
  * @typedef {import('src/types/token.type.js').TyToken.Item} TyToken
@@ -12,7 +12,7 @@ import { TokenModel as Tokens } from '../../models/sequelize/Token.model.js';
  * @typedef {import('src/types/token.type.js').TyToken.CreationAttributes} TyTokenCreationAttributes
 */
 
-export const tokenService = {
+export default {
   create,
   getByOptions,
   getOneByOptions,
@@ -22,6 +22,7 @@ export const tokenService = {
   removeByUserId,
 
   toObject,
+  getValue,
 };
 
 /** Creates a new token record.
@@ -80,6 +81,16 @@ function getOneByOptions(whereConditions) {
  * @returns {TyToken} The plain JavaScript object representation.*/
 function toObject(model) {
   return model.dataValues;
+}
+
+/**
+ * Extracts a field value from a Sequelize document.
+ * @template {keyof TyToken} K
+ * @param {TyTokenModel} model
+ * @param {K} key
+ * @returns {TyToken[K]} */
+function getValue(model, key) {
+  return model.getDataValue(key);
 }
 
 /** Removes a specific token model instance.

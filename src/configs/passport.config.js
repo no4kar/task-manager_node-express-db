@@ -1,10 +1,17 @@
+'use strict';
+// @ts-check
+
+/**
+ * @typedef {import('src/types/user.type.js').TyUser.Item} TyUser
+*/
+
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 
 import { env } from './env.config.js';
-import { userService } from '../services/mongoose/user.service.js';
-import { bcryptService } from '../services/bcrypt.service.js';
-import { tokenService } from '../services/mongoose/token.service.js';
+import { userService as usrSrv } from '../services/user.service.js';
+import { bcryptService as bcrSrv } from '../services/bcrypt.service.js';
+import { tokenService as tknSrv } from '../services/token.service.js';
 import { ApiError } from '../exceptions/apiError.js';
 
 passport.use(
@@ -17,23 +24,32 @@ passport.use(
     },
     // verify: (accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) => void
     async function (
-      accessToken,
-      refreshToken,
+      _unused_accessToken,
+      _unused_refreshToken,
       profile,
       done,
     ) {
       try {
+
+        if (!profile.emails?.length) {
+          throw ApiError.UnprocessableContent(
+            'Email is required in the profile.', {
+            field: 'profile.emails[0].value',
+            reason: 'Missing or empty',
+          });
+        }
+
         // Check if the user already exists in the database
         const foundUser
-          = await userService.getOneByOptions({
+          = await usrSrv.getOneByOptions({
             email: profile.emails[0].value,
           });
 
         if (foundUser) {
           // if the token exists, it needs to update the attributes
           const foundToken
-            = await tokenService.put({
-              userId: foundUser.id,
+            = await tknSrv.put({
+              userId: usrSrv.getValue(foundUser, 'id'),
               refresh: null,
               activation: profile.id,
             });
@@ -42,29 +58,34 @@ passport.use(
             throw ApiError.NotFound(`Can't find token by user`);
           }
 
-          return done(null, userService.toObject(foundUser));
+          return done(null, usrSrv.toObject(foundUser));
         }
 
         // If user does not exist, create a new user with Google profile info
         const createdUser
-          = await userService.create({
+          = await usrSrv.create({
             email: profile.emails[0].value,
-            password: await bcryptService.hash(profile.id),
+            password: await bcrSrv.hash(profile.id),
           });
 
-        const createdToken
-          = await tokenService.create({
-            userId: createdUser.id,
-            refresh: null,
-            activation: profile.id,
-          });
-
-        if (!createdUser || !createdToken) {
+        if (!createdUser) {
           throw ApiError.UnprocessableContent(
             'Google authentication failed');
         }
 
-        return done(null, userService.toObject(createdUser));
+        const createdToken
+          = await tknSrv.create({
+            userId: /**@type {string}*/(usrSrv.getValue(createdUser, 'id')),
+            refresh: null,
+            activation: profile.id,
+          });
+
+        if (!createdToken) {
+          throw ApiError.UnprocessableContent(
+            'Google authentication failed');
+        }
+
+        return done(null, usrSrv.toObject(createdUser));
       } catch (error) {
         console.error('Google Auth Error:', error); // Log error for debugging
         return done(error, false);
@@ -74,19 +95,19 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  return done(null, user.id);
+  return done(null, /**@type {TyUser}*/(user).id);
 });
 
 passport.deserializeUser(async (id, done) => {
   try {
     const foundUser
-      = await userService.getOneByOptions({ id });
+      = await usrSrv.getOneByOptions({ id });
 
     if (!foundUser) {
       throw ApiError.NotFound(`Can't find user by id`);
     }
 
-    return done(null, userService.toObject(foundUser));
+    return done(null, usrSrv.toObject(foundUser));
   } catch (error) {
     return done(error, false);
   }

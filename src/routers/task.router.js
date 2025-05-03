@@ -4,18 +4,18 @@
 import express from 'express';
 export const taskRouter = express.Router();
 
-import { taskController } from '../controllers/task.controller.js';
+import { taskController as tskCntr } from '../controllers/task.controller.js';
 import { catchError } from '../middlewares/error.middleware.js';
 
 taskRouter
-  .get('/:id', catchError(taskController.getById))
-  .get('/', catchError(taskController.get));
+  .get('/:id', catchError(tskCntr.getById))
+  .get('/', catchError(tskCntr.get));
 
 taskRouter
-  .post('/', catchError(taskController.post));
+  .post('/', catchError(tskCntr.post));
 
 taskRouter
-  .put('/:id', catchError(taskController.put));
+  .put('/:id', catchError(tskCntr.put));
 
 taskRouter
-  .delete('/:id', catchError(taskController.remove));
+  .delete('/:id', catchError(tskCntr.remove));

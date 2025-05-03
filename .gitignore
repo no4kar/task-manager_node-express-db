@@ -17,6 +17,7 @@ cypress/screenshots
 cypress/videos
 
 package-lock.json
+
 *.txt
-src/attempt.js
 src/db/*.json
+__test__/

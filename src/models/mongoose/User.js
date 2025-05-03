@@ -5,23 +5,23 @@ import {
   Schema,
   model,
 } from 'mongoose';
-import { TokenModel as Tokens } from './Token.model.js';
-import { TaskModel as Tasks } from './Task.model.js';
-import { TodoModel as Todos } from './Todo.model.js';
-import modelName from '../modelName.js';
+import Tokens from './Token.js';
+import Tasks from './Task.js';
+import { DB_IDENTIFIERS } from '../entities.js';
 
 /**
  * @typedef {import('src/types/user.type.js').TyUser.Item} TyUser
  * @typedef {import('src/types/db.type.js').TyMongoose.Schema<TyUser>} TyUserSchema
+ * @typedef {import('src/types/db.type.js').TyMongoose.Document<unknown,{},TyUser>} TyUserDocument
  */
 
 /** @type {TyUserSchema} */
-export const userSchema = new Schema(
+const userSchema = new Schema(
   {
     id: {
       type: String,
       default: function () {
-        return this._id.toString(); // Assigns the MongoDB-generated `_id` to the `id` field
+        return (/** @type {TyUserDocument} */ (this))._id.toString(); // Assigns the MongoDB-generated `_id` to the `id` field
       },
     },
     email: {
@@ -56,12 +56,11 @@ userSchema.post('deleteOne',
   { document: true, query: false },
   async function (doc, next) {
     try {
-      await Todos.deleteMany({ userId: doc._id });
-      await Tasks.deleteMany({ userId: doc._id });
       await Tokens.deleteOne({ userId: doc._id });
+      await Tasks.deleteMany({ userId: doc._id });
       next();
     } catch (error) {
-      next(error);
+      next(/** @type {Error} */(error));
     }
   });
 
@@ -81,5 +80,7 @@ userSchema.post('deleteOne',
 //   }
 // });
 
-export const UserModel
-  = model(modelName.user, userSchema);
+const UserModel
+  = model(DB_IDENTIFIERS.USER.model, userSchema);
+
+export default UserModel;

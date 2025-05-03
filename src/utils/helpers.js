@@ -127,3 +127,7 @@ function findMatchProps(targetObj, sourceObj) {
 export function findManyMatchProps(targetObj, sourceObjs) {
   return sourceObjs.map(compareObj => findMatchProps(targetObj, compareObj));
 }
+
+export function printJson(val) {
+  return console.info(JSON.stringify(val, null, 2));
+}

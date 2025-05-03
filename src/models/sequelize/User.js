@@ -2,7 +2,8 @@
 // @ts-check
 
 import { DataTypes, Model } from 'sequelize';
-import { sequelize } from '../../store/sqlite.db.js';
+import { sequelize } from '../../store/sequelize.db.js';
+import { DB_IDENTIFIERS } from '../entities.js';
 
 /**
  * @typedef {import('src/types/user.type.js').TyUser.Item} TyUser
@@ -13,22 +14,14 @@ import { sequelize } from '../../store/sqlite.db.js';
 
 /**
  * @class UserModelStatic
- * @extends {Model<TyUser, TyUserCreationAttributes>}
- * @implements {TyUser} */
-export class UserModelStatic extends Model {
-  id = '';
-  email = '';
-  password = '';
-  createdAt = new Date();
-  updatedAt = new Date();
-}
+ * @extends {Model<TyUser, TyUserCreationAttributes>} */
+class UserModelStatic extends Model { }
 
-// `User.init` instead of `sequelize.define`
 UserModelStatic.init(
   {
     id: {
-      type: DataTypes.UUIDV1,
-      defaultValue: DataTypes.UUIDV1,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
       allowNull: false,
     },
@@ -36,6 +29,19 @@ UserModelStatic.init(
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
+      validate: {
+        notNull: {
+          msg: "Email cannot be null",
+        },
+        notEmpty: {
+          msg: "Email cannot be empty",
+        },
+        // Use the 'is' validator for regex
+        // is: {
+        //   args: /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/i, // Your regex here (added 'i' for case-insensitivity, optional)
+        //   msg: "Please enter a valid email address format." // Custom error message
+        // },
+      }
     },
     password: {
       type: DataTypes.STRING,
@@ -52,12 +58,12 @@ UserModelStatic.init(
   },
   {
     sequelize,
-    modelName: 'User',
-    tableName: 'users',
+    modelName: DB_IDENTIFIERS.USER.model,
+    tableName: DB_IDENTIFIERS.USER.table,
     timestamps: true, // Sequelize will manage createdAt and updatedAt
     underscored: false, // Optional: depends on your naming convention
   }
 );
 
 /** @type {TyUserModelStatic} */
-export const UserModel = UserModelStatic;
+export default UserModelStatic;

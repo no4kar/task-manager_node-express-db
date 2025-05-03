@@ -1,7 +1,7 @@
 'use strict';
 // @ts-check
 
-import { Task as Tasks } from '../../models/mongoose/Task.model.js';
+import Tasks from '../../models/mongoose/Task.js';
 
 /**
  * @typedef {import('src/types/task.type.js').TyTask.Item} TyTask
@@ -14,19 +14,21 @@ import { Task as Tasks } from '../../models/mongoose/Task.model.js';
  * @typedef {import('src/types/task.type.js').TyTask.CreationAttributes} TyTaskCreationAttributes
 */
 
-export const taskService = {
-  normalize,
-  toObject,
-  prepareToSend,
+export default {
+  create,
   getByOptions,
   getOneByOptions,
   getAndCountByOptions,
   getOneById,
   getByUserId,
-  create,
   update,
   remove,
   removeById,
+
+  normalize,
+  toObject,
+  prepareToSend,
+  getValue,
 };
 
 /** 
@@ -50,14 +52,31 @@ function normalize({
 
 /**
  * @param {TyTaskDocument} document 
- * @returns */
-function prepareToSend(document){
+ * @returns {TyTask} */
+function toObject(document) {
+  return document.toObject();
+}
+
+/**
+ * @param {TyTaskDocument} document 
+ * @returns {TyTaskNormalized} */
+function prepareToSend(document) {
   return normalize(toObject(document))
 }
 
 /**
+ * Extracts a field value from a Mongoose document.
+ * @template {keyof TyTask} K
+ * @param {TyTaskDocument} document
+ * @param {K} key
+ * @returns {TyTask[K]} */
+function getValue(document, key) {
+  return document.get(key);
+}
+
+/**
  * @param {TyTaskCreationAttributes} properties
- * @returns */
+ * @returns {Promise<TyTaskDocument>} */
 async function create(properties) {
   return Tasks.create(properties);
 }
@@ -65,14 +84,14 @@ async function create(properties) {
 /**
  * @param {TyTaskDocument} document
  * @param {TyTaskUpdateParams} properties
- * @returns */
+ * @returns {Promise<TyTaskDocument>} */
 function update(document, properties) {
   return document.set(properties).save();
 }
 
 /**
  * @param {TyTask['id']} id
- * @returns */
+ * @returns {Promise<TyTaskDocument | null>} */
 function getOneById(id) {
   const query = Tasks.findById(id);
 
@@ -81,7 +100,7 @@ function getOneById(id) {
 
 /**
  * @param {TyTaskFilterQuery} whereConditions
- * @returns */
+ * @returns {Promise<TyTaskDocument | null>} */
 function getOneByOptions(whereConditions) {
   const query = Tasks.findOne(whereConditions);
 
@@ -90,7 +109,7 @@ function getOneByOptions(whereConditions) {
 
 /**
  * @param {TyTaskFilterQuery} whereConditions
- * @returns */
+ * @returns {Promise<Array<TyTaskDocument>>} */
 function getByOptions(whereConditions) {
   const query = Tasks.find(whereConditions);
 
@@ -98,14 +117,28 @@ function getByOptions(whereConditions) {
 }
 
 /**
- * @param {TyTaskFilterQuery} whereConditions
+ * @param {TyTaskGetParams} getParams
  * @param {number} limit
- * @param {number} offset */
+ * @param {number} offset
+ * @returns {Promise<{ rows: Array<TyTaskDocument>; count: number;}>} */
 async function getAndCountByOptions(
-  whereConditions,
+  getParams,
   limit = Number.MAX_SAFE_INTEGER,
   offset = 0,
 ) {
+  /** @type { TyTaskFilterQuery } */
+  const whereConditions = {};
+
+  if (getParams.userId) {
+    whereConditions.userId
+      = getParams.userId;
+  }
+
+  if (getParams.name) {
+    whereConditions.title
+      = new RegExp(getParams.name, 'i');
+  }
+
   return {
     rows:
       await Tasks.find(whereConditions)
@@ -120,15 +153,8 @@ async function getAndCountByOptions(
 }
 
 /**
- * @param {TyTaskDocument} document 
- * @returns */
-function toObject(document) {
-  return document.toObject();
-}
-
-/**
  * @param {TyTask['userId']} userId
- * @returns */
+ * @returns {Promise<Array<TyTaskDocument>>} */
 function getByUserId(userId) {
   const query
     = Tasks.find({ userId });
@@ -138,7 +164,7 @@ function getByUserId(userId) {
 
 /**
  * @param {TyTaskDocument} document
- * @returns */
+ * @returns {Promise<number>} */
 function remove(document) {
   return document.deleteOne()
     .then(res => res.deletedCount);

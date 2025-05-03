@@ -18,6 +18,25 @@ export namespace TyMongoose {
     export type Filter<DocType>
       = Mongoose.FilterQuery<DocType>;
   }
+
+  export namespace Connection {
+    export type Event =
+      | 'connected'      // Emitted when successfully connected to MongoDB
+      | 'open'           // Emitted once the connection is open (ready for operations)
+      | 'reconnected'    // Emitted after a lost connection is successfully re-established
+      | 'disconnecting'  // Emitted just before starting disconnection
+      | 'disconnected'   // Emitted when fully disconnected from MongoDB
+      | 'close'          // Emitted when the connection is closed
+      | 'error'          // Emitted on connection or operational error
+      | 'fullsetup'      // Emitted in replica sets when all nodes are connected
+      | 'all'            // Emitted when all replica set members are connected
+      | 'timeout';       // Emitted when the initial connection times out
+
+    export type Listener
+      = (...args: any[]) => void;
+    export type Listeners
+      = Partial<Record<Event, Listener>>;
+  }
 }
 
 export namespace TySequelize {
@@ -36,4 +55,20 @@ export namespace TySequelize {
     export type WhereOptions<T>
       = Sequelize.WhereOptions<T>; // Model.findOne({where:WhereOptions})
   }
+}
+
+
+export namespace TyDb {
+  export type EntityKey =
+    | 'USER'
+    | 'TOKEN'
+    | 'TODO'
+    | 'TASK';
+
+  export type IdentifiersMap = {
+    [K in EntityKey]: Readonly<{
+      model: string; // Sequelize model name (PascalCase)
+      table: string; // Database table name (snake_case or lowercase plural)
+    }>;
+  };
 }
