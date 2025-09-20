@@ -8,6 +8,17 @@
     "node": "18.18.0",
     "npm": "9.8.1"
   },
+  "imports": {
+    "#utils/*": "./src/utils/*",
+    "#middlewares/*": "./src/middlewares/*",
+    "#configs/*": "./src/configs/*",
+    "#routers/*": "./src/routers/*",
+    "#controllers/*": "./src/controllers/*",
+    "#services/*": "./src/services/*",
+    "#types/*": "./src/types/*",
+    "#src/*": "./src/*",
+    "#root/*": "./*"
+  },
   "scripts": {
     "clean": "npm cache clean --force",
     "dev:insecure": "npm run dev -- --mode no-auth no-roles",

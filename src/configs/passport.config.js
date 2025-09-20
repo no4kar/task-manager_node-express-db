@@ -13,6 +13,7 @@ import { userService as usrSrv } from '../services/user.service.js';
 import { bcryptService as bcrSrv } from '../services/bcrypt.service.js';
 import { tokenService as tknSrv } from '../services/token.service.js';
 import { ApiError } from '../exceptions/apiError.js';
+import { logger } from '#src/utils/logger.js';
 
 passport.use(
   new GoogleStrategy(
@@ -87,7 +88,7 @@ passport.use(
 
         return done(null, usrSrv.toObject(createdUser));
       } catch (error) {
-        console.error('Google Auth Error:', error); // Log error for debugging
+        logger.error('Google Auth Error:', error); // Log error for debugging
         return done(error, false);
       }
     },

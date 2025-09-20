@@ -2,13 +2,14 @@
 // @ts-check
 
 /**
- * @typedef {import('src/types/db.type').TyMongoose.Connection.Listeners} TyListeners
+ * @typedef {import('#src/types/db.type.js').TyMongoose.Connection.Listeners} TyListeners
 */
 
-import * as todosServer from './todosServer.js';
-import { env } from './configs/env.config.js';
-import { connectDB } from './store/mongoose.db.js';
-import { Timer } from './utils/timer.js';
+import * as todosServer from '#src/todosServer.js';
+import { env } from '#src/configs/env.config.js';
+import { connectDB } from '#src/store/mongoose.db.js';
+import { Timer } from '#src/utils/timer.js';
+import { logger } from '#src/utils/logger.js';
 
 /**
  * @param {string} serverName
@@ -29,43 +30,46 @@ try {
     const on
       = /**@type {TyListeners}*/({
         connected:
-          () => console.log('connected'
+          () => logger.info('connected'
             + `\n\tin ${dbTimer.now()} ms`),
         open:
           () => {
-            console.info('open'
+            logger.info('open'
               + `\n\tin ${dbTimer.now()} ms`);
           },
         reconnected:
           () => {
-            console.log('reconnected'
+            logger.info('reconnected'
               + `\n\tin ${dbTimer.stop().duration()} ms`);
             dbTimer.start();
           },
         disconnecting:
-          () => console.log('disconnecting'
+          () => logger.info('disconnecting'
             + `\n\tin ${dbTimer.now()} ms`),
         disconnected:
-          () => console.log('disconnected'),
+          () => logger.info('disconnected'),
         close:
-          () => console.log('close'
+          () => logger.info('close'
             + `\n\tin ${dbTimer.stop().duration()} ms`),
       });
-    
+
     dbTimer.start();
-    await connectDB({
-      usernanme: env.mangodb.user,
-      password: env.mangodb.password,
-      collection: 'task-manager',
-      on,
-    });
+    const connected =
+      await connectDB({
+        username: env.mangodb.user,
+        password: env.mangodb.password,
+        database: 'task-manager',
+        on,
+      });
+
+    connected.connection.db
   }
 
   todosServer.app.listen(env.todo.server.port, () => {
-    console.info(serverRunInfo('todosServer', env.todo));
+    logger.info(serverRunInfo('todosServer', env.todo));
   });
 
 } catch (error) {
-  console.dir(error);
+  logger.dir(error);
   process.exit(1);
 }

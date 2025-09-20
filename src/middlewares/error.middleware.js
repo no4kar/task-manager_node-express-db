@@ -2,13 +2,38 @@
 // @ts-check
 
 import { ApiError } from '../exceptions/apiError.js';
+import { logger } from '#utils/logger.js';
 
-/** @type {import('src/types/func.type.js').TyFunc.ErrorMiddleware} */
-export function errorMiddleware(error, req, res, next) {
-  console.error(error);
+/** 
+ * @typedef {import('src/types/func.type.js')
+ * .TyFunc.ErrorMiddleware
+ * } TyFuncErrorMiddleware
+ * 
+ * @typedef {import('src/types/func.type.js')
+ * .TyFunc.Middleware
+ * } TyFuncMiddleware
+ * 
+ * @typedef {import('src/types/func.type.js')
+ * .TyFunc.AsyncMiddleware
+ * } TyFuncAsyncMiddleware
+ * 
+ */
+
+/** @type {TyFuncErrorMiddleware} */
+export function errorMiddleware(
+  error,
+  _unused_req,
+  res,
+  _unused_next,
+) {
+  logger.error(error);
 
   if (error instanceof ApiError) {
-    const { status, message, errors } = error;
+    const {
+      status,
+      message,
+      errors,
+    } = error;
 
     res.status(status)
       .send({
@@ -19,7 +44,8 @@ export function errorMiddleware(error, req, res, next) {
     return;
   }
 
-  const unexpectedError = new Error(error);
+  const unexpectedError
+    = new Error(error);
 
   res.status(500)
     .send({
@@ -29,8 +55,8 @@ export function errorMiddleware(error, req, res, next) {
 }
 
 /**
- * @param {import("src/types/func.type").TyFunc.Middleware} action
- * @returns {import("src/types/func.type").TyFunc.Middleware} */
+ * @param {TyFuncMiddleware | TyFuncAsyncMiddleware} action
+ * @returns {TyFuncAsyncMiddleware} */
 export function catchError(action) {
   return async (req, res, next) => {
     try {

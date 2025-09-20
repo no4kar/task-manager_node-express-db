@@ -4,16 +4,14 @@ import { ApiError } from '../exceptions/apiError.js';
 * @param {Object} [options]
 * @param {number} [options.unhandledRequestsPerIP]
 * @param {number} [options.totalUnhandledRequests] */
-export function getLimiter(options = {}) {
+export function getLimiter({
+    unhandledRequestsPerIP = 3,
+    totalUnhandledRequests = 11,
+  } = {}) {
   // Middleware to track unhandled requests
   const unhandledRequests = new Map();
 
-  const {
-    unhandledRequestsPerIP = 3,
-    totalUnhandledRequests = 11,
-  } = options;
-
-  /** @type {import("src/types/func.type").TyFunc.Middleware} */
+  /** @type {import("src/types/func.type.js").TyFunc.Middleware} */
   const limiter =
     function (req, res, next) {
       const ip = req.headers['x-forwarded-for'] || req.ip;

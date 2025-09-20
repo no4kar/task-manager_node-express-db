@@ -9,9 +9,17 @@ import Todos from './Todo.js';
 import { DB_IDENTIFIERS } from '../entities.js';
 
 /**
- * @typedef {import('src/types/task.type.js').TyTask.Item} TyTask
- * @typedef {import('src/types/db.type.js').TyMongoose.Schema<TyTask>} TyTaskSchema
- * @typedef {import('src/types/db.type.js').TyMongoose.Document<unknown,{},TyTask>} TyTaskDocument
+ * @typedef {import('src/types/task.type.js')
+ * .TyTask.Item
+ * } TyTask
+ * 
+ * @typedef {import('src/types/db.type.js')
+ * .TyMongoose.Schema<TyTask>
+ * } TyTaskSchema
+ * 
+ * @typedef {import('src/types/db.type.js')
+ * .TyMongoose.Document<unknown,{},TyTask>
+ * } TyTaskDocument
  */
 
 /** @type {TyTaskSchema} */
@@ -42,15 +50,20 @@ const taskSchema = new Schema(
 
 
 // Middleware to delete the associated Todos when a Task is removed
-taskSchema.post('deleteOne', { document: true, query: false }, async function (doc, next) {
-  try {
-    // Remove the associated todos
-    await Todos.deleteMany({ taskId: doc._id });
-    next();
-  } catch (error) {
-    next(/** @type {Error} */(error));
-  }
-});
+taskSchema.post('deleteOne',
+  {
+    document: true,
+    query: false
+  },
+  async function (doc, next) {
+    try {
+      // Remove the associated todos
+      await Todos.deleteMany({ taskId: doc._id });
+      next();
+    } catch (error) {
+      next(/** @type {Error} */(error));
+    }
+  });
 
 const TaskModel
   = model(DB_IDENTIFIERS.TASK.model, taskSchema);

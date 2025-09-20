@@ -17,6 +17,7 @@ const options = (Object.freeze({
     password: env.postgresdb.password,
     logging: false,
   },
+  
   /** @type {TySequelizeOptions}*/
   sqlite: {
     dialect: 'sqlite',

@@ -18,7 +18,14 @@ export namespace TyFunc {
     req: Request,
     res: Response,
     next: NextFunction,
-  ) => void | Promise<void>;
+  ) => void;
+
+  // Type definition for a controller function
+  export type AsyncMiddleware = (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => Promise<void>;
 
   // Type definition for an error-handling middleware function
   export type ErrorMiddleware = (

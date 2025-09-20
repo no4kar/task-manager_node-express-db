@@ -1,8 +1,12 @@
-import { ApiError } from '../exceptions/apiError.js';
+'use strict';
+// @ts-check
+
+import util from 'node:util';
+import child_process from 'node:child_process';
 
 /**
  * @template {string} T1
- * @typedef {import('src/types/error.type').TyError.FailedReport<T1>} TyFailedReport
+ * @typedef {import('#src/types/error.type.js').TyError.FailedReport<T1>} TyFailedReport
 */
 
 /**
@@ -65,8 +69,6 @@ export function testByRegEx(pattern) {
   }
 }
 
-
-
 /**
  * Extract specified properties from an object.
  * 
@@ -93,8 +95,7 @@ export function extractProps(props, from) {
  * meaning it may not correctly handle cases where arguments contain special characters or quotes.
  *
  * @param {string} [flag='--mode'] - The flag to search for (e.g., `--mode`).
- * @returns {string} - The matched value(s) as a single string, or an empty string if the flag is not found.
- */
+ * @returns {string} - The matched value(s) as a single string, or an empty string if the flag is not found. */
 export function getFlagValues(flag = '--mode') {
   const pattern = new RegExp(`${flag}\\s+(.*?)(?=$|\\s+\\-{1,})`);
   return process.argv
@@ -128,6 +129,32 @@ export function findManyMatchProps(targetObj, sourceObjs) {
   return sourceObjs.map(compareObj => findMatchProps(targetObj, compareObj));
 }
 
-export function printJson(val) {
-  return console.info(JSON.stringify(val, null, 2));
+/**
+ * Executes a terminal command asynchronously and returns the standard output.
+ *
+ * @async
+ * @function execShell
+ * @param {string} cmd - The terminal command to execute.
+ * @returns {Promise<string>} The standard output from the executed command.
+ * @throws {Error} If the command produces any error output (stderr).
+ *
+ * @example
+ * const ip = await execShell('curl -s ipinfo.io/ip'); // Gets public IP address
+ * const list = await execShell('ls -la'); // Runs custom command
+ */
+export async function execShell(
+  cmd,
+) {
+  const exec = util.promisify(child_process.exec);
+  const { stdout, stderr } = await exec(cmd);
+  if (stderr) {
+    throw new Error(stderr);
+  }
+
+  return stdout;
 }
+
+/**
+ * No-op function to disable logging in production
+ * @returns {void} */
+export function nopFunc() { }

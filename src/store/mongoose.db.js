@@ -1,48 +1,65 @@
 'use strict';
 // @ts-check
 
-/**
- * @typedef {import('src/types/db.type').TyMongoose.Connection.Listeners} TyListeners
-*/
-
 import mongoose from 'mongoose';
+
+/**
+ * @typedef {import('src/types/db.type.js')
+ * .TyMongoose.Connection.Listeners
+ * } TyListeners
+*/
 
 /** 
 * @param {Object} param0 
-* @param {string} param0.usernanme 
+* @param {string} param0.username 
 * @param {string} param0.password 
-* @param {string} param0.collection 
-* @param {TyListeners} param0.on 
+* @param {string} param0.database 
+* @param {string} [param0.host]
+* @param {string} [param0.appName]
+* @param {TyListeners} [param0.on] 
 * @returns */
 export function connectDB({
-  usernanme,
+  username,
   password,
-  collection,
-  on,
+  database,
+  host = 'cluster-node.2f56p.mongodb.net',
+  appName = 'cluster-node',
+  on = {},
 }) {
   // Apply all event listeners dynamically
   for (const [event, listener] of Object.entries(on)) {
     mongoose.connection.on(event, listener);
   }
 
+  const uri
+    = `mongodb+srv://${encodeURIComponent(username)}`
+    + `:${encodeURIComponent(password)}`
+    + `@${encodeURIComponent(host)}`
+    + `/${encodeURIComponent(database)}?retryWrites=true&w=majority`
+    + `&appName=${encodeURIComponent(appName)}`;
+
+  mongoose.set('strictQuery', true);
+
   return mongoose.connect(
-    `mongodb+srv://${usernanme}:${password}@cluster-node.2f56p.mongodb.net/${collection}?retryWrites=true&w=majority&appName=cluster-node`,
-  );
+    uri, {
+    autoIndex: false,
+    serverSelectionTimeoutMS: 15000,
+  });
 }
 
 /** 
 * @param {Object} param0 
 * @param {string} param0.usernanme 
 * @param {string} param0.password 
-* @param {string} param0.collection 
+* @param {string} param0.database 
 * @returns */
 export function createConnectionDB({
   usernanme,
   password,
-  collection,
+  database,
 }) {
   return mongoose.createConnection(
-    `mongodb+srv://${usernanme}:${password}@cluster-node.2f56p.mongodb.net/${collection}?retryWrites=true&w=majority&appName=cluster-node`,
+    `mongodb+srv://${usernanme}:${password}@cluster-node.2f56p.mongodb.net/${database}?retryWrites=true&w=majority&appName=cluster-node`,
   );
 
   // const conn = mongoose.createConnection(
