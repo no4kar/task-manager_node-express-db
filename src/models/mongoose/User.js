@@ -10,9 +10,17 @@ import Tasks from './Task.js';
 import { DB_IDENTIFIERS } from '../entities.js';
 
 /**
- * @typedef {import('src/types/user.type.js').TyUser.Item} TyUser
- * @typedef {import('src/types/db.type.js').TyMongoose.Schema<TyUser>} TyUserSchema
- * @typedef {import('src/types/db.type.js').TyMongoose.Document<unknown,{},TyUser>} TyUserDocument
+ * @typedef {import('src/types/user.type.js')
+ * .TyUser.Item
+ * } TyUser
+ * 
+ * @typedef {import('src/types/db.type.js')
+ * .TyMongoose.Schema<TyUser>
+ * } TyUserSchema
+ * 
+ * @typedef {import('src/types/db.type.js')
+ * .TyMongoose.Document<unknown,{},TyUser>
+ * } TyUserDocument
  */
 
 /** @type {TyUserSchema} */

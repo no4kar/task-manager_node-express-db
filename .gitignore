@@ -19,5 +19,7 @@ cypress/videos
 package-lock.json
 
 *.txt
+*.ps1
+*.sh
 src/db/*.json
 __test__/

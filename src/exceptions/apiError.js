@@ -2,13 +2,17 @@
 // @ts-check
 
 /**
- * @typedef {import('src/types/func.type.js').TyFunc.ApiError.StaticMethod} ApiErrorStaticMethod
-*/
+ * @typedef {import('src/types/func.type.js')
+ * .TyFunc.ApiError.StaticMethod
+ * } ApiErrorStaticMethod
+ */
 
 /**
  * @template {string} T1
- * @typedef {import('src/types/error.type').TyError.FailedReport<T1>} TyFailedReport
-*/
+ * @typedef {import('src/types/error.type.js')
+ * .TyError.FailedReport<T1>
+ * } TyFailedReport
+ */
 
 export class ApiError extends Error {
   /**
@@ -94,8 +98,7 @@ export class ApiError extends Error {
      * @param {TyFailedReport<T1>} errors - An object where keys represent field names and values indicate validation errors (truthy if invalid).
      * @param {string} [message] - The error message. 'Type error' by default.
      * @param {(message?: string, errors?: Object) => ApiError} [ApiErrorMethod] - A function that returns an ApiError instance. 'ApiError.UnprocessableContent' by default.
-     * @returns {ApiError} If any validation fails, an error with expected and actual types is thrown.
-     */
+     * @returns {ApiError} If any validation fails, an error with expected and actual types is thrown. */
   static FailedReport(
     errors,
     message = 'Type error',

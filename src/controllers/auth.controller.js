@@ -4,19 +4,31 @@
 import validator from 'validator';
 
 import { ApiError } from '../exceptions/apiError.js';
-import { env } from '../configs/env.config.js';
-import { jwtService as jwtSrv } from '../services/jwt.service.js';
-import { tokenService as tknSrv } from '../services/token.service.js';
-import { userService as usrSrv } from '../services/user.service.js';
-import { bcryptService as bcrSrv } from '../services/bcrypt.service.js';
+import { env } from '#configs/env.config.js';
+import { jwtService as jwtSrv } from '#services/jwt.service.js';
+import { tokenService as tknSrv } from '#services/token.service.js';
+import { userService as usrSrv } from '#services/user.service.js';
+import { bcryptService as bcrSrv } from '#services/bcrypt.service.js';
 
 /**
- * @typedef {import('src/types/user.type.js').TyUser.Item} TyUser
+ * @typedef {import('src/types/func.type.js')
+ * .TyFunc.Middleware
+ * } TyFuncMiddleware
+ * 
+ * @typedef {import('src/types/func.type.js')
+ * .TyFunc.AsyncMiddleware
+ * } TyFuncAsyncMiddleware
+ * 
+ * @typedef {import('src/types/user.type.js')
+ * .TyUser.Item
+ * } TyUser
  */
 
 /**
  * @template {string} T1
- * @typedef {import('src/types/error.type.js').TyError.FailedReport<T1>} TyFailedReport
+ * @typedef {import('src/types/error.type.js')
+ * .TyError.FailedReport<T1>
+ * } TyFailedReport
  */
 
 export const authController = {
@@ -28,7 +40,7 @@ export const authController = {
   refresh,
 };
 
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+/** @type {TyFuncAsyncMiddleware} */
 async function register(req, res) {
   const {
     email,
@@ -72,7 +84,7 @@ async function register(req, res) {
   res.send({ message: 'OK' });
 }
 
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+/** @type {TyFuncAsyncMiddleware} */
 async function activate(req, res) {
   const { activationToken } = req.params;
 
@@ -109,7 +121,7 @@ async function activate(req, res) {
   );
 }
 
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+/** @type {TyFuncAsyncMiddleware} */
 async function activateByGoogle(req, res) {
   const user
     = /** @type {TyUser | null} */ (req.user || null); // This is the user returned by Passport
@@ -130,7 +142,7 @@ async function activateByGoogle(req, res) {
   res.redirect(`${env.todo.client.host}/task-manager_react-vite/activate/${tknSrv.getValue(foundToken, 'activation')}`);
 }
 
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+/** @type {TyFuncAsyncMiddleware} */
 async function login(req, res) {
   const {
     email,
@@ -171,7 +183,7 @@ async function login(req, res) {
   );
 }
 
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+/** @type {TyFuncAsyncMiddleware} */
 async function refresh(req, res) {
   const { refreshToken } = req.cookies;
   /** @type {TyUser | null} */
@@ -206,7 +218,7 @@ async function refresh(req, res) {
   );
 }
 
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+/** @type {TyFuncAsyncMiddleware} */
 async function logout(req, res) {
   const { refreshToken } = req.cookies;
 
@@ -240,7 +252,7 @@ async function logout(req, res) {
 
 /** 
  * @param {import('express').Response} res
- * @param {import('src/types/user.type').TyUser.Item} user */
+ * @param {TyUser} user */
 async function sendAuthentication(res, user) {
   const accessToken = jwtSrv.generateAccessToken(user);
   const refreshToken = jwtSrv.generateRefreshToken(user);

@@ -5,13 +5,25 @@ import * as Helpers from '../utils/helpers.js';
 import { todoService as tdSrv } from '../services/todo.service.js';
 import { ApiError } from '../exceptions/apiError.js';
 
-/** 
- * @typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodoItem
- * */
+/**
+ * @typedef {import('src/types/func.type.js')
+ * .TyFunc.Middleware
+ * } TyFuncMiddleware
+ * 
+ * @typedef {import('src/types/func.type.js')
+ * .TyFunc.AsyncMiddleware
+ * } TyFuncAsyncMiddleware
+ * 
+ * @typedef {import('src/types/todo.type.js')
+ * .TyTodo.Item
+ * } TyTodoItem
+ */
 
 /**
  * @template {string} T1
- * @typedef {import('src/types/error.type.js').TyError.FailedReport<T1>} TyFailedReport
+ * @typedef {import('src/types/error.type.js')
+ * .TyError.FailedReport<T1>
+ * } TyFailedReport
  */
 
 export const todoController = {
@@ -37,7 +49,7 @@ function undefOr(another, val) {
     || typeoVal === another;
 }
 
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+/** @type {TyFuncAsyncMiddleware} */
 async function get(req, res) {
   // console.info(`\napp.get('/todos')`);
   // query variables have 'undefined', 'string', 'string[]'
@@ -118,7 +130,7 @@ async function get(req, res) {
   });
 }
 
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+/** @type {TyFuncAsyncMiddleware} */
 async function getById(req, res) {
   // console.info(`\napp.get('/todos/:id=${req.params.id}')`);
   const { id } = req.params;
@@ -131,7 +143,7 @@ async function getById(req, res) {
   res.send(tdSrv.prepareToSend(todo));
 }
 
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+/** @type {TyFuncAsyncMiddleware} */
 async function post(req, res) {
   // express.json() can parse types correctly
   const {
@@ -182,7 +194,7 @@ async function post(req, res) {
     .send(tdSrv.prepareToSend(todo));
 }
 
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+/** @type {TyFuncAsyncMiddleware} */
 async function put(req, res) {
   const { id } = req.params;
   const {
@@ -192,47 +204,56 @@ async function put(req, res) {
     completed,
   } = req.body;
 
+  /** @type {TyFailedReport<'id' | 'userId' | 'taskId' | 'title' | 'completed'>} */
   const errors = {
-    id: !id || typeof id !== 'string',
-    userId: !userId || typeof userId !== 'string',
-    taskId: !taskId || typeof userId !== 'string',
-    title: !title || typeof title !== 'string',
-    completed: typeof completed !== 'boolean',
+    id: {
+      isInvalid: !id,
+      expected: 'string',
+      got: typeof id,
+    },
+    userId: {
+      isInvalid: !userId || typeof userId !== 'string',
+      expected: 'string',
+      got: typeof userId,
+    },
+    taskId: {
+      isInvalid: !taskId || typeof taskId !== 'string',
+      expected: 'string',
+      got: typeof taskId,
+    },
+    title: {
+      isInvalid: !title || typeof title !== 'string',
+      expected: 'string',
+      got: typeof title,
+    },
+    completed: {
+      isInvalid: typeof completed !== 'boolean',
+      expected: 'boolean',
+      got: typeof completed,
+    },
   };
 
+  if (errors.id.isInvalid
+    || errors.userId.isInvalid
+    || errors.taskId.isInvalid
+    || errors.title.isInvalid
+    || errors.completed.isInvalid) {
+    throw ApiError.FailedReport(errors,
+      'Validation error', ApiError.BadRequest);
+  }
+
   // if no id then no foundTodo
-  const foundTodo = await tdSrv.getById(id);
+  const foundTodo
+    = await tdSrv.getById(id);
 
   if (!foundTodo) {
-    if (errors.userId
-      || errors.taskId
-      || errors.title
-      || errors.completed) {
-      throw ApiError.UnprocessableContent(
-        `Type error`,
-        {
-          expected: {
-            userId: 'string',
-            taskId: 'string',
-            title: 'string',
-            completed: 'boolean',
-          },
-          got: {
-            userId: `${typeof userId}: ${userId}`,
-            taskId: `${typeof taskId}: ${taskId}`,
-            title: `${typeof title}: ${title}`,
-            completed: `${typeof completed}: ${completed}`,
-          }
-        },
-      );
-    }
-
-    const createdTodo = await tdSrv.create({
-      userId,
-      taskId,
-      title,
-      completed,
-    });
+    const createdTodo
+      = await tdSrv.create({
+        userId,
+        taskId,
+        title,
+        completed,
+      });
 
     res.status(201)
       .send(tdSrv.prepareToSend(createdTodo));
@@ -248,7 +269,7 @@ async function put(req, res) {
   res.send(tdSrv.prepareToSend(foundTodo));
 }
 
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+/** @type {TyFuncAsyncMiddleware} */
 async function patchById(req, res) {// overwrites some fields except id
   const { id } = req.params;
 
@@ -290,12 +311,12 @@ async function patchById(req, res) {// overwrites some fields except id
   );
 }
 
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+/** @type {TyFuncMiddleware} */
 function patchBulkUnknown(req) {// overwrites some fields except id
   throw ApiError.NotFound(`action=${req.query.action} unknown`);
 }
 
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+/** @type {TyFuncAsyncMiddleware} */
 async function updateMany(req, res) {
   /**@type {{items: TyTodoItem[]}} */
   const { items } = req.body;
@@ -311,10 +332,11 @@ async function updateMany(req, res) {
   return;
 }
 
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+/** @type {TyFuncAsyncMiddleware} */
 async function remove(req, res) {
   const { id } = req.params;
-  const foundTodo = await tdSrv.getById(id);
+  const foundTodo
+    = await tdSrv.getById(id);
 
   if (!foundTodo) {
     throw ApiError.NotFound(
@@ -329,7 +351,7 @@ async function remove(req, res) {
   res.status(200).send(`${count}`);
 }
 
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+/** @type {TyFuncAsyncMiddleware} */
 async function removeMany(req, res) {
   /**@type {{ids: string[]}} */
   const { ids } = req.body;

@@ -2,14 +2,28 @@
 // @ts-check
 
 /**
- * @typedef {import('src/types/func.type.js').TyFunc.Middleware} TyFuncMiddleware
- * @typedef {import('src/types/error.type.js').TyError.CodeReport} TyErrorCodeReport
- * @typedef {import('src/types/user.type.js').TyUser.Item} TyUser
+ * @typedef {import('src/types/func.type.js')
+ * .TyFunc.Middleware
+ * } TyFuncMiddleware
+ * 
+ * @typedef {import('src/types/func.type.js')
+ * .TyFunc.AsyncMiddleware
+ * } TyFuncAsyncMiddleware
+ * 
+ * @typedef {import('src/types/error.type.js')
+ * .TyError.CodeReport
+ * } TyErrorCodeReport
+ * 
+ * @typedef {import('src/types/user.type.js')
+ * .TyUser.Item
+ * } TyUser
 */
 
 /**
  * @template {string} T1
- * @typedef {import('src/types/error.type.js').TyError.FailedReport<T1>} TyFailedReport
+ * @typedef {import('src/types/error.type.js')
+ * .TyError.FailedReport<T1>
+ * } TyFailedReport
  */
 
 import { isNatural } from '../utils/helpers.js';
@@ -31,7 +45,7 @@ export const taskController = {
   remove,
 };
 
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+/** @type {TyFuncAsyncMiddleware} */
 async function get(req, res) {
   const {
     userId,
@@ -105,7 +119,7 @@ async function get(req, res) {
   });
 }
 
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+/** @type {TyFuncAsyncMiddleware} */
 async function getById(req, res) {
   const { id } = req.params;
   const foundTask
@@ -125,7 +139,7 @@ async function getById(req, res) {
   res.send(tskSrv.prepareToSend(foundTask));
 }
 
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+/** @type {TyFuncAsyncMiddleware} */
 async function post(req, res) {
   const {
     userId,
@@ -176,7 +190,7 @@ async function post(req, res) {
     .send(tskSrv.prepareToSend(createdTask));
 }
 
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+/** @type {TyFuncAsyncMiddleware} */
 async function put(req, res) {
   const { id } = req.params;
   const {
@@ -247,7 +261,7 @@ async function put(req, res) {
   res.send(tskSrv.prepareToSend(foundTask));
 }
 
-/** @type {import('src/types/func.type.js').TyFunc.Middleware} */
+/** @type {TyFuncAsyncMiddleware} */
 async function remove(req, res) {
   const { id } = req.params;
   const foundTask

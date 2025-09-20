@@ -1,8 +1,8 @@
 import 'dotenv/config';
-import { getFlagValues } from '../utils/helpers.js';
+import { getFlagValues, execShell } from '../utils/helpers.js';
 
 const serverPort = Number(process.env.SERVER_PORT || 3001);
-const serverHost = process.env.SERVER_HOST || `http://localhost:${serverPort}`;
+const serverHost = process.env.SERVER_HOST || `http://${(await execShell('curl -s ipinfo.io/ip')).trim()}:${serverPort}`;
 
 const clientPort = Number(process.env.CLIENT_PORT || 8080);
 const clientHost = process.env.CLIENT_HOST || `http://localhost:${clientPort}`;
@@ -33,6 +33,8 @@ const postgresdbPassword = process.env.POSTGRES_PASSWORD || '1111';
 
 const maxUnhandledRequestsPerIP = Number(process.env.MAX_UNHANDLED_REQUESTS_PER_IP) || 3;
 const maxTotalUnhandledRequests = Number(process.env.MAX_TOTAL_UNHANDLED_REQUESTS) || 11;
+
+const logLevels = process.env.LOG_LEVELS || 'DEBUG,INFO,WARN,ERROR,JSON,DIR';
 
 export const env = Object.freeze({
   todo: {
@@ -90,5 +92,8 @@ export const env = Object.freeze({
   },
   flag: {
     mode: getFlagValues('--mode'),
-  }
+  },
+  logLevels:
+    logLevels.toUpperCase()
+      .split(/\s*[\,\.\s]\s*/g), /* eslint-disable-line no-useless-escape */
 });

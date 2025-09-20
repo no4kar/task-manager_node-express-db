@@ -5,6 +5,11 @@ import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../../store/sequelize.db.js';
 import { DB_IDENTIFIERS } from '../entities.js';
 
+const {
+  model: modelName,
+  table: tableName,
+} = DB_IDENTIFIERS.USER;
+
 /**
  * @typedef {import('src/types/user.type.js').TyUser.Item} TyUser
  * @typedef {import('src/types/user.type.js').TyUser.CreationAttributes} TyUserCreationAttributes
@@ -58,8 +63,8 @@ UserModelStatic.init(
   },
   {
     sequelize,
-    modelName: DB_IDENTIFIERS.USER.model,
-    tableName: DB_IDENTIFIERS.USER.table,
+    modelName,
+    tableName,
     timestamps: true, // Sequelize will manage createdAt and updatedAt
     underscored: false, // Optional: depends on your naming convention
   }

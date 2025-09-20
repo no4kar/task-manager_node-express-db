@@ -5,9 +5,17 @@ import { Schema, model } from 'mongoose';
 import { DB_IDENTIFIERS } from '../entities.js';
 
 /**
- * @typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodo
- * @typedef {import('src/types/db.type').TyMongoose.Schema<TyTodo>} TyTodoSchema
- * @typedef {import('src/types/db.type.js').TyMongoose.Document<unknown,{},TyTodo>} TyTodoDocument
+ * @typedef {import('src/types/todo.type.js')
+ * .TyTodo.Item
+ * } TyTodo
+ * 
+ * @typedef {import('src/types/db.type.js')
+ * .TyMongoose.Schema<TyTodo>
+ * } TyTodoSchema
+ * 
+ * @typedef {import('src/types/db.type.js')
+ * .TyMongoose.Document<unknown,{},TyTodo>
+ * } TyTodoDocument
  */
 
 // Define the schema for the User model
@@ -17,7 +25,7 @@ const todoSchema = new Schema(
     id: {
       type: String,
       default: function () {
-        return (/** @type {TyTodoDocument} */ (this))._id.toString();
+        return (/**@type {TyTodoDocument}*/(this))._id.toString();
       },
     },
     userId: {

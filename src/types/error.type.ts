@@ -40,7 +40,7 @@ export namespace TyError {
   > = {
       [key in T1]: {
         isInvalid: boolean;
-        expected: 'natural number' | 'number' | 'string' | 'string[]' | string | RegExp;
+        expected: 'natural number' | 'number' | 'string' | 'string[]' | 'boolean' | RegExp;
         got: T2;
       };
     }

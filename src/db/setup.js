@@ -43,7 +43,6 @@ const TodoBelongsToTask
     foreignKey: 'taskId'
   });
 
-
 await sequelize.sync({ force: true })
   .then(() => {
     /* eslint-disable no-console */
