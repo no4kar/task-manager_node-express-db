@@ -69,6 +69,8 @@ const logLevels
   = process.env.LOG_LEVELS
   || 'DEBUG,INFO,WARN,ERROR,JSON,DIR';
 
+const logLevels = process.env.LOG_LEVELS || 'DEBUG,INFO,WARN,ERROR,JSON,DIR';
+
 export const env = Object.freeze({
   todo: {
     server: {
