@@ -15,8 +15,13 @@ export namespace TyMongoose {
   };
 
   export namespace Query {
+    /** Mongoose-friendly query filter */
     export type Filter<DocType>
       = Mongoose.FilterQuery<DocType>;
+
+    /** Raw MongoDB driver filter */
+    export type RawFilter<DocType>
+      = Mongoose.mongo.Filter<DocType>;
   }
 
   export namespace Connection {

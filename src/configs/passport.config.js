@@ -2,7 +2,9 @@
 // @ts-check
 
 /**
- * @typedef {import('src/types/user.type.js').TyUser.Item} TyUser
+ * @typedef {import('src/types/user.type.js')
+ * .TyUser.Item
+ * } TyUser
 */
 
 import passport from 'passport';
@@ -21,7 +23,7 @@ passport.use(
     {
       clientID: env.google.client.id,
       clientSecret: env.google.client.secret,
-      callbackURL: `${env.todo.server.host}/auth/google/callback`,
+      callbackURL: `${env.project.server.host}/auth/google/callback`,
     },
     // verify: (accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) => void
     async function (

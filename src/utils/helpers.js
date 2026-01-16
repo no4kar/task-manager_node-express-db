@@ -103,7 +103,6 @@ export function getFlagValues(flag = '--mode') {
     .match(pattern)?.[1] || '';
 }
 
-
 /**
  * @param {object} targetObj
  * @param {object} sourceObj */
@@ -129,24 +128,34 @@ export function findManyMatchProps(targetObj, sourceObjs) {
   return sourceObjs.map(compareObj => findMatchProps(targetObj, compareObj));
 }
 
+
 /**
  * Executes a terminal command asynchronously and returns the standard output.
  *
  * @async
  * @function execShell
  * @param {string} cmd - The terminal command to execute.
+ * @param {'C:\\Program Files\\Git\\bin\\bash.exe'
+ * | 'cmd.exe'
+ * | 'powershell.exe'} [shell] - The command shell.
  * @returns {Promise<string>} The standard output from the executed command.
  * @throws {Error} If the command produces any error output (stderr).
  *
  * @example
  * const ip = await execShell('curl -s ipinfo.io/ip'); // Gets public IP address
- * const list = await execShell('ls -la'); // Runs custom command
- */
+ * const list = await execShell('ls -la'); // Runs custom command */
 export async function execShell(
   cmd,
+  shell = 'C:\\Program Files\\Git\\bin\\bash.exe',
 ) {
-  const exec = util.promisify(child_process.exec);
-  const { stdout, stderr } = await exec(cmd);
+  const exec
+    = util.promisify(child_process.exec);
+
+  const {
+    stdout,
+    stderr
+  } = await exec(cmd, { shell });
+
   if (stderr) {
     throw new Error(stderr);
   }
@@ -158,3 +167,16 @@ export async function execShell(
  * No-op function to disable logging in production
  * @returns {void} */
 export function nopFunc() { }
+
+/**
+ * Throws an error with a given message.
+ *
+ * Useful in expressions to enforce required values by immediately throwing
+ * if a condition is not met.
+ *
+ * @param {string} [message] - The error message to throw.
+ * @throws {Error} Always throws an error with the provided message.
+ * @returns {never} This function never returns; it always throws. */
+export function throwFunc(message) {
+  throw new Error(message);
+}

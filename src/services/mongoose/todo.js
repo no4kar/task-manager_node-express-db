@@ -5,14 +5,30 @@ import mongoose from 'mongoose';
 import Todos from '../../models/mongoose/Todo.js';
 
 /**
- * @typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodo
- * @typedef {import('src/types/todo.type.js').TyTodo.GetParams} TyTodoGetParams
- * @typedef {import('src/types/todo.type.js').TyTodo.UpdateParams} TyTodoUpdateParams
- * @typedef {import('src/types/todo.type.js').TyTodo.Normalized} TyTodoNormalized
- * @typedef {import('src/types/todo.type.js').TyTodo.Extended} TyTodoExtended
- * @typedef {import('src/types/todo.type.js').TyTodo.CreationAttributes} TyTodoCreationAttributes
- * @typedef {import('src/types/db.type.js').TyMongoose.Query.Filter<TyTodo>} TyTodoFilterQuery
- * @typedef {import('src/types/db.type.js').TyMongoose.Document<unknown,{},TyTodo>} TyTodoDocument
+ * @typedef {import('src/types/todo.type.js')
+ * .TyTodo.Item
+ * } TyTodo
+ * @typedef {import('src/types/todo.type.js')
+ * .TyTodo.GetParams
+ * } TyTodoGetParams
+ * @typedef {import('src/types/todo.type.js')
+ * .TyTodo.UpdateParams
+ * } TyTodoUpdateParams
+ * @typedef {import('src/types/todo.type.js')
+ * .TyTodo.Normalized
+ * } TyTodoNormalized
+ * @typedef {import('src/types/todo.type.js')
+ * .TyTodo.Extended
+ * } TyTodoExtended
+ * @typedef {import('src/types/todo.type.js')
+ * .TyTodo.CreationAttributes
+ * } TyTodoCreationAttributes
+ * @typedef {import('src/types/db.type.js')
+ * .TyMongoose.Query.Filter<TyTodo>
+ * } TyTodoFilterQuery
+ * @typedef {import('src/types/db.type.js')
+ * .TyMongoose.Document<unknown,{},TyTodo>
+ * } TyTodoDocument
  */
 
 export default {

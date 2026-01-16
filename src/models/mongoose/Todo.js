@@ -3,6 +3,7 @@
 
 import { Schema, model } from 'mongoose';
 import { DB_IDENTIFIERS } from '../entities.js';
+import { imageSchema } from './sharedSchemes.js';
 
 /**
  * @typedef {import('src/types/todo.type.js')
@@ -41,6 +42,10 @@ const todoSchema = new Schema(
     title: {
       type: String,
       default: 'none',
+    },
+    images: {
+      type: [imageSchema],
+      default: [],
     },
     completed: {
       type: Boolean,

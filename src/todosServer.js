@@ -7,20 +7,41 @@ import path from 'node:path';
 import cookieParser from 'cookie-parser';
 import swaggerUI from 'swagger-ui-express';
 import passport from 'passport';
-import './configs/passport.config.js';
+import '#configs/passport.config.js';
 
-import { rootRouter } from './routers/root.router.js';
-import { todoRouter } from './routers/todo.router.js';
-import { taskRouter } from './routers/task.router.js';
-import { authRouter } from './routers/auth.router.js';
+import { rootRouter } from '#routers/root.router.js';
+import { todoRouter } from '#routers/todo.router.js';
+import { taskRouter } from '#routers/task.router.js';
+import { authRouter } from '#routers/auth.router.js';
 
-import { catchError, errorMiddleware } from './middlewares/error.middleware.js';
+import { env } from '#configs/env.config.js';
+import { corsConfig } from '#configs/cors.config.js';
 import { swaggerSpec } from './api-docs/swagger.js';
-import { authMiddleware } from './middlewares/auth.middleware.js';
-import { corsConfig } from './configs/cors.config.js';
-import { getLimiter } from './middlewares/limit.middleware.js';
+import { catchError, errorMiddleware } from '#middlewares/error.middleware.js';
+import { authMiddleware } from '#middlewares/auth.middleware.js';
+import { getLimiter } from '#middlewares/limit.middleware.js';
+
+const {
+  project: {
+    server,
+  }
+} = env;
 
 export const app = express();
+const apiV1Router = express.Router();
+
+// Routers
+apiV1Router.use('/',
+  rootRouter,
+).use('/todos',
+  catchError(authMiddleware),
+  todoRouter,
+).use('/tasks',
+  catchError(authMiddleware),
+  taskRouter,
+).use('/auth',
+  authRouter,
+);
 
 app.use(
   getLimiter({
@@ -47,18 +68,9 @@ app.use('/api-docs',
   swaggerUI.setup(swaggerSpec),
 );
 
-// Routers
-app.use('/',
-  rootRouter,
-).use('/todos',
-  catchError(authMiddleware),
-  todoRouter,
-).use('/tasks',
-  catchError(authMiddleware),
-  taskRouter,
-).use('/auth',
-  authRouter,
-);
+// API Routers
+app.use(server.apiV[1], apiV1Router);
+
 
 // Intercept of the errors
 app.use(errorMiddleware);

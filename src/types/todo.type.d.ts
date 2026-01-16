@@ -1,9 +1,14 @@
+import type {
+  TyGeneral
+} from '#types/general.type.d.ts'
+
 export namespace TyTodo {
   export type Item = {
     id: string;
     userId: string;
     taskId: string;
     title: string;
+    images?: Array<TyGeneral.Image>;
     completed: boolean;
     createdAt: Date;
     updatedAt: Date;

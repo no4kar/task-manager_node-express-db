@@ -1,46 +1,123 @@
 import 'dotenv/config';
-import { getFlagValues, execShell } from '../utils/helpers.js';
+import {
+  getFlagValues,
+  execShell,
+  throwFunc,
+} from '#utils/helpers.js';
 
-const serverPort = Number(process.env.SERVER_PORT || 3001);
-const serverHost = process.env.SERVER_HOST || `http://${(await execShell('curl -s ipinfo.io/ip')).trim()}:${serverPort}`;
+const {
+  SERVER_PORT,
+  SERVER_HOST,
 
-const clientPort = Number(process.env.CLIENT_PORT || 8080);
-const clientHost = process.env.CLIENT_HOST || `http://localhost:${clientPort}`;
+  CLIENT_PORT,
+  CLIENT_HOST,
 
-const JWTAccessSecret = process.env.JWT_ACCESS_SECRET || 'secretOrPrivateKey';
-const JWTRefreshSecret = process.env.JWT_REFRESH_SECRET || 'secretOrPrivateKey';
+  JWT_ACCESS_SECRET,
+  JWT_REFRESH_SECRET,
 
-const bcryptSaltOrRounds = Number(process.env.SALT_OR_ROUNDS) || 8;
+  SALT_OR_ROUNDS,
 
-const smtpPort = Number(process.env.SMTP_PORT || 587);
-const smtpHost = process.env.SMTP_HOST || 'smtp.example.com';
-const smtpUser = process.env.SMTP_USER || 'example@email.com';
-const smtpPassword = process.env.SMTP_PASSWORD || 'example-password';
+  CRYPTO_SALT,
+  CRYPTO_IV,
+  CRYPTO_SECRET,
+  CRYPTO_ALGORITHM,
 
-const googleClientId = process.env.GOOGLE_CLIENT_ID || '';
-const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET || '';
+  SMTP_PORT,
+  SMTP_HOST,
+  SMTP_USER,
+  SMTP_PASSWORD,
 
-const ormSolution = /**@type {'sequelize' | 'mongoose'}*/('mongoose'); // process.env.ORM_SOLUTION ||
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  GOOGLE_EMPLOYEEDATA_SHEET_CREDENTIALS,
 
-const mangodbUser = process.env.MANGO_USER || '';
-const mangodbPassword = process.env.MANGO_PASSWORD || '';
+  MANGO_USER,
+  MANGO_PASSWORD,
 
-const postgresdbHost = process.env.POSTGRES_HOST || 'localhost';
-const postgresdbPort = parseInt(process.env.POSTGRES_PORT || '5432', 10);
-const postgresdb = process.env.POSTGRES_DB || 'postgres';
-const postgresdbUsername = process.env.POSTGRES_USER || 'postgres';
-const postgresdbPassword = process.env.POSTGRES_PASSWORD || '1111';
+  POSTGRES_HOST,
+  POSTGRES_PORT,
+  POSTGRES_DB,
+  POSTGRES_USER,
+  POSTGRES_PASSWORD,
 
-const maxUnhandledRequestsPerIP = Number(process.env.MAX_UNHANDLED_REQUESTS_PER_IP) || 3;
-const maxTotalUnhandledRequests = Number(process.env.MAX_TOTAL_UNHANDLED_REQUESTS) || 11;
+  MAX_UNHANDLED_REQUESTS_PER_IP,
+  MAX_TOTAL_UNHANDLED_REQUESTS,
 
-const logLevels = process.env.LOG_LEVELS || 'DEBUG,INFO,WARN,ERROR,JSON,DIR';
+  ALLOWED_ORIGINS,
+  ALLOWED_IPS,
+
+  LOG_LEVELS,
+} = process.env;
+
+const serverPort
+  = Number(SERVER_PORT || 3001);
+const serverHost
+  = SERVER_HOST
+  || `http://${(await execShell('curl -s ipinfo.io/ip')).trim()}:${serverPort}`;
+
+const clientPort
+  = Number(CLIENT_PORT || 8080);
+const clientHost
+  = CLIENT_HOST
+  || `http://localhost:${clientPort}`;
+
+const JWTAccessSecret
+  = JWT_ACCESS_SECRET
+  || throwFunc('JWT_ACCESS_SECRET');
+const JWTRefreshSecret
+  = JWT_REFRESH_SECRET
+  || throwFunc('JWT_REFRESH_SECRET');
+
+const bcryptSaltOrRounds
+  = Number(SALT_OR_ROUNDS)
+  || throwFunc(SALT_OR_ROUNDS);
+
+const smtpPort = Number(SMTP_PORT || 587);
+const smtpHost = SMTP_HOST || 'smtp.example.com';
+const smtpUser = SMTP_USER || 'example@email.com';
+const smtpPassword = SMTP_PASSWORD || 'example-password';
+
+const googleClientId = GOOGLE_CLIENT_ID || '';
+const googleClientSecret = GOOGLE_CLIENT_SECRET || '';
+
+/**@type {'sequelize' | 'mongoose'}*/
+const ormSolution
+  = 'mongoose';
+
+const mangodbUser
+  = MANGO_USER || '';
+const mangodbPassword
+  = MANGO_PASSWORD || '';
+
+const postgresdbHost
+  = POSTGRES_HOST || 'localhost';
+const postgresdbPort
+  = parseInt(POSTGRES_PORT || '5432', 10);
+const postgresdb
+  = POSTGRES_DB || 'postgres';
+const postgresdbUsername
+  = POSTGRES_USER || 'postgres';
+const postgresdbPassword
+  = POSTGRES_PASSWORD || '1111';
+
+const maxUnhandledRequestsPerIP
+  = Number(MAX_UNHANDLED_REQUESTS_PER_IP) || 3;
+const maxTotalUnhandledRequests
+  = Number(MAX_TOTAL_UNHANDLED_REQUESTS) || 11;
+
+const logLevels
+  = LOG_LEVELS
+  || 'DEBUG,INFO,WARN,ERROR,JSON,DIR';
 
 export const env = Object.freeze({
-  todo: {
+  project: {
     server: {
       port: serverPort,
       host: serverHost,
+      apiV: [
+        '',
+        '/api/v1',
+      ]
     },
     client: {
       port: clientPort,

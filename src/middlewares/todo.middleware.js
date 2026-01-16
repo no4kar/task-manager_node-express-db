@@ -2,8 +2,14 @@
 // @ts-check
 
 /**
+ * @typedef {import("src/types/func.type.js")
+ * .TyFunc.Middleware
+ * } TyFuncMiddleware
+ */
+
+/**
  * @param { ('delete' | 'update') } action
- * @returns {import("src/types/func.type").TyFunc.Middleware} */
+ * @returns {TyFuncMiddleware} */
 export function isAction(action) {
   return (req, res, next) => {
     if (req.query.action === action) {

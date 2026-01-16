@@ -2,7 +2,9 @@
 // @ts-check
 
 /**
- * @typedef {import('#src/types/db.type.js').TyMongoose.Connection.Listeners} TyListeners
+ * @typedef {import('#src/types/db.type.js')
+ * .TyMongoose.Connection.Listeners
+ * } TyListeners
 */
 
 import * as todosServer from '#src/todosServer.js';
@@ -13,7 +15,7 @@ import { logger } from '#src/utils/logger.js';
 
 /**
  * @param {string} serverName
- * @param {typeof env.todo} configs */
+ * @param {typeof env.project} configs */
 function serverRunInfo(serverName, configs) {
   return (`
 ${serverName} is running
