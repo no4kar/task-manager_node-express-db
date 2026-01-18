@@ -136,6 +136,7 @@ export function findManyMatchProps(targetObj, sourceObjs) {
  * @function execShell
  * @param {string} cmd - The terminal command to execute.
  * @param {'C:\\Program Files\\Git\\bin\\bash.exe'
+ * | '/bin/bash'
  * | 'cmd.exe'
  * | 'powershell.exe'} [shell] - The command shell.
  * @returns {Promise<string>} The standard output from the executed command.

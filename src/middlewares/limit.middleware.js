@@ -1,3 +1,4 @@
+import { logger } from '#utils/logger.js';
 import { ApiError } from '../exceptions/apiError.js';
 
 /** 
@@ -35,7 +36,7 @@ export function getLimiter({
 
       unhandledRequests.set(ip, unhandledRequests.get(ip) + 1);
 
-      console.info('\n\nSTART'
+      logger.info('\n\nSTART'
         + `\n\treq.headers['x-forwarded-for'] || req.ip: ${ip}`
         + `\n\tunhandledRequests.get(${ip}): ${unhandledRequests.get(ip)}`
         + `\n\tunhandledRequests.size: ${unhandledRequests.size}`
@@ -51,7 +52,7 @@ export function getLimiter({
           unhandledRequests.delete(ip);
         }
 
-        console.info('\nFINISH'
+        logger.info('\nFINISH'
           + `\n\treq.headers['x-forwarded-for'] || req.ip: ${ip}`
           + `\n\tunhandledRequests.get(${ip}): ${unhandledRequests.get(ip)}`
           + `\n\tunhandledRequests.size: ${unhandledRequests.size}`

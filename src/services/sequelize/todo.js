@@ -2,8 +2,8 @@
 // @ts-check
 
 import { Op } from 'sequelize';
-import { sequelize } from '../../store/sequelize.db.js';
-import Todos from '../../models/sequelize/Todo.js';
+import { sequelize } from '#src/store/sequelize.db.js';
+import Todos from '#models/sequelize/Todo.js';
 
 /**
  * @typedef {import('src/types/todo.type.js').TyTodo.Item} TyTodo 

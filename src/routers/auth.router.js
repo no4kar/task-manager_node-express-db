@@ -31,3 +31,9 @@ authRouter
   .post('/login', catchError(authCntr.login))
   .post('/logout', catchError(authCntr.logout))
   ;
+
+// authRouter.use((req, _res, next) => {
+//   console.log('[AUTH ROUTER HIT]', req.method, req.originalUrl);
+//   next();
+// });
+

@@ -3,8 +3,8 @@
 
 import { v1 as uuidv1 } from 'uuid';
 
-import { ApiError } from '../../exceptions/apiError.js';
-import Users from '../../models/mongoose/User.js';
+import { ApiError } from '#src/exceptions/apiError.js';
+import Users from '#models/mongoose/User.js';
 import tknSrv from '../mongoose/token.js';
 import { emailService as emlSrv } from '../email.service.js';
 import { bcryptService as bcrSrv } from '../bcrypt.service.js';

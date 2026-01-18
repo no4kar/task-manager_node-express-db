@@ -139,7 +139,7 @@ async function activateByGoogle(req, res) {
     throw ApiError.Unauthorized('Google authentication failed');
   }
 
-  res.redirect(`${env.todo.client.host}/task-manager_react-vite/activate/${tknSrv.getValue(foundToken, 'activation')}`);
+  res.redirect(`${env.project.client.host}/task-manager_react-vite/activate/${tknSrv.getValue(foundToken, 'activation')}`);
 }
 
 /** @type {TyFuncAsyncMiddleware} */
@@ -148,6 +148,7 @@ async function login(req, res) {
     email,
     password,
   } = req.body;
+  
   const foundUser
     = await usrSrv.getOneByOptions({ email });
 

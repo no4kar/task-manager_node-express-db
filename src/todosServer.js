@@ -30,19 +30,22 @@ const {
 export const app = express();
 const apiV1Router = express.Router();
 
-// Routers
-apiV1Router.use('/',
-  rootRouter,
-).use('/todos',
-  catchError(authMiddleware),
-  todoRouter,
-).use('/tasks',
-  catchError(authMiddleware),
-  taskRouter,
-).use('/auth',
-  authRouter,
-);
+// console.log('authRouter:', authRouter);
+// console.log('todoRouter:', todoRouter);
+// console.log('taskRouter:', taskRouter);
 
+// Routers
+apiV1Router
+  .use('/todos', 
+    catchError(authMiddleware), 
+    todoRouter)
+  .use('/tasks', 
+    catchError(authMiddleware), 
+    taskRouter)
+  .use('/auth', authRouter)
+  .use('/', rootRouter); // LAST
+
+// --- Middlewares ---
 app.use(
   getLimiter({
     unhandledRequestsPerIP: 3,
@@ -54,13 +57,9 @@ app.use(
   passport.initialize() // Initialize passport
 );
 
-// Get all files from address
-app.use(express.static(path.resolve('./public')));
-
-// Get all files from address
-app.use('/images',
-  express.static(path.resolve('./images'))
-);
+// --- API routes FIRST ---
+app.use(server.apiV[1],
+  apiV1Router);
 
 // Use swagger-ui-express for your app documentation endpoint
 app.use('/api-docs',
@@ -68,14 +67,19 @@ app.use('/api-docs',
   swaggerUI.setup(swaggerSpec),
 );
 
-// API Routers
-app.use(server.apiV[1], apiV1Router);
 
+// --- Static files AFTER ---
+// Get all files from address
+app.use(express.static(path.resolve('./public')));
+// Get all files from address
+app.use('/images',
+  express.static(path.resolve('./images'))
+);
 
-// Intercept of the errors
+// --- Intercept of the errors ---
 app.use(errorMiddleware);
 
-// Unhandled errors
+// --- Unhandled errors ---
 app.all('*',
   (_unused_req, res) => res.status(404).sendFile(
     path.resolve('./public/views/404.html')

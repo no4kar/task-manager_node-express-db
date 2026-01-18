@@ -13,6 +13,7 @@
     "#middlewares/*": "./src/middlewares/*",
     "#configs/*": "./src/configs/*",
     "#routers/*": "./src/routers/*",
+    "#models/*": "./src/models/*",
     "#controllers/*": "./src/controllers/*",
     "#services/*": "./src/services/*",
     "#types/*": "./src/types/*",

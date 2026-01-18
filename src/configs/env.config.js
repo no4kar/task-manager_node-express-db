@@ -53,7 +53,11 @@ const serverPort
   = Number(SERVER_PORT || 3001);
 const serverHost
   = SERVER_HOST
-  || `http://${(await execShell('curl -s ipinfo.io/ip')).trim()}:${serverPort}`;
+  || `http://${(await execShell(
+    'curl -s ipinfo.io/ip',
+    process.platform === 'linux' ? '/bin/bash' : undefined
+  ))
+    .trim()}:${serverPort}`;
 
 const clientPort
   = Number(CLIENT_PORT || 8080);

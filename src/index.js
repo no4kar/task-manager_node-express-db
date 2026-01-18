@@ -64,12 +64,16 @@ try {
         on,
       });
 
-    connected.connection.db
+    connected.connection.db;
   }
 
-  todosServer.app.listen(env.todo.server.port, () => {
-    logger.info(serverRunInfo('todosServer', env.todo));
-  });
+  todosServer.app.listen(
+    env.project.server.port,
+    () => {
+      logger.info(serverRunInfo(
+        'todosServer',
+        env.project));
+    });
 
 } catch (error) {
   logger.dir(error);

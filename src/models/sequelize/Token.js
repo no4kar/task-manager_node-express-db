@@ -2,7 +2,7 @@
 // @ts-check
 
 import { DataTypes, Model } from 'sequelize';
-import { sequelize } from '../../store/sequelize.db.js';
+import { sequelize } from '#src/store/sequelize.db.js';
 import { DB_IDENTIFIERS } from '../entities.js';
 import UserModelStatic from './User.js';
 

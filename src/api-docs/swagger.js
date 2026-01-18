@@ -32,7 +32,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: env.todo.server.host,
+      url: env.project.server.host,
       description: 'Development server',
     },
   ],

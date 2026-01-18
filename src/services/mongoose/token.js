@@ -1,7 +1,7 @@
 'use strict';
 // @ts-check
 
-import Tokens from '../../models/mongoose/Token.js';
+import Tokens from '#models/mongoose/Token.js';
 
 /**
  * @typedef {import('src/types/token.type.js').TyToken.Item} TyToken

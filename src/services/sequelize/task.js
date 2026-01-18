@@ -2,7 +2,7 @@
 // @ts-check
 
 import { Op } from 'sequelize';
-import Tasks from '../../models/sequelize/Task.js';
+import Tasks from '#models/sequelize/Task.js';
 
 /**
  * @typedef {import('src/types/task.type.js').TyTask.Item} TyTask

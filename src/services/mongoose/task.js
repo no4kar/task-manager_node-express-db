@@ -1,7 +1,7 @@
 'use strict';
 // @ts-check
 
-import Tasks from '../../models/mongoose/Task.js';
+import Tasks from '#models/mongoose/Task.js';
 
 /**
  * @typedef {import('src/types/task.type.js').TyTask.Item} TyTask

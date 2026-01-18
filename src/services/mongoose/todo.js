@@ -2,7 +2,7 @@
 // @ts-check
 
 import mongoose from 'mongoose';
-import Todos from '../../models/mongoose/Todo.js';
+import Todos from '#models/mongoose/Todo.js';
 
 /**
  * @typedef {import('src/types/todo.type.js')
@@ -59,11 +59,13 @@ function normalize({
   userId,
   taskId,
   title,
+  images,
   completed,
   createdAt,
   updatedAt,
 }) {
-  return {
+  /**@type {TyTodoNormalized}*/
+  const normalized = {
     id,
     userId,
     taskId,
@@ -71,7 +73,13 @@ function normalize({
     completed,
     createdAt,
     updatedAt,
-  };
+  }
+
+  if (Array.isArray(images)) {
+    normalized.images = images;
+  }
+
+  return normalized;
 }
 
 /**

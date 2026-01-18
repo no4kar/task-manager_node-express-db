@@ -4,6 +4,7 @@ import UserModel from '../models/sequelize/User.js';
 import TokenModel from '../models/sequelize/Token.js';
 import TodoModel from '../models/sequelize/Todo.js';
 import TaskModel from '../models/sequelize/Task.js';
+import { logger } from '#utils/logger.js';
 
 // User has one Token (one-to-one relationship)
 const UserHasOneToken
@@ -46,21 +47,21 @@ const TodoBelongsToTask
 await sequelize.sync({ force: true })
   .then(() => {
     /* eslint-disable no-console */
-    console.info('\n\n\tUserHasOneToken\n');
-    console.dir(UserHasOneToken);
-    console.info('\n\n\tTokenBelongsToUser\n');
-    console.dir(TokenBelongsToUser);
+    logger.info('\n\n\tUserHasOneToken\n');
+    logger.dir(UserHasOneToken);
+    logger.info('\n\n\tTokenBelongsToUser\n');
+    logger.dir(TokenBelongsToUser);
 
-    console.info('\n\n\tUserHasManyTask\n');
-    console.dir(UserHasManyTask);
-    console.info('\n\n\tTaskBelongsToUser\n');
-    console.dir(TaskBelongsToUser);
+    logger.info('\n\n\tUserHasManyTask\n');
+    logger.dir(UserHasManyTask);
+    logger.info('\n\n\tTaskBelongsToUser\n');
+    logger.dir(TaskBelongsToUser);
 
-    console.info('\n\n\tTaskHasManyTodo\n');
-    console.dir(TaskHasManyTodo);
-    console.info('\n\n\tTodoBelongsToTask\n');
-    console.dir(TodoBelongsToTask);
+    logger.info('\n\n\tTaskHasManyTodo\n');
+    logger.dir(TaskHasManyTodo);
+    logger.info('\n\n\tTodoBelongsToTask\n');
+    logger.dir(TodoBelongsToTask);
 
-    console.info('\n\n\tDatabase & tables created!');
+    logger.info('\n\n\tDatabase & tables created!');
   })
-  .catch(err => console.error('Error creating database tables:', err));
+  .catch(err => logger.error('Error creating database tables:', err));

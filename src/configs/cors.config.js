@@ -3,7 +3,8 @@ import { env } from './env.config.js';
 /** @type {import('cors').CorsOptionsDelegate<import('cors').CorsRequest>} */
 export const corsConfig = (req, cb) => {
   const corsOptions = {
-    origin: env.todo.client.host || req.headers.origin/* req.header('Origin') */, // Dynamically set the origin
+    origin: req.headers.origin/* req.header('Origin') */, // Dynamically set the origin
+    // origin: env.project.client.host || req.headers.origin/* req.header('Origin') */, // Dynamically set the origin
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // PUT, DELETE (these trigger preflight)
     allowedHeaders: ['Content-Type', 'Authorization'], // 'Authorization' (this triggers preflight)
     credentials: true,
